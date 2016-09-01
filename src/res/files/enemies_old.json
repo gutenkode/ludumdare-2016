@@ -1,0 +1,70 @@
+{
+  "SLIME": {
+    "name": "Slime",
+    "ingame": {
+      "sprite": "entity_slime",
+      "spriteFrames": 1
+    },
+    "battle": {
+      "sprite": "entity_battle_slime",
+      "spriteFrames": [
+        16,
+        12,
+        16,
+        12
+      ],
+      "encounter": "A Slime draws near!",
+      "death": "The Slime melts into a puddle.",
+      "background": "red",
+      "stats": {
+        "health": 90,
+        "attack": 12,
+        "defense": 8,
+        "magic": 10,
+        "evasion": 0.15,
+        "critrate": 0.05
+      },
+      "elementMult": [
+        1,
+        0.5,
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  "NOISE": {
+    "name": "Noise",
+    "ingame": {
+      "sprite": "entity_noise",
+      "spriteFrames": 1
+    },
+    "battle": {
+      "sprite": "entity_battle_noise",
+      "spriteFrames": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "encounter": "The Noise approaches.",
+      "death": "The Noise fades away.",
+      "background": "red",
+      "stats": {
+        "health": 64,
+        "attack": 10,
+        "defense": 7,
+        "magic": 10,
+        "evasion": 0,
+        "critrate": 0
+      },
+      "elementMult": [
+        0.01,
+        0.5,
+        0.5,
+        0.5,
+        1
+      ]
+    }
+  }
+}

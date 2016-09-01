@@ -1,0 +1,67 @@
+tileset/foundation		tileset_1
+tileset/foundation_NRM		tileset_1_NRM
+tileset/shade			tileset_shade
+
+ui/scalablemenu			ui_scalablemenu
+ui/arrow_cursor			ui_cursor
+ui/statbars			ui_statbars
+
+ui/battlebg/red			ui_bg_red
+ui/battlebg/grayscale		ui_bg_grayscale
+ui/battlebg/circle		ui_bg_circle
+ui/battlefloor/tile1		ui_floor_tile1
+
+font/misterpixel/misterpixel	font_1
+font/6px/6px			font_6px
+font/terminal/terminal		font_terminal
+
+entity/solidsnake		entity_player
+
+entity/enemy/slime		entity_slime
+entity/battle/bginr		entity_bginr
+entity/battle/viledrink	entity_viledrink
+entity/battle/solidsnake_icon	entity_mirror
+entity/battle/barrel		entity_barrel
+entity/battle/door_icon	entity_door
+
+entity/battle/slime		entity_battle_slime
+entity/battle/bginr		entity_battle_bginr
+entity/battle/viledrink	entity_battle_viledrink
+entity/battle/solidsnake_icon	entity_battle_mirror
+entity/battle/barrel		entity_battle_barrel
+entity/battle/door_icon	entity_battle_door
+
+entity/env/keyDoor		entity_keyDoor
+entity/env/elevator		entity_elevator
+entity/env/toggleButton	entity_toggleButton
+entity/env/togglePlatform	entity_togglePlatform
+entity/env/laserGrid		entity_laserGrid
+entity/env/water		entity_water
+entity/env/terminal		entity_terminal
+
+object/crate			obj_crate
+object/barrel			obj_barrel
+object/fluorescent		obj_fluorescent
+object/ceiling			obj_ceiling
+
+color/test			color_test
+
+post/noise			post_noise
+post/vignette			post_vignette
+
+item/drink			item_drink
+item/grenade			item_grenade
+item/hypo			item_hypo
+item/potion			item_potion
+item/keycard1			item_keycard1
+item/keycard2			item_keycard2
+item/keycard3			item_keycard3
+item/keycard4			item_keycard4
+
+skill/fire			skill_fire
+
+talk/boss			talk_boss
+talk/none			talk_none
+
+status/poison			status_poison
+status/fatigue			status_fatigue

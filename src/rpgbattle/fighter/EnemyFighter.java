@@ -1,0 +1,107 @@
+package rpgbattle.fighter;
+
+import mote4.util.matrix.ModelMatrix;
+import rpgbattle.BattleManager;
+import rpgbattle.EnemyData;
+import rpgbattle.enemyBehavior.EnemyBehavior;
+import rpgbattle.fighter.Fighter.Toast.ToastType;
+import rpgsystem.Element;
+
+/**
+ * Encapsulates the logic of an enemy in a battle.
+ * @author Peter
+ */
+public class EnemyFighter extends Fighter {
+    
+    private int currentFrame, currentFrameDelay;
+    private int[] frameDelay;
+    private float[] spriteInfo;
+    public final String enemyName,
+                        displayName,
+                        spriteName,
+                        encounterString,
+                        deathString;
+    private EnemyBehavior behavior;
+    
+    public EnemyFighter(String enemyName) {
+        this.enemyName = enemyName;
+        displayName = EnemyData.getDisplayName(enemyName);
+        spriteName = EnemyData.getBattleSprite(enemyName);
+        encounterString =  EnemyData.getEncounterString(enemyName);
+        deathString = EnemyData.getDeathString(enemyName);
+        frameDelay = EnemyData.getFrameDelay(enemyName);
+        EnemyData.populateStats(enemyName, stats);
+        
+        currentFrame = (int)(Math.random()*frameDelay.length);
+        currentFrameDelay = (int)(Math.random()*frameDelay[currentFrame]);
+        spriteInfo = new float[] {frameDelay.length, 1, 0};
+        
+        behavior = EnemyData.getBehavior(this);
+    }
+    
+    @Override
+    public void initAct() {
+        actionStartFlash();
+        behavior.initAct();
+    }
+    
+    @Override
+    public boolean act() {
+        return behavior.act();
+    }
+    
+    @Override
+    public void damage(Element e, int stat, int atkPower, int accuracy, boolean crit) {
+        if (calculateHit(accuracy)) {
+            int dmg = calculateDamage(e,stat*atkPower,crit);
+            
+            // actually do health subtraction
+            lastHealth = stats.health;
+            stats.health -= (int)dmg;
+            stats.health = Math.max(0, stats.health);
+            addToast("-"+dmg);
+            shakeVel = dmg;
+            
+            if (stats.health <= 0)
+                BattleManager.enemyDied(this);
+        } else {
+            addToast("MISS");
+        }
+    }
+    @Override
+    public boolean restoreHealth(int amount) {
+        if (stats.health == stats.maxHealth)
+            return false;
+        
+        int delta = stats.health;
+        stats.health += amount;
+        stats.health = Math.min(stats.health, stats.maxHealth);
+        addToast(ToastType.HEAL, stats.health-delta);
+        lastHealth = stats.health;
+        return true; 
+    }
+    @Override
+    public boolean restoreStamina(int amount) {return false; }
+    @Override
+    public boolean restoreMana(int amount) { return false; }
+    
+    /**
+     * Updates animation data for this enemy and returns the array needed
+     * for rendering the correct tilesheet frame.
+     * @return 
+     */
+    public float[] updateSpriteInfo() { 
+        currentFrameDelay--;
+        if (currentFrameDelay <= 0) {
+            currentFrame++;
+            currentFrame %= frameDelay.length;
+            currentFrameDelay = frameDelay[currentFrame];
+            spriteInfo[2] = currentFrame;
+        }
+        return spriteInfo; 
+    }
+    
+    public void runDeathAnimation(ModelMatrix model) {
+        behavior.runDeathAnimation(model);
+    }
+}

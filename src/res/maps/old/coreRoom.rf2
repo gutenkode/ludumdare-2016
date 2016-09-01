@@ -1,0 +1,45 @@
+<meta>
+width=7
+height=7
+</meta>
+<tiledata>
+1,1,0 1,1,0 1,1,0 2,1,0 1,1,0 1,1,0 1,1,0
+1,1,0 1,1,0 1,1,0 1,0,0 1,1,0 1,1,0 1,1,0
+2,1,0 1,1,0 1,1,0 1,1,0 1,1,0 1,1,0 1,1,0
+1,1,0 1,1,0 1,1,0 1,1,0 1,1,0 1,1,0 1,1,0
+1,1,0 1,1,0 1,1,0 1,1,0 1,1,0 1,1,0 1,1,0
+1,1,0 1,1,0 1,1,0 1,1,0 1,1,0 1,1,0 1,1,0
+1,1,0 1,2,0 1,2,0 2,1,0 1,2,0 1,2,0 1,1,0
+</tiledata>
+<walkdata>
+2 2 2 0 2 2 2
+2 0 0 0 0 0 2
+0 0 0 0 0 0 2
+2 -4 0 0 0 -4 2
+2 -4 -4 -4 -4 -4 2
+2 -4 -4 -4 -4 0 2
+2 -6 -6 -4 -6 -6 2
+</walkdata>
+<linkdata>
+...a...
+.......
+c......
+.......
+.......
+.......
+...b...
+</linkdata>
+<linkdesc>
+hallway,1
+elbowHallway,3
+startRoom,2
+</linkdesc>
+<entitydata>
+KeyDoor,3,0,0,0
+Terminal,5,1
+ScriptTrigger,4,1,1,2,consoleTutorial
+ScriptTrigger,2,1,1,2,intro2
+Elevator,3,4,4
+TogglePlatform,5,3,0,0,0,false
+TogglePlatform,5,4,0,0,0,false
+</entitydata>

@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="ludumdare:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/ludumdare_jar</output-path>
+    <root id="archive" name="ludumdare.jar">
+      <element id="module-output" name="ludumdare" />
+      <element id="extracted-dir" path="$USER_HOME$/Documents/Json/json-20160212.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Documents/lwjgl-3/jar/lwjgl.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../mote4/out/artifacts/mote4_jar/mote4.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
