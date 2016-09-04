@@ -65,8 +65,8 @@ public class MapLevelManager {
     public static void incrementCurrentLevel() { setCurrentLevel(currentLevelNum+1); }
     /**
      * Sets the current level.  Must be called before the game begins running.
-     * It will initialize MapManager and MapLoader, creating timelines, loading
-     * the default map file, and constructing the player/other entities.
+     * It will initialize MapManager and MapLoader which create timelines, load
+     * the default map file, and construct the player/other entities.
      * @param i 
      */
     public static void setCurrentLevel(int i) {
