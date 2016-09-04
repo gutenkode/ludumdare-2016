@@ -1,5 +1,13 @@
 package map;
 
+import mote4.scenegraph.Window;
+import mote4.util.FileIO;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
+
 /**
  * Master control for managing maps and levels.  Map groups are split into levels,
  * which are defined in a index.txt and split by directories.  This class will
@@ -8,19 +16,50 @@ package map;
  * @author Peter
  */
 public class MapLevelManager {
-    /*
-    public static final int MAX_LEVELS = 2;
-    private static final String[] DIRS = new String[] {"_mylevel1","old"};
-    private static final String[] FIRSTROOM = new String[] {"1a_start","newStart"};
-    private static final int[][] PLAYERPOS = new int[][] {{2,5},{2,5}};
-    */
-    
-    public static final int MAX_LEVELS = 4;
-    private static final String[] DIRS = new String[] {"Level1","Level2","Level3","Level4"};
-    private static final String[] FIRSTROOM = new String[] {"Room1","Room1","Room1","Room1"};
-    private static final int[][] PLAYERPOS = new int[][] {{4,4},{4,4},{4,4},{4,4}};
+    private static int numLevels;
+    private static String[] levelDirs;
+    private static String[] firstMapName;
+    private static int[][] playerInitPos;
     
     private static int currentLevelNum = -1;
+
+    /**
+     * Load an index file describing levels to load.
+     * This does not load a level, only the metadata.
+     * @param fileName
+     */
+    public static void loadIndexFile(String fileName) {
+        BufferedReader bf = FileIO.getBufferedReader("/res/maps/"+fileName);
+        ArrayList<String> file = new ArrayList<>();
+        try {
+            String inString;
+            while ((inString = bf.readLine()) != null)
+                file.add(inString);
+            bf.close();
+        } catch (IOException e) {
+            System.err.println("Error loading index file '"+fileName+"':");
+            e.printStackTrace();
+            Window.destroy();
+        }
+
+        numLevels = file.size();
+        for (String s : file)
+            if (s.startsWith("#"))
+                numLevels--; // ignore comments
+        levelDirs = new String[numLevels];
+        firstMapName = new String[numLevels];
+        playerInitPos = new int[numLevels][2];
+        for (String s : file) {
+            if (!s.startsWith("#")) {
+                StringTokenizer tok = new StringTokenizer(s, ",");
+                int i = Integer.parseInt(tok.nextToken())-1;
+                levelDirs[i] = tok.nextToken();
+                firstMapName[i] = tok.nextToken();
+                playerInitPos[i] = new int[] {Integer.parseInt(tok.nextToken()),Integer.parseInt(tok.nextToken())};
+                i++;
+            }
+        }
+    }
     
     public static int getCurrentLevel() { return currentLevelNum; }
     public static void incrementCurrentLevel() { setCurrentLevel(currentLevelNum+1); }
@@ -31,14 +70,14 @@ public class MapLevelManager {
      * @param i 
      */
     public static void setCurrentLevel(int i) {
-        if (i > 0 && i <= MAX_LEVELS) {
+        if (i > 0 && i <= numLevels) {
             currentLevelNum = i; 
-            MapLoader.setLevelPath(DIRS[currentLevelNum-1]);
-            MapManager.createNewTimelines(FIRSTROOM[currentLevelNum-1]);
+            MapLoader.setLevelPath(levelDirs[currentLevelNum-1]);
+            MapManager.createNewTimelines(firstMapName[currentLevelNum-1]);
         }
     }
     
     public static int[] playerStartPos() {
-        return PLAYERPOS[currentLevelNum-1];
+        return playerInitPos[currentLevelNum-1];
     }
 }

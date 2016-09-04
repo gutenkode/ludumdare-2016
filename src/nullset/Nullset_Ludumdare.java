@@ -22,7 +22,9 @@ public class Nullset_Ludumdare {
     
     public static void main(String[] args) {
         System.setProperty("java.awt.headless", "true"); // prevents ImageIO from hanging
-        Window.init(1920/2, 1080/2);
+        //Window.initFullscreen();
+        //Window.initWindowed(1920/2, 1080/2);
+        Window.initWindowedPercent(.75, 16/9.0);
         
         Input.createCharCallback();
         Input.createKeyCallback();
@@ -37,6 +39,7 @@ public class Nullset_Ludumdare {
         //glfwSetWindowAspectRatio(Window.getWindowID(), 16, 9);
         
         // important line, this sets up the level loading process
+        MapLevelManager.loadIndexFile("index.txt");
         MapLevelManager.setCurrentLevel(1);
         
         //FBO ingame = new FBO(853,480,true,false,null); // 640x480, PS1 resolution

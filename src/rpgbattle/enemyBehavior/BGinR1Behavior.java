@@ -21,7 +21,7 @@ public class BGinR1Behavior extends EnemyBehavior {
     
     @Override
     public void initAct() {
-        actDelay = 120;
+        actDelay = 50;
         BattleUIManager.logMessage("B. Gin R. flails wildly!\n...But nothing happens!");
     }
 

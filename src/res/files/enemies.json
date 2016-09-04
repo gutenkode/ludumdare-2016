@@ -2,7 +2,7 @@
     "BARREL1":{
         "battle":{
             "background":"red",
-            "death":"What no boom?",
+            "death":"What, no boom?",
             "elementMult":[
                 1,
                 1,
@@ -10,7 +10,7 @@
                 1,
                 1
             ],
-            "encounter":"Oh come on, I haven't seen that before ",
+            "encounter":"I haven't seen that before...",
             "sprite":"entity_battle_barrel",
             "spriteFrames":[
                 16
@@ -43,7 +43,7 @@
                 1,
                 1
             ],
-            "encounter":"Oh come on, I haven't seen that before ",
+            "encounter":"I haven't seen that before...",
             "sprite":"entity_battle_barrel",
             "spriteFrames":[
                 16
@@ -68,7 +68,7 @@
     "BARREL3":{
         "battle":{
             "background":"red",
-            "death":"What no boom?",
+            "death":"What, no boom?",
             "elementMult":[
                 1,
                 1,
@@ -76,7 +76,7 @@
                 1,
                 1
             ],
-            "encounter":"Oh come on, I haven't seen that before ",
+            "encounter":"I haven't seen that before...",
             "sprite":"entity_battle_barrel",
             "spriteFrames":[
                 16
@@ -101,7 +101,7 @@
     "BGINR1":{
         "battle":{
             "background":"red",
-            "death":"You Monster",
+            "death":"You monster...",
             "elementMult":[
                 1,
                 1,
@@ -109,7 +109,7 @@
                 1,
                 1
             ],
-            "encounter":"A B. Gin R draws near (What a noob)",
+            "encounter":"A B. Gin R draws near. (What a noob!)",
             "sprite":"entity_battle_bginr",
             "spriteFrames":[
                 16
@@ -134,7 +134,7 @@
     "BGINR2":{
         "battle":{
             "background":"red",
-            "death":"You Monster",
+            "death":"You monster...",
             "elementMult":[
                 1,
                 1,
@@ -142,7 +142,7 @@
                 1,
                 1
             ],
-            "encounter":"A B. Gin R draws near (What a noob)",
+            "encounter":"A B. Gin R draws near. (What a noob!)",
             "sprite":"entity_battle_bginr",
             "spriteFrames":[
                 16
@@ -167,7 +167,7 @@
     "MIRROR1":{
         "battle":{
             "background":"red",
-            "death":"I guess I'm a vampire now?",
+            "death":"Like tears in the rain.",
             "elementMult":[
                 1,
                 1,
@@ -175,7 +175,7 @@
                 1,
                 1
             ],
-            "encounter":"Is that me?",
+            "encounter":"Is that... me?",
             "sprite":"entity_battle_mirror",
             "spriteFrames":[
                 16
@@ -200,7 +200,7 @@
     "MIRROR2":{
         "battle":{
             "background":"red",
-            "death":"I guess I'm a vampire now?",
+            "death":"There can be only one.",
             "elementMult":[
                 1,
                 1,
@@ -208,7 +208,7 @@
                 1,
                 1
             ],
-            "encounter":"Is that me?",
+            "encounter":"Is that... me?",
             "sprite":"entity_battle_mirror",
             "spriteFrames":[
                 16
@@ -233,7 +233,7 @@
     "SLIME1":{
         "battle":{
             "background":"red",
-            "death":"The slime melts away",
+            "death":"The slime melts away.",
             "elementMult":[
                 1,
                 1,
@@ -241,10 +241,13 @@
                 1,
                 1
             ],
-            "encounter":"A slime draws near",
+            "encounter":"A slime draws near!",
             "sprite":"entity_battle_slime",
             "spriteFrames":[
-                16
+              16,
+              12,
+              16,
+              12
             ],
             "stats":{
                 "attack":12,
@@ -266,7 +269,7 @@
     "SLIME2":{
         "battle":{
             "background":"red",
-            "death":"The slime melts away",
+            "death":"The slime melts away.",
             "elementMult":[
                 1,
                 1,
@@ -274,10 +277,13 @@
                 1,
                 1
             ],
-            "encounter":"A slime draws near",
+            "encounter":"A slime draws near!",
             "sprite":"entity_battle_slime",
             "spriteFrames":[
-                16
+              16,
+              12,
+              16,
+              12
             ],
             "stats":{
                 "attack":12,
@@ -299,7 +305,7 @@
     "SLIME3":{
         "battle":{
             "background":"red",
-            "death":"The slime melts away",
+            "death":"The slime melts away.",
             "elementMult":[
                 1,
                 1,
@@ -307,10 +313,13 @@
                 1,
                 1
             ],
-            "encounter":"A slime draws near",
+            "encounter":"A slime draws near!",
             "sprite":"entity_battle_slime",
             "spriteFrames":[
-                16
+              16,
+              12,
+              16,
+              12
             ],
             "stats":{
                 "attack":12,
@@ -332,7 +341,7 @@
     "SLIME4":{
         "battle":{
             "background":"red",
-            "death":"The slime melts away",
+            "death":"The slime melts away.",
             "elementMult":[
                 1,
                 1,
@@ -340,10 +349,13 @@
                 1,
                 1
             ],
-            "encounter":"A slime draws near",
+            "encounter":"A slime draws near!",
             "sprite":"entity_battle_slime",
             "spriteFrames":[
-                16
+              16,
+              12,
+              16,
+              12
             ],
             "stats":{
                 "attack":12,
@@ -365,7 +377,7 @@
     "VILEDOOR1":{
         "battle":{
             "background":"red",
-            "death":"I guess that was a shut out...",
+            "death":"I guess that was a shut-out.",
             "elementMult":[
                 1,
                 1,
@@ -373,7 +385,7 @@
                 1,
                 1
             ],
-            "encounter":"Now this is just lazy...",
+            "encounter":"A... door approaches?",
             "sprite":"entity_battle_door",
             "spriteFrames":[
                 16
@@ -398,7 +410,7 @@
     "VILEDOOR2":{
         "battle":{
             "background":"red",
-            "death":"I guess that was a shut out...",
+            "death":"I guess that was a shut-out.",
             "elementMult":[
                 1,
                 1,
@@ -406,7 +418,7 @@
                 1,
                 1
             ],
-            "encounter":"Now this is just lazy...",
+            "encounter":"A... door approaches?",
             "sprite":"entity_battle_door",
             "spriteFrames":[
                 16
@@ -431,7 +443,7 @@
     "VILEDRINK1":{
         "battle":{
             "background":"red",
-            "death":"Delicious",
+            "death":"Delicious!",
             "elementMult":[
                 1,
                 1,
@@ -464,7 +476,7 @@
     "VILEDRINK2":{
         "battle":{
             "background":"red",
-            "death":"Delicious",
+            "death":"Delicious!",
             "elementMult":[
                 1,
                 1,
