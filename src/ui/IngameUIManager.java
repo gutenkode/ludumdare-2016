@@ -83,21 +83,22 @@ public class IngameUIManager implements MenuHandler {
             dialogueSlide += (1-dialogueSlide)/SLIDE_SCALE;
     }
     public static void render(Transform trans) {
-        trans.model.setIdentity();
-        trans.makeCurrent();
-        ShaderMap.use("texture");
+        //trans.model.setIdentity();
+        //trans.makeCurrent();
         ModelMatrix model = trans.model;
         
         if (gamePaused || !BattleManager.getPlayer().areStatsFull()) {
             // PlayerStatBar, sets own shaders
             PlayerStatBar.render(60, RootScene.height()-42-Const.UI_SCALE/2, trans);
-            ShaderMap.use("texture");
-            trans.view.setIdentity();
-            trans.model.setIdentity();
         }
+        ShaderMap.use("texture");
+        trans.view.setIdentity();
+        trans.model.setIdentity();
+        trans.makeCurrent();
         
         if (logMessageTimeout > 0) {
             logMessageTimeout--;
+            // does not set model to identity as this is the first potentially rendered item
             model.translate(80, RootScene.height()-80);
             model.makeCurrent();
             TextureMap.bindUnfiltered("font_1");

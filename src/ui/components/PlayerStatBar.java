@@ -71,7 +71,15 @@ public class PlayerStatBar {
     public static void stopManaPreview() {
         manaPreview = false;
     }
-    
+
+    /**
+     * Renders the player's stat box, detailing how much of each stat the player has,
+     * as well as any status conditions the player currently has.
+     * This class will set its own shaders and transformation matrices.
+     * @param x
+     * @param y
+     * @param trans
+     */
     public static void render(int x, int y, Transform trans) {
         ModelMatrix model = trans.model;
         

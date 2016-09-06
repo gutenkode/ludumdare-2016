@@ -39,7 +39,7 @@ public class Nullset_Ludumdare {
         //glfwSetWindowAspectRatio(Window.getWindowID(), 16, 9);
         
         // important line, this sets up the level loading process
-        MapLevelManager.loadIndexFile("index_ludum.txt");
+        MapLevelManager.loadIndexFile("index.txt");
         MapLevelManager.setCurrentLevel(1);
         
         //FBO ingame = new FBO(853,480,true,false,null); // 640x480, PS1 resolution
