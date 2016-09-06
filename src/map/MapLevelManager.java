@@ -16,11 +16,12 @@ import java.util.StringTokenizer;
  * @author Peter
  */
 public class MapLevelManager {
+
     private static int numLevels;
     private static String[] levelDirs;
     private static String[] firstMapName;
     private static int[][] playerInitPos;
-    
+
     private static int currentLevelNum = -1;
 
     /**
