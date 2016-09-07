@@ -3,6 +3,8 @@ package map;
 import entities.Entity;
 import entities.Player;
 import java.util.ArrayList;
+
+import entities.Water;
 import mote4.util.matrix.GenericMatrix;
 import mote4.util.matrix.Transform;
 import mote4.util.matrix.TransformationMatrix;
@@ -221,6 +223,8 @@ public class MapManager {
         
         // render entity tilesheets
         for (Entity e : currentTimeline.getEntities()) {
+            if (e instanceof Water)
+                continue; // water does not cast shadows
             shadowModel.setIdentity();
             shadowModel.makeCurrent();
             e.render(shadowModel);

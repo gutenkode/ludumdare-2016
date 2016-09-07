@@ -57,6 +57,7 @@ void main()
     float bias = 0.005*tan(acos(max(dot(bumpNormal,L),0)));
     bias = clamp(bias, 0, 0.01);
     float shadow = textureProj(shadowMap, shadowCoord+vec4(0,0,-bias,0));
+		shadow = shadow*.9+.1;
 
     // apply lighting to fragment, cannot be brighter than the diffuse texture
     FragColor.rgb *= max(ambient, vec3(clamp(

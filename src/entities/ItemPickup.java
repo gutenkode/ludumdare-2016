@@ -18,7 +18,8 @@ import ui.IngameUIManager;
 public class ItemPickup extends Entity {
     
     private static Mesh mesh;
-    private float cycle = 0;
+    private boolean collected = false;
+    private float cycle = 0, addSpeed = 0;
     private Item item;
     
     static {
@@ -65,7 +66,12 @@ public class ItemPickup extends Entity {
     
     @Override
     public void update() {
-        cycle += .05f;
+        if (collected) {
+            addSpeed += .03;
+            if (addSpeed > 1)
+                MapManager.removeEntity(this);
+        }
+        cycle += .05f+addSpeed*.35;
     }
     
     @Override
@@ -73,6 +79,7 @@ public class ItemPickup extends Entity {
         float floatHeight = (float)(Math.sin(cycle)/2+.5)/3;
         
         model.translate(posX, posY, floatHeight+tileHeight);
+        model.scale(1-addSpeed,1,1);
         model.rotate(cycle, 0, 0, 1);
         model.makeCurrent();
         Uniform.varFloat("spriteInfo", 1,1,0);
@@ -84,8 +91,10 @@ public class ItemPickup extends Entity {
     
     @Override
     public void playerPointIn() {
-        Inventory.addItem(item);
-        MapManager.removeEntity(this);
-        IngameUIManager.logMessage("Obtained a "+item.name+".");
+        if (!collected) {
+            collected = true;
+            Inventory.addItem(item);
+            IngameUIManager.logMessage("Obtained a " + item.name + ".");
+        }
     }
 }

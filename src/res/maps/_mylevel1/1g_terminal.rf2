@@ -38,6 +38,6 @@ ItemPickup,2,2,KEYCARD2
 TogglePlatform,3,1,0,1,3,false
 TogglePlatform,4,1,0,1,3,false
 ScriptTrigger,5,3,1,1,boilerRoomEnter
-Water,3,3
+Water,-2
 KeyDoor,3,5,1,2
 </entitydata>

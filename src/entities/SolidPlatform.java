@@ -53,8 +53,8 @@ public class SolidPlatform extends Entity {
         model.translate((float)posX-.5f, (float)posY-.5f, tileHeight);
         model.makeCurrent();
         
-        Uniform.varFloat("spriteInfo", 3,1,0);
-        TextureMap.bindUnfiltered("entity_togglePlatform");
+        Uniform.varFloat("spriteInfo", 1,1,0);
+        TextureMap.bindUnfiltered("entity_solidPlatform");
         mesh.render();
     }
     

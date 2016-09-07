@@ -48,6 +48,7 @@ public class Elevator extends Entity {
     
     @Override
     public void onRoomInit() {
+        lightCycle = (int)(posX*4+posY*8);
         baseTileHeight = MapManager.getTileHeight((int)posX, (int)posY);
         if (state) {
             cycle = 1;
@@ -99,13 +100,13 @@ public class Elevator extends Entity {
         height = (height+1)/2;
         floatTileHeight = baseTileHeight+maxHeight*height;
         tileHeight = Math.round(floatTileHeight);
+
+        lightCycle++;
+        lightCycle %= 100;
     }
     
     @Override
     public void render(TransformationMatrix model) {
-        lightCycle++;
-        lightCycle %= 100;
-        
         model.translate((float)posX-.5f, (float)posY-.5f, floatTileHeight+.01f);
         model.makeCurrent();
         

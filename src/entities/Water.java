@@ -31,31 +31,34 @@ public class Water extends Entity {
                 0, null, new float[] {0,0,1, 0,0,1, 0,0,1, 0,0,1});
     }
     
-    public Water(int x, int y) {
-        posX = x;
-        posY = y;
-        tileHeight = MapManager.getTileHeight(x, y);
+    public Water(int h) {
+        posX = 0;
+        posY = 0;
+        tileHeight = h;
     }
     
     @Override
     public void update() {
         offset += .001;
         offset %= 2;
+
+        posX = (int)MapManager.getPlayer().posX;
+        posY = (int)MapManager.getPlayer().posY;
     }
     
     @Override
     public void render(TransformationMatrix model) {
-        float addHeight = (float)Math.sin(offset*Math.PI)*.09f;
-        
+        float addHeight = (float)Math.sin(offset*Math.PI)*.1f;
+
         model.translate((float)posX+offset, (float)posY+offset/2, tileHeight+addHeight);
         model.makeCurrent();
         
         Uniform.varFloat("spriteInfo", 1,1,1);
         TextureMap.bindUnfiltered("entity_water");
-        for (int i = 0; i < 3; i++) 
+        for (int i = 0; i < 6; i++)
         {
-            Uniform.varFloat("colorMult", 1,1,1,.6f-.15f*i);
-            model.translate(offset, offset/2, .15f);
+            Uniform.varFloat("colorMult", 1,1,1,.65f-.1f*i);
+            model.translate(offset, offset/2, .1f);
             model.makeCurrent();
             mesh.render();
         }

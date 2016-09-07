@@ -38,6 +38,7 @@ entity/env/togglePlatform	entity_togglePlatform
 entity/env/laserGrid		entity_laserGrid
 entity/env/water		entity_water
 entity/env/terminal		entity_terminal
+entity/env/solidPlatform	entity_solidPlatform
 
 object/crate			obj_crate
 object/barrel			obj_barrel

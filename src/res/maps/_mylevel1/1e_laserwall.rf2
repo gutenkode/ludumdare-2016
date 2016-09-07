@@ -52,6 +52,6 @@ ItemPickup,3,2,KEYCARD1
 LaserGrid,2,5,3
 ScriptTrigger,2,8,1,2,alertTrigger
 ScriptTrigger,2,6,2,1,test
-Water,1,7
+Water,-2
 StaticObject,1,6,Ceiling
 </entitydata>

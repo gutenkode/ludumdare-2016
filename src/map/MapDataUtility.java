@@ -105,9 +105,8 @@ public class MapDataUtility {
                     list.add(new Elevator(x,y,height));
                     break;
                 case "Water":
-                    x = Integer.valueOf(tok.nextToken());
-                    y = Integer.valueOf(tok.nextToken());
-                    list.add(new Water(x,y));
+                    h = Integer.valueOf(tok.nextToken());
+                    list.add(new Water(h));
                     break;
                 default:
                     System.err.println("Unrecognized entity name while constructing entities: "+s);

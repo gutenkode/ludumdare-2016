@@ -21,11 +21,11 @@ uniform sampler2D texture1;
 uniform sampler2DShadow shadowMap; // shadow depth texture
 uniform vec3 flashlightAngle = vec3(1,0,0);
 
-void main() 
+void main()
 {
 	// color texture component
 	FragColor = texture(texture1, texCoord);
-	
+
 	if (FragColor.a == 0.0)
 		discard;
 
@@ -49,6 +49,7 @@ void main()
     float bias = 0.005*tan(acos(max(dot(normal,L),0)));
     bias = clamp(bias, 0, 0.01);
     float shadow = textureProj(shadowMap, shadowCoord+vec4(0,0,-bias,0));
+		shadow = shadow*.9+.1;
 
     // apply lighting to fragment, cannot be brighter than the diffuse texture
     FragColor.rgb *= max(ambient, vec3(clamp(lightDistCoef*flashlightAmbient+lightDistCoef*diffuseCoef*shadow, 0.0, 1.0)));
