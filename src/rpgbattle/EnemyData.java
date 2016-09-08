@@ -124,10 +124,11 @@ public class EnemyData {
             case "VILEDRINK1":
             case "VILEDRINK2":
                 return new PoisonedDrinkBehavior(fighter);
+
             case "NOISE":
-            //    return null;
+                return new NoiseBehavior(fighter);
             case "BOSS":
-            //    return null;
+                return new BossBehavior(fighter);
             default:
                 throw new IllegalStateException();
         }

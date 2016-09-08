@@ -17,9 +17,9 @@
       "death": "The Slime melts into a puddle.",
       "background": "red",
       "stats": {
-        "health": 90,
-        "attack": 12,
-        "defense": 8,
+        "health": 100,
+        "attack": 10,
+        "defense": 10,
         "magic": 10,
         "evasion": 0.15,
         "critrate": 0.05
@@ -44,11 +44,10 @@
       "spriteFrames": [
         5,
         5,
-        5,
         5
       ],
       "encounter": "The Noise approaches.",
-      "death": "The Noise fades away.",
+      "death": "The Noise flickers out of existence.",
       "background": "red",
       "stats": {
         "health": 64,
@@ -63,6 +62,38 @@
         0.5,
         0.5,
         0.5,
+        1
+      ]
+    }
+  },
+  "BOSS": {
+    "name": "Boss",
+    "ingame": {
+      "sprite": "entity_boss",
+      "spriteFrames": 1
+    },
+    "battle": {
+      "sprite": "entity_battle_boss",
+      "spriteFrames": [
+        80,
+        30
+      ],
+      "encounter": "The last battle.",
+      "death": "...",
+      "background": "grayscale",
+      "stats": {
+        "health": 300,
+        "attack": 20,
+        "defense": 15,
+        "magic": 10,
+        "evasion": 0.3,
+        "critrate": 0.1
+      },
+      "elementMult": [
+        1,
+        1.5,
+        0.5,
+        1,
         1
       ]
     }

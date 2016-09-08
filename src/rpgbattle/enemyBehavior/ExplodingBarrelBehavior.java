@@ -4,7 +4,6 @@ import mote4.util.matrix.ModelMatrix;
 import rpgbattle.BattleManager;
 import rpgbattle.fighter.EnemyFighter;
 import rpgsystem.Element;
-import rpgsystem.StatEffect;
 import ui.BattleUIManager;
 
 /**
@@ -18,7 +17,7 @@ public class ExplodingBarrelBehavior extends EnemyBehavior {
     
     public ExplodingBarrelBehavior(EnemyFighter f){
         super(f);
-        performTime = 40;
+        performActTime = 40;
         deathCycle = 1;
     }
     

@@ -82,6 +82,9 @@ public abstract class Fighter {
         // damage cap
         dmg = Math.min(9999, dmg);
 
+        if (dmg == 0)
+            addToast("NO DAMAGE");
+
         // flash the sprite the color of the elemental attack
         flash(element.color);
         

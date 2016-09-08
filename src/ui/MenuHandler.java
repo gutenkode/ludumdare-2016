@@ -22,6 +22,10 @@ public interface MenuHandler
     
     public void displayScriptChoice(String[] s);
     public void loadScriptLine(String s);
+    /**
+     * End playing a script.
+     * @param b Whether the script is finished.  If false, it will reset.
+     */
     public void endScript(boolean b);
     
     public void showFlavorText(boolean lock, String s);

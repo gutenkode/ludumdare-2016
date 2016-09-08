@@ -16,7 +16,7 @@ public class PoisonedDrinkBehavior extends EnemyBehavior {
     
     public PoisonedDrinkBehavior(EnemyFighter f){
         super(f);
-        performTime = 40;
+        performActTime = 40;
         deathCycle = 1;
     }
     

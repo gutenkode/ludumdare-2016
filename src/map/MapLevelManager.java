@@ -2,6 +2,7 @@ package map;
 
 import mote4.scenegraph.Window;
 import mote4.util.FileIO;
+import ui.script.ScriptLoader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -72,7 +73,8 @@ public class MapLevelManager {
      */
     public static void setCurrentLevel(int i) {
         if (i > 0 && i <= numLevels) {
-            currentLevelNum = i; 
+            currentLevelNum = i;
+            ScriptLoader.setLevelPath(levelDirs[currentLevelNum-1]);
             MapLoader.setLevelPath(levelDirs[currentLevelNum-1]);
             MapManager.createNewTimelines(firstMapName[currentLevelNum-1]);
         }

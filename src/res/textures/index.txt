@@ -18,6 +18,8 @@ font/terminal/terminal		font_terminal
 entity/solidsnake		entity_player
 
 entity/enemy/slime		entity_slime
+entity/enemy/noise		entity_noise
+entity/enemy/boss		entity_boss
 entity/battle/bginr		entity_bginr
 entity/battle/viledrink	entity_viledrink
 entity/battle/solidsnake_icon	entity_mirror
@@ -25,6 +27,8 @@ entity/battle/barrel		entity_barrel
 entity/battle/door_icon	entity_door
 
 entity/battle/slime		entity_battle_slime
+entity/battle/noise		entity_battle_noise
+entity/battle/boss		entity_battle_boss
 entity/battle/bginr		entity_battle_bginr
 entity/battle/viledrink	entity_battle_viledrink
 entity/battle/solidsnake_icon	entity_battle_mirror

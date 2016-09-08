@@ -17,7 +17,7 @@ public class EvilDoorBehavior extends EnemyBehavior {
     
     public EvilDoorBehavior(EnemyFighter f){
         super(f);
-        performTime = 40;
+        performActTime = 40;
         deathCycle = 1;
     }
     

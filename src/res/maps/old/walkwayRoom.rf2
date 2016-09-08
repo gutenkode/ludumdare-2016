@@ -45,7 +45,7 @@ TogglePlatform,8,3,0,0,3,false
 TogglePlatform,11,2,0,1,3,false
 #TogglePlatform,5,5,0,1,3,false
 #ItemPickup,6,5,Keycard2
-KeyDoor,11,1,2,0
+KeyDoor,11,0,2,0
 ScriptTrigger,3,2,1,3,walkwayRoomEnter
 ScriptTrigger,10,1,3,3,beforeBoss
 </entitydata>

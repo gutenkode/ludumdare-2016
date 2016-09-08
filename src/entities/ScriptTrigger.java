@@ -2,7 +2,7 @@ package entities;
 
 import map.MapManager;
 import mote4.util.matrix.TransformationMatrix;
-import ui.script.Script;
+import ui.script.ScriptLoader;
 import ui.IngameUIManager;
 
 /**
@@ -13,7 +13,7 @@ public class ScriptTrigger extends Entity {
     
     private boolean triggered = false;
     private int retriggerCooldown = 0;
-    private Script script;
+    private String scriptName;
     
     public ScriptTrigger(int x, int y, int width, int height, String scriptName) {
         hitboxW = width/2f -.01f; // -.01f is to get rid of any edge cases
@@ -22,7 +22,7 @@ public class ScriptTrigger extends Entity {
         posY = y+hitboxH;
         tileHeight = MapManager.getTileHeight(x, y);
         
-        script = Script.getScript(scriptName);
+        this.scriptName = scriptName;
     }
     
     @Override
@@ -43,7 +43,7 @@ public class ScriptTrigger extends Entity {
         if (!triggered && retriggerCooldown <= 0) {
             retriggerCooldown = 20;
             triggered = true;
-            IngameUIManager.playScript(this, script);
+            IngameUIManager.playScript(this, scriptName);
         } else
             retriggerCooldown--;
     }

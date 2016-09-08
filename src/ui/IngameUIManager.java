@@ -17,7 +17,7 @@ import scenes.RootScene;
 import ui.components.FlavorTextMenu;
 import ui.components.PlayerStatBar;
 import ui.components.ScriptChoiceMenu;
-import ui.script.Script;
+import ui.script.ScriptLoader;
 import ui.script.ScriptReader;
 import ui.selectionmenubehavior.RootIngameMenu;
 import ui.selectionmenubehavior.SelectionMenuBehavior;
@@ -183,12 +183,12 @@ public class IngameUIManager implements MenuHandler {
         logMessage = new ScrollingText(message, "font_1", 0, 0, Const.UI_SCALE, Const.UI_SCALE, 1);
         logMessageTimeout = 100;
     }
-    public static void playScript(ScriptTrigger t, Script script) {
+    public static void playScript(ScriptTrigger t, String scriptName) {
         trigger = t;
         showDialogue = true;
         scriptPlaying = true;
         Input.pushLock(Input.Lock.SCRIPT);
-        currentScript = new ScriptReader(script);
+        currentScript = new ScriptReader(scriptName);
         currentScript.advance(manager);
     }
     

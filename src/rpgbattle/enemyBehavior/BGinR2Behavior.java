@@ -1,9 +1,7 @@
 package rpgbattle.enemyBehavior;
 
 import mote4.util.matrix.ModelMatrix;
-import rpgbattle.BattleManager;
 import rpgbattle.fighter.EnemyFighter;
-import rpgsystem.StatEffect;
 import ui.BattleUIManager;
 
 /**
@@ -17,7 +15,7 @@ public class BGinR2Behavior extends EnemyBehavior {
     
     public BGinR2Behavior(EnemyFighter f){
         super(f);
-        performTime = 40;
+        performActTime = 40;
         hasRaised = false;
         deathCycle = 1;
     }

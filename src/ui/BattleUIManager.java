@@ -10,7 +10,6 @@ import nullset.Const;
 import nullset.Input;
 import rpgbattle.BattleManager;
 import rpgbattle.fighter.EnemyFighter;
-import rpgbattle.fighter.Fighter;
 import scenes.RootScene;
 import ui.components.DialogueMenu;
 import ui.components.EnemySprite;
@@ -20,7 +19,7 @@ import ui.components.PlayerStatBar;
 import ui.components.ScriptChoiceMenu;
 import ui.components.SelectionMenu;
 import ui.components.SpriteMenu;
-import ui.script.Script;
+import ui.script.ScriptLoader;
 import ui.script.ScriptReader;
 import ui.selectionmenubehavior.RootBattleMenu;
 import ui.selectionmenubehavior.SelectionMenuBehavior;
@@ -214,11 +213,11 @@ public class BattleUIManager implements MenuHandler {
     public static void logMessage(String message) {
         LogMenu.addLine(message);
     }
-    public static void playScript(Script script) {
+    public static void playScript(String scriptName) {
         showDialogue = true;
         scriptPlaying = true;
         Input.pushLock(Input.Lock.SCRIPT);
-        currentScript = new ScriptReader(script);
+        currentScript = new ScriptReader(scriptName);
         currentScript.advance(manager);
         //DialogueMenu.setText(script.dialogue[0]);
     }

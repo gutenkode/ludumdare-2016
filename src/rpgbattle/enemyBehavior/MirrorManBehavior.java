@@ -4,7 +4,6 @@ import rpgsystem.Inventory;
 import mote4.util.matrix.ModelMatrix;
 import rpgbattle.BattleManager;
 import rpgbattle.fighter.EnemyFighter;
-import rpgsystem.StatEffect;
 import ui.BattleUIManager;
 import rpgbattle.PlayerSkills;
 import rpgsystem.Element;
@@ -25,7 +24,7 @@ public class MirrorManBehavior extends EnemyBehavior {
     
     public MirrorManBehavior(EnemyFighter f){
         super(f);
-        performTime = 40;
+        performActTime = 40;
         deathCycle = 1;
         ArrayList<Item> inv = Inventory.get();
         for (int i = 0; i < inv.size(); i++){

@@ -17,13 +17,13 @@ public class SlimeBehavior extends EnemyBehavior {
 
     public SlimeBehavior(EnemyFighter f) {
         super(f);
-        performTime = 40;
         deathCycle = 1;
     }
 
     @Override
     public void initAct() {
         actDelay = 60;
+        performActTime = 40;
         
         if (fighter.stats.health < fighter.stats.maxHealth/2 
             && Math.random() > .85) 
@@ -54,6 +54,7 @@ public class SlimeBehavior extends EnemyBehavior {
             action = 0;
         }
     }
+
     @Override
     void performAct() {
         switch (action) {
