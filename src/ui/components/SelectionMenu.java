@@ -49,6 +49,23 @@ public class SelectionMenu {
         renderBorderW = 0;
         renderBorderH = 0;
     }
+
+    /**
+     * Put the cursor on a specific index, useful for initializing a menu
+     * on an index other than zero.  The index will be clamped
+     * to the actual range of the menu.
+     * @param i
+     */
+    public void setCursorPos(int i) {
+        cursorPos = i;
+
+        cursorPos %= this.b.getNumElements();
+
+        if (cursorPos < 0)
+            cursorPos = this.b.getNumElements()-1;
+
+        this.b.onHighlight(cursorPos);
+    }
     
     public int cursorPos() { return cursorPos; }
     public int width() { return renderBorderW; }

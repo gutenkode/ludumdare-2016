@@ -55,6 +55,7 @@ public class ItemDiscardMenu implements SelectionMenuBehavior {
 
     @Override
     public void onFocus() {
+        handler.setMenuCursorPos(1);
     }
 
     @Override

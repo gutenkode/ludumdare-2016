@@ -227,8 +227,12 @@ public class BattleUIManager implements MenuHandler {
     @Override
     public void openMenu(SelectionMenuBehavior b) {
         SelectionMenu sm = new SelectionMenu(b);
-        sm.onFocus();
         selectionMenus.push(sm);
+        sm.onFocus();
+    }
+    @Override
+    public void setMenuCursorPos(int i) {
+        selectionMenus.peek().setCursorPos(i);
     }
     @Override
     public void forceMenuRefocus() {
