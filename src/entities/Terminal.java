@@ -49,7 +49,7 @@ public class Terminal extends Entity {
             delay = 15;
         }
         
-        model.translate((float)posX-.5f, (float)posY-.2f, tileHeight());
+        model.translate((float)posX-.5f, (float)posY-.05f, tileHeight());
         //model.rotate(.78f, 1, 0, 0);
         model.makeCurrent();
         Uniform.varFloat("spriteInfo", 2,2,index);

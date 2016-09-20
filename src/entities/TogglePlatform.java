@@ -71,7 +71,7 @@ public class TogglePlatform extends Entity {
     @Override
     public void render(TransformationMatrix model) {
         model.setIdentity();
-        model.translate((float)posX-.5f, (float)posY-.5f, tileHeight);
+        model.translate((float)posX-.5f, (float)posY-.5f+.075f*position, tileHeight);
         // rotate to flip towards a certain wall
         //model.rotate((float)Math.PI/2*rotation, 0, 0, 1);
         // flip down if deactivated

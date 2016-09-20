@@ -54,7 +54,7 @@ public class ToggleButton extends Entity {
     @Override
     public void render(TransformationMatrix model) {
         model.setIdentity();
-        model.translate((float)posX-.5f, (float)posY-.5f, tileHeight+.01f);
+        model.translate((float)posX-.5f, (float)posY-.5f, tileHeight+.075f);
         model.makeCurrent();
         
         Uniform.varFloat("spriteInfo", 2,2,2*index);

@@ -43,6 +43,9 @@ public class RootIngameMenu implements SelectionMenuBehavior {
             case "Skills":
                 handler.openMenu(new RootSkillMenu(handler));
                 break;
+            case "Options":
+                handler.openMenu(new OptionsMenu(handler));
+                break;
             case "Exit":
                 handler.closeMenu();
                 break;
@@ -50,12 +53,10 @@ public class RootIngameMenu implements SelectionMenuBehavior {
     }
 
     @Override
-    public void onHighlight(int index) {
-    }
+    public void onHighlight(int index) {}
 
     @Override
-    public void onFocus() {
-    }
+    public void onFocus() {}
 
     @Override
     public void onClose() {

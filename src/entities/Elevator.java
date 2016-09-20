@@ -98,7 +98,7 @@ public class Elevator extends Entity {
         
         height = (float)Math.sin(cycle*Math.PI -Math.PI/2);
         height = (height+1)/2;
-        floatTileHeight = baseTileHeight+maxHeight*height;
+        floatTileHeight = baseTileHeight+Math.max(.075f, maxHeight*height);
         tileHeight = Math.round(floatTileHeight);
 
         lightCycle++;
