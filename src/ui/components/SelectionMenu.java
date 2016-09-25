@@ -125,6 +125,27 @@ public class SelectionMenu {
     }
     
     public void update() {
+        redrawBorder();
+
+        cursorAnimation += .05f;
+        cursorAnimation %= 1;
+        
+        if (Input.isKeyNew(Input.Keys.DOWN)) {
+            cursorPos++;
+            cursorPos %= this.b.getNumElements();
+            this.b.onHighlight(cursorPos);
+        } else if (Input.isKeyNew(Input.Keys.UP)) {
+            cursorPos--;
+            if (cursorPos < 0)
+                cursorPos = this.b.getNumElements()-1;
+            this.b.onHighlight(cursorPos);
+        } else if (Input.isKeyNew(Input.Keys.YES)) {
+            this.b.onAction(cursorPos);
+        } else if (Input.isKeyNew(Input.Keys.NO)) {
+            this.b.onClose();
+        }
+    }
+    private void redrawBorder() {
         // the text box will expand out from size 0,0
         boolean redraw = false;
         if (renderBorderH > borderH) {
@@ -145,24 +166,6 @@ public class SelectionMenu {
             if (border != null)
                 border.destroy();
             border = MenuMeshCreator.create(Const.UI_SCALE, Const.UI_SCALE, renderBorderW, renderBorderH, Const.UI_SCALE);
-        }
-
-        cursorAnimation += .05f;
-        cursorAnimation %= 1;
-        
-        if (Input.isKeyNew(Input.Keys.DOWN)) {
-            cursorPos++;
-            cursorPos %= this.b.getNumElements();
-            this.b.onHighlight(cursorPos);
-        } else if (Input.isKeyNew(Input.Keys.UP)) {
-            cursorPos--;
-            if (cursorPos < 0)
-                cursorPos = this.b.getNumElements()-1;
-            this.b.onHighlight(cursorPos);
-        } else if (Input.isKeyNew(Input.Keys.YES)) {
-            this.b.onAction(cursorPos);
-        } else if (Input.isKeyNew(Input.Keys.NO)) {
-            this.b.onClose();
         }
     }
     

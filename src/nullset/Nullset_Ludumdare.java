@@ -4,15 +4,17 @@ import map.MapLevelManager;
 import mote4.scenegraph.Layer;
 import mote4.scenegraph.Window;
 import mote4.scenegraph.target.EmptyTarget;
-import mote4.scenegraph.target.FBO;
 import mote4.util.shader.ShaderUtils;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.builder.StaticMeshBuilder;
 import mote4.util.vertex.mesh.MeshMap;
-import static org.lwjgl.glfw.GLFW.*;
+import scenes.Postprocess;
+import scenes.RootScene;
+
+import static org.lwjgl.glfw.GLFW.GLFW_DONT_CARE;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowSizeLimits;
 import static org.lwjgl.opengl.GL11.*;
-import scenes.*;
 
 /**
  *
@@ -21,7 +23,8 @@ import scenes.*;
 public class Nullset_Ludumdare {
     
     public static void main(String[] args) {
-        System.setProperty("java.awt.headless", "true"); // prevents ImageIO from hanging
+        if (System.getProperty("os.name").toLowerCase().contains("mac"))
+            System.setProperty("java.awt.headless", "true"); // prevents ImageIO from hanging on OS X
         //Window.initFullscreen();
         //Window.initWindowed(1920/2, 1080/2);
         Window.initWindowedPercent(.75, 16/9.0);

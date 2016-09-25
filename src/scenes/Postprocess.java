@@ -19,19 +19,21 @@ public class Postprocess implements Scene {
     private static Runnable callbackFunction; // function to call when the fadeout is halfway done
     private static boolean fadeToBlack = false;
     private float colorMult;
-    
+
+    private static final int NUM_BLOOM_FBOS = 6;
     private Random random;
     private static boolean finalPassShaderInitialized = false;
     private static int width, height;
     private static float dofCoef, dofCoefTarget;
     private static FBO combineScene, ditherScene, uiUpscaleScene,
-                       bloomScene1, bloomScene2,
-                       dofScene1, dofScene2;
+                       hdrScene, dofScene1, dofScene2;
+    private static FBO[][] bloomScene;
     
     public Postprocess() {
         random = new Random();
         colorMult = 1;
         dofCoef = dofCoefTarget = 0;
+        bloomScene = new FBO[NUM_BLOOM_FBOS][2];
     }
 
     @Override
@@ -93,24 +95,27 @@ public class Postprocess implements Scene {
     // create a bloom and fov texture from the combined scene
         createBloomTexture("fbo_combine");
         createDOFTexture("fbo_dither");
+        //createBloomTexture("fbo_dof2");
         
    // render final mix shader to screen
         framebuffer.makeCurrent();
         ShaderMap.use("quad_final");
         
         Uniform.varFloat("dofCoef", dofCoef);
+        //Uniform.varFloat("bloomCoef", .5f);
         Uniform.varFloat("colorMult", colorMult,colorMult,colorMult);
         Uniform.varFloat("rand", random.nextFloat(), random.nextFloat());
         
         // TEMPORARY
         Uniform.samplerAndTextureFiltered("tex_scene", 1, "fbo_dither");
         Uniform.samplerAndTextureFiltered("tex_ui", 2, "fbo_ui_upscale");
-        Uniform.samplerAndTextureFiltered("tex_bloom", 3, "fbo_bloom2");
+        Uniform.samplerAndTextureFiltered("tex_bloom", 3, "fbo_hdr");
         Uniform.samplerAndTextureFiltered("tex_dof", 4, "fbo_dof2");
         Uniform.samplerAndTextureFiltered("tex_dofvalue", 5, "fbo_dofvalue");
         Uniform.samplerAndTextureFiltered("tex_noise", 6, "post_noise");
         Uniform.samplerAndTextureFiltered("tex_vignette", 7, "post_vignette");
-        
+        Uniform.samplerAndTextureFiltered("tex_scanlines", 8, "post_scanlines");
+
         TextureMap.bindFiltered("fbo_combine");
         MeshMap.render("quad");
         
@@ -132,54 +137,48 @@ public class Postprocess implements Scene {
     
     /**
      * Creates a bloom texture of the specified texture.
-     * The result is stored in the texture "fbo_bloom2"
+     * The result is stored in the texture "fbo_hdr"
      * @param texName The texture to apply bloom to.
      */
     public void createBloomTexture(String texName) {
-        // render scene FBO to bloom texture 2 FBO
+        // render scene FBO to HDR scene FBO
         // this cuts off the darker part of the image so only
         // the bright part of the image is blurred for HDR effects
-        bloomScene2.makeCurrent();
+        hdrScene.makeCurrent();
         ShaderMap.use("quad_hdr");
         TextureMap.bindFiltered(texName);
         glClear(GL_COLOR_BUFFER_BIT);
         MeshMap.render("quad");
-        
-    // FIRST PASS
-        
-        // render bloom texture 2 to bloom texture 1 FBO
-        bloomScene1.makeCurrent();
-        ShaderMap.use("quad_horizBlur");
-        Uniform.varFloat("blurSize", 1f/width);
-        TextureMap.bindFiltered("fbo_bloom2");
-        glClear(GL_COLOR_BUFFER_BIT);
-        MeshMap.render("quad");
-        
-        // render bloom texture 1 FBO to bloom texture 2 FBO
-        bloomScene2.makeCurrent();
-        ShaderMap.use("quad_vertBlur");
-        Uniform.varFloat("blurSize", 1f/height);
-        TextureMap.bindFiltered("fbo_bloom1");
-        glClear(GL_COLOR_BUFFER_BIT);
-        MeshMap.render("quad");
-        
-    // SECOND PASS
-        
-        // render bloom texture 2 to bloom texture 1 FBO
-        bloomScene1.makeCurrent();
-        ShaderMap.use("quad_horizBlur");
-        Uniform.varFloat("blurSize", 1f/width);
-        TextureMap.bindFiltered("fbo_bloom2");
-        glClear(GL_COLOR_BUFFER_BIT);
-        MeshMap.render("quad");
-        
-        // render bloom texture 1 FBO to bloom texture 2 FBO
-        bloomScene2.makeCurrent();
-        ShaderMap.use("quad_vertBlur");
-        Uniform.varFloat("blurSize", 1f/height);
-        TextureMap.bindFiltered("fbo_bloom1");
-        glClear(GL_COLOR_BUFFER_BIT);
-        MeshMap.render("quad");
+
+        glBlendFunc(GL_ONE, GL_ONE);
+
+        for (int i = 0; i < bloomScene.length; i++) {
+            bloomScene[i][0].makeCurrent();
+            ShaderMap.use("quad_horizBlur");
+            Uniform.varFloat("blurSize", 1f/(width/(i+1)));
+            //if (i == 0)
+                TextureMap.bindFiltered("fbo_hdr");
+            //else
+            //    TextureMap.bindFiltered("fbo_bloom"+i+"_1");
+            glClear(GL_COLOR_BUFFER_BIT);
+            MeshMap.render("quad");
+
+            bloomScene[i][1].makeCurrent();
+            ShaderMap.use("quad_vertBlur");
+            Uniform.varFloat("blurSize", 1f/(width/(i+1)));
+            TextureMap.bindFiltered("fbo_bloom"+(i+1)+"_0");
+            glClear(GL_COLOR_BUFFER_BIT);
+            MeshMap.render("quad");
+        }
+        // add all the passes to the hdr buffer for rendering
+        hdrScene.makeCurrent();
+        //glClear(GL_COLOR_BUFFER_BIT);
+        ShaderMap.use("quad");
+        for (int i = 0; i < bloomScene.length; i++) {
+            TextureMap.bindFiltered("fbo_bloom"+(i+1)+"_1");
+            MeshMap.render("quad");
+        }
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
     /**
      * Creates a blurred texture of the specified texture.
@@ -251,21 +250,25 @@ public class Postprocess implements Scene {
         uiUpscaleScene = new FBO(width*2,height*2,false,false,null);
         TextureMap.delete("fbo_ui_upscale");
         uiUpscaleScene.addToTextureMap("fbo_ui_upscale");
+
+        if (hdrScene != null)
+            hdrScene.destroy();
+        hdrScene = new FBO(width,height,false,false,null);
+        TextureMap.delete("fbo_hdr");
+        hdrScene.addToTextureMap("fbo_hdr");
         
-        //width /= 2;
-        //height /= 2;
-        
-        if (bloomScene1 != null)
-            bloomScene1.destroy();
-        bloomScene1 = new FBO(width,height,false,false,null);
-        TextureMap.delete("fbo_bloom1");
-        bloomScene1.addToTextureMap("fbo_bloom1");
-        
-        if (bloomScene2 != null)
-            bloomScene2.destroy();
-        bloomScene2 = new FBO(width,height,false,false,null);
-        TextureMap.delete("fbo_bloom2");
-        bloomScene2.addToTextureMap("fbo_bloom2");
+        for (int i = 0; i < bloomScene.length; i++) {
+            if (bloomScene[i][0] != null)
+                bloomScene[i][0].destroy();
+            if (bloomScene[i][1] != null)
+                bloomScene[i][1].destroy();
+            bloomScene[i][0] = new FBO(width/(i+1),height/(i+1),false,false,null);
+            bloomScene[i][1] = new FBO(width/(i+1),height/(i+1),false,false,null);
+            TextureMap.delete("fbo_bloom"+(i+1)+"_0");
+            TextureMap.delete("fbo_bloom"+(i+1)+"_1");
+            bloomScene[i][0].addToTextureMap("fbo_bloom"+(i+1)+"_0");
+            bloomScene[i][1].addToTextureMap("fbo_bloom"+(i+1)+"_1");
+        }
         
         if (dofScene1 != null)
             dofScene1.destroy();

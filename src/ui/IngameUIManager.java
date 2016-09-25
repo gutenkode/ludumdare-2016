@@ -30,12 +30,13 @@ public class IngameUIManager implements MenuHandler {
     
     private static final IngameUIManager manager;
     private static final Stack<SelectionMenu> selectionMenus;
-    private static SelectionMenu closingMenu; // a reference to a recently closed menu is kept to play its animation
-    private static ScriptReader currentScript;
-    private static ScriptTrigger trigger;
+    private static SelectionMenu closingMenu; // a reference to a recently closed menu is kept to play its closing animation
+    private static ScriptReader currentScript; // the object responsible for parsing scripts and script logic
+    private static ScriptTrigger trigger; // a reference to the current script trigger is kept in order to tell it whether to reset
     
-    private static ScrollingText logMessage;
+    private static ScrollingText logMessage; // simple string that appears to announce events in the overworld
     private static int logMessageTimeout = 0;
+
     private static boolean gamePaused = false,
                            scriptPlaying = false,
                            showDialogue = false,
@@ -44,16 +45,15 @@ public class IngameUIManager implements MenuHandler {
                            showSprite = false,
                            showScriptChoice = false;
     
-    private static float dialogueSlide,
-                         statBarSlide,
+    private static float dialogueSlide, // position slide for the dialogue box
+                         statBarSlide, // position slide for the player's stat bar
                          menuCloseTransition, // when a menu is closed it will "slide out" of the window
                          flavorTextRenderYOffset; // flavor text bar will smoothly slide to the correct position
-    private static final float SLIDE_SCALE = 3, SLIDE_AMOUNT = 100;
-    
+
     static {
         manager = new IngameUIManager();
         selectionMenus = new Stack<>();
-        dialogueSlide = 0;
+        dialogueSlide = 1;
         statBarSlide = 1;
         flavorTextRenderYOffset = 0;
     }
@@ -82,9 +82,9 @@ public class IngameUIManager implements MenuHandler {
         }
 
         if (showDialogue)
-            dialogueSlide /= SLIDE_SCALE;
+            dialogueSlide /= 1.5;
         else
-            dialogueSlide += (1-dialogueSlide)/SLIDE_SCALE;
+            dialogueSlide += (1-dialogueSlide)/3;
 
         if (gamePaused || !BattleManager.getPlayer().areStatsFull())
             statBarSlide /= 1.5;
@@ -100,6 +100,7 @@ public class IngameUIManager implements MenuHandler {
         if (statBarSlide < .95)
             PlayerStatBar.render(60, RootScene.height()-42-Const.UI_SCALE/2+(int)(60*statBarSlide), trans);
 
+        // initialize state for the rest of the UI
         ShaderMap.use("texture");
         trans.view.setIdentity();
         trans.model.setIdentity();
@@ -113,27 +114,31 @@ public class IngameUIManager implements MenuHandler {
             TextureMap.bindUnfiltered("font_1");
             logMessage.render();
         }
+        // dialogue box needs to play exit animation after a script ends
+        if (dialogueSlide < .95) {
+            // the dialogue box will auto-align with the bottom of the screen
+            // and center in the X direction
+            model.setIdentity();
+            model.translate(0, dialogueSlide*100);
+            model.translate(RootScene.width()/2-DialogueMenu.BORDER_W/2-Const.UI_SCALE,
+                    RootScene.height()-40-3*Const.UI_SCALE);
+            model.makeCurrent();
+            DialogueMenu.render();
+        }
         if (scriptPlaying || gamePaused)
         {
-            if (dialogueSlide < .95) {
-                // the dialogue box will auto-align with the bottom of the screen
-                // and center in the X direction
-                model.setIdentity();
-                model.translate(0, dialogueSlide*SLIDE_AMOUNT);
-                model.translate(RootScene.width()/2-DialogueMenu.BORDER_W/2-Const.UI_SCALE, 
-                                RootScene.height()-40-3*Const.UI_SCALE);
-                model.makeCurrent();
-                DialogueMenu.render();
-            }
             if (scriptPlaying)
             {
                 // sprite
+                // no smooth in/out animation, but not too noticeable next to dialogue bar
                 model.setIdentity();
                 model.translate(RootScene.width()/2+DialogueMenu.BORDER_W/2+Const.UI_SCALE, 
                                 RootScene.height()-40-3*Const.UI_SCALE);
                 model.makeCurrent();
                 SpriteMenu.render(model);
 
+                // script choice dialogue
+                // needs a simple animation
                 if (showScriptChoice) {
                     model.setIdentity();
                     model.translate(RootScene.width()/2-DialogueMenu.BORDER_W/2-Const.UI_SCALE, 
@@ -144,6 +149,7 @@ public class IngameUIManager implements MenuHandler {
             }
             if (gamePaused)
             {
+                // when exiting the final menu and unpausing the game, the closing animation will still play
                 model.setIdentity();
                 for (SelectionMenu sm : selectionMenus) {
                     model.translate(Const.UI_SCALE/2, Const.UI_SCALE/2);
@@ -152,6 +158,7 @@ public class IngameUIManager implements MenuHandler {
                     sm.render(model);
                     model.pop();
                 }
+                // flavor text and preview sprite still pop in/out, but resize and move dynamically
                 if (showFlavorText) 
                 {
                     float yOffset;

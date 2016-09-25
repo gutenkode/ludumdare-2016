@@ -53,6 +53,7 @@ color/test			color_test
 
 post/noise			post_noise
 post/vignette			post_vignette
+post/scanlines			post_scanlines
 
 item/drink			item_drink
 item/grenade			item_grenade

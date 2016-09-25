@@ -12,13 +12,14 @@ uniform sampler2D tex_dof;
 uniform sampler2D tex_dofvalue;
 uniform sampler2D tex_noise;
 uniform sampler2D tex_vignette;
+uniform sampler2D tex_scanlines;
 uniform float bloomCoef = 1.0,
 			  aspectRatio = 16.0/9.0,
 			  dofCoef = 0.0;
 uniform vec2 rand;
 uniform vec3 colorMult = vec3(1.0);
 
-void main() 
+void main()
 {
 	// blend 3D scene with blurred DOF scene
 	vec4 v1 = texture(tex_scene, texCoord);
@@ -34,12 +35,13 @@ void main()
 	FragColor = ui*(ui.a) + FragColor*(1-ui.a);
 
 	// bloom
-	FragColor += texture(tex_bloom, texCoord) * bloomCoef;
+	FragColor += /*texture(tex_scanlines, texCoord) */ texture(tex_bloom, texCoord) * bloomCoef;
 
 	// noise and vignette
 	vec2 noiseCoord = (texCoord + rand) * vec2(aspectRatio,1);
 	FragColor *= texture(tex_noise, noiseCoord);
 	FragColor *= texture(tex_vignette, texCoord);
+	FragColor *= texture(tex_scanlines, texCoord*vec2(1,128));
 
 	FragColor.xyz *= colorMult; // used for fading in/out
 }
