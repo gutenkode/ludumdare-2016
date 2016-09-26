@@ -177,7 +177,7 @@ public class IngameUIManager implements MenuHandler {
                     // the sprite's position is relative to the flavor text box, model is not reset
                     if (showSprite) 
                     {
-                        model.translate(0, Const.UI_SCALE*2+FlavorTextMenu.height());
+                        model.translate(0, Const.UI_SCALE*2+FlavorTextMenu.height()-1);
                         model.makeCurrent();
                         SpriteMenu.render(model);
                     }
