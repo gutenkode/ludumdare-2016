@@ -18,6 +18,7 @@ public class ToggleButton extends Entity {
     
     private int index;
     private int cooldown = 0;
+    private float brightness = 0;
     
     static {
         mesh = StaticMeshBuilder.constructVAO(GL11.GL_TRIANGLE_FAN, 
@@ -47,8 +48,12 @@ public class ToggleButton extends Entity {
     
     @Override
     public void update() {
-        if (cooldown > 0)
+        if (cooldown > 0) {
             cooldown--;
+            if (brightness < 1)
+                brightness += .125;
+        } else if (brightness > 0)
+            brightness -= .125;
     }
 
     @Override
@@ -58,8 +63,8 @@ public class ToggleButton extends Entity {
         model.makeCurrent();
         
         Uniform.varFloat("spriteInfo", 2,2,2*index);
-        if (cooldown > 0) {
-            Uniform.varFloat("emissiveMult", 1);
+        if (brightness > 0) {
+            Uniform.varFloat("emissiveMult", brightness);
             Uniform.varFloat("spriteInfoEmissive", 2,2,1+2*index);
         }
         TextureMap.bindUnfiltered("entity_toggleButton");
