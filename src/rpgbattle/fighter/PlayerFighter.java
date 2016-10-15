@@ -46,10 +46,10 @@ public class PlayerFighter extends Fighter {
         if (statEffects.contains(StatEffect.FATIGUE)) {
             addToast(ToastType.STAMINA.color+"FATIGUE");
             addToast(ToastType.STAMINA.color+"-5");
-            drainStamina(5);
+            drainStamina(stats.attack/2);
         } else if (stats.stamina != stats.maxStamina) {
             addToast(ToastType.STAMINA.color+"REGEN");
-            restoreStamina(5);
+            restoreStamina(stats.attack/3);
         }
     }
     @Override
@@ -160,7 +160,7 @@ public class PlayerFighter extends Fighter {
         BattleManager.getEnemies().get(0).damage(Element.PHYS, stats.attack, getAttackPower(), 100, false);
         
         lastStamina = stats.stamina;
-        stats.stamina -= stats.attack;
+        stats.stamina -= stats.attack/2;
         stats.stamina = Math.max(0, stats.stamina);
         addToast(ToastType.STAMINA, "-"+stats.attack);
         
