@@ -1,9 +1,12 @@
 package ui.selectionmenubehavior;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import rpgbattle.BattleManager;
 import rpgbattle.PlayerSkills;
+import rpgbattle.fighter.Fighter;
 import rpgsystem.Skill;
+import rpgsystem.SkillModifier;
 import ui.BattleUIManager;
 import ui.MenuHandler;
 import ui.components.PlayerStatBar;
@@ -19,6 +22,8 @@ public class BattleSkillMenu implements SelectionMenuBehavior {
     private String title = "SKILLS";
     private String[] options;
     private ArrayList<Skill> skills;
+
+    private Skill currentSkill;
     
     public BattleSkillMenu(MenuHandler h) {
         handler = h;
@@ -44,10 +49,18 @@ public class BattleSkillMenu implements SelectionMenuBehavior {
         if (index == options.length-1)
             handler.closeMenu();
         else {
-            if (BattleManager.getPlayer().useSkill(handler, skills.get(index))) {
-                PlayerStatBar.stopManaPreview();
-                BattleUIManager.endPlayerTurn();
+            if (BattleManager.getPlayer().canUseSkill(handler, skills.get(index))) {
+                currentSkill = skills.get(index);
+                boolean isMultiTarget = (PlayerSkills.getLinkedModifier(currentSkill) == SkillModifier.MULTI_TARGET);
+                handler.openMenu(new EnemySelectionMenu(handler, this::skillCallback, isMultiTarget));
             }
+        }
+    }
+    public void skillCallback(Fighter... f) {
+        if (BattleManager.getPlayer().useSkill(handler, currentSkill, f)) {
+            currentSkill = null;
+            PlayerStatBar.stopManaPreview();
+            BattleUIManager.endPlayerTurn();
         }
     }
 
@@ -70,9 +83,10 @@ public class BattleSkillMenu implements SelectionMenuBehavior {
 
     @Override
     public void onClose() {
-        PlayerStatBar.stopManaPreview();
         handler.closeMenu();
     }
+    @Override
+    public void onCloseCleanup() { PlayerStatBar.stopManaPreview(); }
 
     private void rebuildMenu() {
         skills = PlayerSkills.getEquippedSkills(); // only show equipped skills

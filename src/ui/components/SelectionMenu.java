@@ -185,6 +185,7 @@ public class SelectionMenu {
     }
     
     public void destroy() {
+        b.onCloseCleanup();
         border.destroy();
         for (ScrollingText s : textList)
             s.destroy();

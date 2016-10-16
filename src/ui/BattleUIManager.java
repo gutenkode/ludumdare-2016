@@ -312,6 +312,10 @@ public class BattleUIManager implements MenuHandler {
         showSprite = true;
     }
     @Override
+    public void setFlavorTextLock(boolean lock) {
+        lockFlavorText = lock;
+    }
+    @Override
     public void closeFlavorText() {
         showFlavorText = false;
         showSprite = false;

@@ -104,6 +104,8 @@ public enum Skill {
                 return baseCost/2;
             case POWER_BOOST:
                 return baseCost*2;
+            case MULTI_TARGET:
+                return (int)(baseCost*1.5);
             default:
                 return baseCost;
         }

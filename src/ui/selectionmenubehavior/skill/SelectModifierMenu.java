@@ -64,6 +64,8 @@ public class SelectModifierMenu implements SelectionMenuBehavior {
     public void onClose() {
         handler.closeMenu();
     }
+    @Override
+    public void onCloseCleanup() {}
 
     private void rebuildMenu() {
         modifiers = PlayerSkills.getAvailableModifiers(); // only show skills the player has

@@ -155,9 +155,9 @@ public class PlayerFighter extends Fighter {
     }
     // functions called from RootBattleMenu or submenus
     
-    public boolean useAttack(MenuHandler handler) {
+    public boolean useAttack(MenuHandler handler, Fighter... targets) {
         BattleUIManager.logMessage("You attack!");
-        BattleManager.getEnemies().get(0).damage(Element.PHYS, stats.attack, getAttackPower(), 100, false);
+        targets[0].damage(Element.PHYS, stats.attack, getAttackPower(), 100, false);
         
         lastStamina = stats.stamina;
         stats.stamina -= stats.attack/2;
@@ -165,21 +165,26 @@ public class PlayerFighter extends Fighter {
         addToast(ToastType.STAMINA, "-"+stats.attack);
         
         turnUsed = true;
-        return turnUsed;
+        return true;
     }
     public int getAttackPower() {
         return (int)(10*Math.min(1,.25+(stats.stamina/(float)stats.maxStamina)));
     }
-    public boolean useSkill(MenuHandler handler, Skill skill) {
+    public boolean canUseSkill(MenuHandler handler, Skill skill) {
         if (skill.cost() > stats.mana) {
             handler.showDialogue("You don't have enough mana!",skill.spriteName);
             return false;
         }
+        return true;
+    }
+    public boolean useSkill(MenuHandler handler, Skill skill, Fighter... targets) {
+        if (!canUseSkill(handler, skill))
+            return false;
         
         lastMana = stats.mana;
         stats.mana -= skill.cost();
         addToast(ToastType.MANA, "-"+skill.cost());
-        
+        /*
         if (PlayerSkills.getLinkedModifier(skill) == SkillModifier.MULTI_TARGET) {
             Fighter[] targets = new Fighter[BattleManager.getEnemies().size()];
             for (int i = 0; i < targets.length; i++)
@@ -199,27 +204,17 @@ public class PlayerFighter extends Fighter {
                     break;
             }
             skill.useBattle(handler,  stats.magic, target);
-        }
-        
+        }*/
+        for (Fighter f : targets)
+            skill.useBattle(handler,  stats.magic, f);
+
         turnUsed = true;
         return turnUsed;
     }
-    public boolean useItem(MenuHandler handler, Item item) {
-        Fighter target;
-        switch (item.defaultTarget) {
-            case PLAYER:
-                target = this;
-                break;
-            case ENEMY:
-                target = BattleManager.getEnemies().get(0);
-                break;
-            default:
-                target = null;
-                break;
-        }
-        
-        if (item.useBattle(handler, target))
-            turnUsed = true;
+    public boolean useItem(MenuHandler handler, Item item, Fighter... targets) {
+        for (Fighter f : targets)
+            if (item.useBattle(handler, f))
+                turnUsed = true;
         
         return turnUsed;
     }

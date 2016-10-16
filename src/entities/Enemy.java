@@ -12,6 +12,8 @@ import rpgbattle.BattleManager;
 import rpgbattle.EnemyData;
 import scenes.RootScene;
 
+import java.util.Arrays;
+
 
 /**
  *
@@ -45,7 +47,8 @@ public class Enemy extends Entity {
     public Enemy(int x, int y, String en) {
         hitboxW = hitboxH = .3f;
         enemyName = en;
-        
+
+        // enemyName is the API name, all upper-case
         patrol = EnemyData.getPatrol(enemyName, x+.5f,y+.5f);
         spriteName = EnemyData.getIngameSprite(enemyName);
     }
@@ -122,12 +125,13 @@ public class Enemy extends Entity {
     public void playerPointIn() {
         if (MapManager.getPlayer().tileHeight == tileHeight) 
         {
-            // BattleManager -> load enemies
-            BattleManager.initEnemies(enemyName);
-            //BattleManager.initEnemies(enemyName, enemyName);
+            // BattleManager -> load enemies for battle
+            BattleManager.initEnemies(enemyName,enemyName,enemyName);
+
             // RootScene -> go to battle
             RootScene.transitionToBattle();
-            // MapManager -> delete this entity (?)
+
+            // MapManager -> delete this entity
             MapManager.removeEntity(this);
         }
     }

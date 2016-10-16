@@ -1,6 +1,7 @@
 package ui.selectionmenubehavior;
 
 import rpgbattle.BattleManager;
+import rpgbattle.fighter.Fighter;
 import rpgbattle.fighter.Fighter.FighterStats;
 import ui.BattleUIManager;
 import ui.MenuHandler;
@@ -40,8 +41,9 @@ public class RootBattleMenu implements SelectionMenuBehavior {
     public void onAction(int index) {
         switch (getElementName(index)) {
             case "Attack":
-                if (BattleManager.getPlayer().useAttack(handler))
-                    BattleUIManager.endPlayerTurn();
+                handler.openMenu(new EnemySelectionMenu(handler, this::attackCallback, false));
+                //if (BattleManager.getPlayer().useAttack(handler))
+                //    BattleUIManager.endPlayerTurn();
                 break;
             case "Guard":
                 break;
@@ -56,6 +58,10 @@ public class RootBattleMenu implements SelectionMenuBehavior {
                     BattleUIManager.endPlayerTurn();
                 break;
         }
+    }
+    public void attackCallback(Fighter... f) {
+        if (BattleManager.getPlayer().useAttack(handler, f))
+            BattleUIManager.endPlayerTurn();
     }
 
     @Override
@@ -90,4 +96,6 @@ public class RootBattleMenu implements SelectionMenuBehavior {
     public void onClose() {
         // can't close the root menu in a battle
     }
+    @Override
+    public void onCloseCleanup() {}
 }

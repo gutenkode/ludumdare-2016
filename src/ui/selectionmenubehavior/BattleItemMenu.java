@@ -2,6 +2,7 @@ package ui.selectionmenubehavior;
 
 import java.util.ArrayList;
 import rpgbattle.BattleManager;
+import rpgbattle.fighter.Fighter;
 import rpgsystem.Inventory;
 import rpgsystem.Item;
 import ui.BattleUIManager;
@@ -18,7 +19,8 @@ public class BattleItemMenu implements SelectionMenuBehavior {
     private String title = "INVENTORY";
     private String[] options;
     ArrayList<Item> items;
-        
+
+    private Item currentItem;
 
     public BattleItemMenu(MenuHandler h) {
         handler = h;
@@ -43,9 +45,16 @@ public class BattleItemMenu implements SelectionMenuBehavior {
     public void onAction(int index) {
         if (index == options.length-1)
             handler.closeMenu();
-        else
-            if (BattleManager.getPlayer().useItem(handler, items.get(index)))
-                BattleUIManager.endPlayerTurn();
+        else {
+            currentItem = items.get(index);
+            handler.openMenu(new EnemySelectionMenu(handler, this::itemCallback, false));
+        }
+    }
+    public void itemCallback(Fighter... f) {
+        if (BattleManager.getPlayer().useItem(handler, currentItem, f)) {
+            BattleUIManager.endPlayerTurn();
+            currentItem = null;
+        }
     }
 
     @Override
@@ -66,6 +75,8 @@ public class BattleItemMenu implements SelectionMenuBehavior {
     public void onClose() {
         handler.closeMenu();
     }
+    @Override
+    public void onCloseCleanup() {}
 
     private void rebuildMenu() {
         items = Inventory.get();

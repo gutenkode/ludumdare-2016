@@ -248,7 +248,7 @@ public abstract class Fighter {
                 return false;
             }
             double val = 1.0-1.0/(timeout/20.0+1.0);
-            m.translate(randX-centerOffset, randY-(float)val*70);
+            m.translate(randX-centerOffset, randY-(float)val*40);
             m.makeCurrent();
             Uniform.varFloat("colorMult", 0,0,0,1);
             mesh.render();
@@ -256,7 +256,7 @@ public abstract class Fighter {
             m.makeCurrent();
             Uniform.varFloat("colorMult", 1,1,1,1);
             mesh.render();
-            m.translate(1-randX+centerOffset, 1-randY+(float)val*70);
+            m.translate(1-randX+centerOffset, 1-randY+(float)val*40);
             timeout++;
             if (timeout > 50) {
                 mesh.destroy();

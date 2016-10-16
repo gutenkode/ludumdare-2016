@@ -11,7 +11,7 @@ public enum SkillModifier {
     EFFICIENCY("Efficiency","Halves mana cost for a skill.", 1),
     POWER_BOOST("Overclock","Doubles power and mana cost.", 3),
     ACCURACY("Accuracy","Doubles accuracy of a skill.", 3),
-    MULTI_TARGET("Multi-Target","The skill targets all enemies.\nAccuracy is reduced.", 5);
+    MULTI_TARGET("Multi-Target","The skill targets all enemies.\nAccuracy is reduced,\nCost is increased.", 5);
 
     public final int cost;
     public final String name, desc;

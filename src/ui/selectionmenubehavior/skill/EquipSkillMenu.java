@@ -65,6 +65,8 @@ public class EquipSkillMenu implements SelectionMenuBehavior {
     public void onClose() {
         handler.closeMenu();
     }
+    @Override
+    public void onCloseCleanup() {}
 
     private void rebuildMenu() {
         skills = PlayerSkills.getAvailableSkills(); // only show skills the player has

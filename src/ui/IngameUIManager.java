@@ -98,7 +98,7 @@ public class IngameUIManager implements MenuHandler {
 
         // PlayerStatBar, sets own shaders
         if (statBarSlide < .95)
-            PlayerStatBar.render(60, RootScene.height()-42-Const.UI_SCALE/2+(int)(60*statBarSlide), trans);
+            PlayerStatBar.render(54, RootScene.height()-42-Const.UI_SCALE/2+(int)(60*statBarSlide), trans);
 
         // initialize state for the rest of the UI
         ShaderMap.use("texture");
@@ -116,10 +116,10 @@ public class IngameUIManager implements MenuHandler {
         }
         // dialogue box needs to play exit animation after a script ends
         if (dialogueSlide < .95) {
-            // the dialogue box will auto-align with the bottom of the screen
-            // and center in the X direction
             model.setIdentity();
+            // the dialogue box will auto-align with the bottom of the screen
             model.translate(0, dialogueSlide*100);
+            // and center in the X direction
             model.translate(RootScene.width()/2-DialogueMenu.BORDER_W/2-Const.UI_SCALE,
                     RootScene.height()-40-3*Const.UI_SCALE);
             model.makeCurrent();
@@ -138,7 +138,7 @@ public class IngameUIManager implements MenuHandler {
                 SpriteMenu.render(model);
 
                 // script choice dialogue
-                // needs a simple animation
+                // !!!! needs a simple animation
                 if (showScriptChoice) {
                     model.setIdentity();
                     model.translate(RootScene.width()/2-DialogueMenu.BORDER_W/2-Const.UI_SCALE, 
@@ -322,6 +322,10 @@ public class IngameUIManager implements MenuHandler {
         SpriteMenu.setSprite(sprite);
         showFlavorText = true;
         showSprite = true;
+    }
+    @Override
+    public void setFlavorTextLock(boolean lock) {
+        lockFlavorText = lock;
     }
     @Override
     public void closeFlavorText() {

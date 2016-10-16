@@ -70,4 +70,5 @@ StaticObject,3.8,5,Crate,.8
 StaticObject,1,4,Ceiling
 TogglePlatform,2,8,-8,0,0,false
 Water,-9
+Enemy,3,7,SLIME
 </entitydata>

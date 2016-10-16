@@ -62,6 +62,8 @@ public class IngameItemMenu implements SelectionMenuBehavior {
     public void onClose() {
         handler.closeMenu();
     }
+    @Override
+    public void onCloseCleanup() {}
 
     private void rebuildMenu() {
         items = Inventory.get();

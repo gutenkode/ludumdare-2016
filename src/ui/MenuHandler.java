@@ -31,5 +31,6 @@ public interface MenuHandler
     
     public void showFlavorText(boolean lock, String s);
     public void showFlavorText(boolean lock, String s, String sprite);
+    public void setFlavorTextLock(boolean lock);
     public void closeFlavorText();
 }

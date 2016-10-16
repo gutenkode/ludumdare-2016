@@ -77,4 +77,6 @@ public class RootSkillMenu implements SelectionMenuBehavior {
     public void onClose() {
         handler.closeMenu();
     }
+    @Override
+    public void onCloseCleanup() {}
 }

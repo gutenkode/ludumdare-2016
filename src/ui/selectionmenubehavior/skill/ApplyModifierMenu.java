@@ -68,6 +68,8 @@ public class ApplyModifierMenu implements SelectionMenuBehavior {
     public void onClose() {
         handler.closeMenu();
     }
+    @Override
+    public void onCloseCleanup() {}
 
     private void rebuildMenu() {
         skills = PlayerSkills.getEquippedSkills(); // only equipped skills can have modifiers

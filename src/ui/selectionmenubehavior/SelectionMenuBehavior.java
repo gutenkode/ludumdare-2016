@@ -37,7 +37,15 @@ public interface SelectionMenuBehavior {
      */
     public void onFocus();
     /**
-     * To be called when this menu is closed.
+     * To be called when this menu is given the signal to close.
+     * If this menu should close, it must explicitly call closeMenu() from a manager.
+     * State cleanup code should NOT be placed here as it will not always be called,
+     * if this menu is closed from elsewhere.
      */
     public void onClose();
+    /**
+     * Called when this menu is being closed.  Any cleanup or state reset code should go here,
+     * as it will always reliably be called when the menu is closing.
+     */
+    public void onCloseCleanup();
 }
