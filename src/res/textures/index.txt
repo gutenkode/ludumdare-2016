@@ -71,3 +71,7 @@ talk/none			talk_none
 
 status/poison			status_poison
 status/fatigue			status_fatigue
+
+anim/ice			anim_ice
+anim/fire			anim_fire
+anim/elec_2			anim_elec

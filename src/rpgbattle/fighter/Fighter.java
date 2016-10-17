@@ -11,6 +11,7 @@ import rpgsystem.Element;
 import rpgsystem.StatEffect;
 import scenes.RootScene;
 import scenes.RootScene.State;
+import ui.components.BattleAnimation;
 
 /**
  * Represents a single fighter on the field.  This includes enemies and the player.
@@ -19,6 +20,7 @@ import scenes.RootScene.State;
 public abstract class Fighter {
     
     public ArrayList<StatEffect> statEffects = new ArrayList<>();
+    private ArrayList<BattleAnimation> battleAnimations = new ArrayList<>();
     public FighterStats stats = new FighterStats();
     
     float[] flash = new float[] {0,0,0};
@@ -263,6 +265,20 @@ public abstract class Fighter {
                 return true;
             }
             return false;
+        }
+    }
+
+    // battle animation handling
+
+    public void addAnim(BattleAnimation ba) {
+        battleAnimations.add(ba);
+    }
+    public void updateAnim() {
+        for (int i = 0; i < battleAnimations.size(); i++) {
+            if (battleAnimations.get(i).render()) {
+                battleAnimations.remove(i);
+                i--;
+            }
         }
     }
 }

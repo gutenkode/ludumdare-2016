@@ -14,7 +14,7 @@ import rpgbattle.fighter.EnemyFighter;
  */
 public class EnemySprite {
     
-    private static Mesh sprite;
+    public static final Mesh sprite;
     
     static {
         sprite = StaticMeshBuilder.constructVAO(GL11.GL_TRIANGLE_FAN,
@@ -44,15 +44,23 @@ public class EnemySprite {
     }
     public void render(ModelMatrix model) {
         TextureMap.bindUnfiltered(fighter.spriteName);
+
+        model.setIdentity();
         model.translate(fighter.shakeValue()+posX, posY);
-        
         if (fighter.isDead())
             fighter.runDeathAnimation(model);
-        
         model.makeCurrent();
+
         Uniform.varFloat("colorAdd", fighter.updateFlash());
         Uniform.varFloat("spriteInfo", fighter.updateSpriteInfo());
         sprite.render();
         Uniform.varFloat("colorAdd", 0,0,0);
+    }
+    public void renderAnimations(ModelMatrix model) {
+        model.setIdentity();
+        model.translate(posX, posY);
+        model.makeCurrent();
+
+        fighter.updateAnim();
     }
 }

@@ -81,8 +81,8 @@ public class BattleUIManager implements MenuHandler {
     trans.makeCurrent();
         // EnemySprite
         for (EnemySprite s : enemySprites) {
-            model.setIdentity();
             s.render(model);
+            s.renderAnimations(model);
         }
         /*
         for (EnemyFighter f : BattleManager.getEnemies()) {

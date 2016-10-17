@@ -7,6 +7,8 @@ import rpgbattle.fighter.Fighter;
 import rpgbattle.fighter.Fighter.FighterStats;
 import ui.BattleUIManager;
 import ui.MenuHandler;
+import ui.components.BattleAnimation;
+
 import static rpgsystem.DefaultTarget.*;
 
 /**
@@ -136,19 +138,24 @@ public enum Skill {
         switch (this) {
             case FIRE:
                 BattleUIManager.logMessage("You cast Fireball!");
-                for (Fighter f : targets)
+                for (Fighter f : targets) {
                     f.damage(Element.FIRE, magicStat, power(), accuracy(), false);
+                    f.addAnim(new BattleAnimation(BattleAnimation.Type.FIRE));
+                }
                 break;
             case BOLT:
                 BattleUIManager.logMessage("You cast Thunderbolt!");
-                for (Fighter f : targets)
+                for (Fighter f : targets) {
                     f.damage(Element.ELEC, magicStat, power(), accuracy(), false);
+                    f.addAnim(new BattleAnimation(BattleAnimation.Type.ELEC));
+                }
                 break;
             case ICE:
                 BattleUIManager.logMessage("You cast Ice!");
                 for (Fighter f : targets) {
                     boolean crit = Math.random() > .35;
                     f.damage(Element.ICE, magicStat, power(), accuracy(), crit);
+                    f.addAnim(new BattleAnimation(BattleAnimation.Type.ICE));
                 }
                 break;
             case CURE:
