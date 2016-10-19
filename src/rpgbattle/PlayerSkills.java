@@ -30,10 +30,7 @@ public class PlayerSkills {
         availableModifiers.addAll(Arrays.asList(SkillModifier.values()));
         
         // equip skills by default
-        equippedSkills.add(Skill.FIRE);
-        equippedSkills.add(Skill.BOLT);
-        equippedSkills.add(Skill.ICE);
-        equippedSkills.add(Skill.CURE);
+        equippedSkills.addAll(Arrays.asList(Skill.values()));
     }
     
     public static int maxCapacity() { return maxCapacity; }

@@ -104,7 +104,7 @@ public class MirrorManBehavior extends EnemyBehavior {
                 manaHypos -= 1;
                 break;
             case 4:
-                BattleManager.getPlayer().damage(Element.NONE, 10, 40, 100, false);
+                BattleManager.getPlayer().damage(Element.EXPLOSIVE, 10, 40, 100, false);
                 grenades -= 1;
                 break;
             case 5:

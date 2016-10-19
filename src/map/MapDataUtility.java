@@ -17,6 +17,7 @@ import rpgsystem.Item;
  * @author Peter
  */
 public class MapDataUtility {
+
     public static ArrayList<Entity> constructEntities(String[] entityData) {
         ArrayList<Entity> list = new ArrayList<>();
         int x,y,h,width,height;
@@ -147,114 +148,144 @@ public class MapDataUtility {
         
         return builder.constructVAO(GL11.GL_TRIANGLES);
     }
+
+    /**
+     * Adds all mesh data for a tile.
+     * @param vertAttrib
+     * @param texAttrib
+     * @param normAttrib
+     * @param shadeAttrib
+     * @param i Tile X value.
+     * @param j Tile Y value.
+     */
     private static void addVertex(Attribute vertAttrib, Attribute texAttrib, Attribute[] normAttrib, Attribute shadeAttrib, int i, int j) {
         int h = mapData.heightData[i][j];
         
-        // ground tile is only drawn for first 2 types
+        // ground tile is only drawn for shapes 0,1
         if (mapData.tileData[i][j][1] < 2) {
             // ground tile
-            vertAttrib.add(i,j,h,
-                             i,j+1,h,
-                             i+1,j,h,
-                             
-                             i+1,j,h,
-                             i,j+1,h,
-                             i+1,j+1,h);
-            addTex(texAttrib, i,j, 1,0);
+            vertAttrib.add(
+                i,j,h,
+                i,j+1,h,
+                i+1,j,h,
+
+                i+1,j,h,
+                i,j+1,h,
+                i+1,j+1,h
+            );
+            addTex(texAttrib, i,j, 0,0);
             addNormal(normAttrib, 0,0,1);
-            
             addShade(shadeAttrib, i,j, true);
         }
         
-        // shape 0 and 2 only have the ground tile
+        // wall tile only drawn for shapes 1,3
         if (mapData.tileData[i][j][1] == 0 || mapData.tileData[i][j][1] == 2)
             return;
         
         // back wall
-        if (j > 0) {
+        if (j > 0) { // don't try to draw back walls for back row
             int h2 = mapData.heightData[i][j-1];
             if (h2 > h) { // if the back tile is higher than this one
                 int diff = h2-h;
-                vertAttrib.add(i,j,h2,
-                                 i,j,h2-diff,
-                                 i+1,j,h2,
-                                 i+1,j,h2,
-                                 i,j,h2-diff,
-                                 i+1,j,h2-diff);
-                // shapes 1 and 4 use the current tile's texture
-                if (mapData.tileData[i][j][1] == 1 || mapData.tileData[i][j][1] == 4)
-                    addTex(texAttrib, i,j, diff,2);
-                else
-                    addTex(texAttrib, i,j-1, diff,2);
-                addNormal(normAttrib, 0,1,0);
-                //addNormal(builder, 0,-1,1);
-                addShade(shadeAttrib, i,j, false);
+                for (int k = 0; k < diff; k++) {
+                    vertAttrib.add(
+                            i,j,h2-k,
+                            i,j,h2-(1+k),
+                            i+1,j,h2-k,
+
+                            i+1,j,h2-k,
+                            i,j,h2-(1+k),
+                            i+1,j,h2-(1+k)
+                    );
+                    if ((k & 1) == 0)
+                        addTex(texAttrib, i,j, 0,2);
+                    else
+                        addTex(texAttrib, i,j, 1,2);
+                    addNormal(normAttrib, 0,1,0);
+                    addShade(shadeAttrib, i,j, false);
+                }
             }
         }
         
         // right wall
-        if (i+1 < mapData.heightData.length) {
+        if (i+1 < mapData.heightData.length) { // don't draw right walls for far right column
             int h2 = mapData.heightData[i+1][j];
             if (h2 > h) { // if the right tile is higher than this one
                 int diff = h2-h;
-                vertAttrib.add(i+1,j,h2,
-                                 i+1,j,h2-diff,
-                                 i+1,j+1,h2,
-                                 i+1,j+1,h2,
-                                 i+1,j,h2-diff,
-                                 i+1,j+1,h2-diff);
-                // shapes 1 and 4 use the current tile's texture
-                if (mapData.tileData[i][j][1] == 1 || mapData.tileData[i][j][1] == 4)
-                    addTex(texAttrib, i,j, diff,2);
-                else
-                    addTex(texAttrib, i+1,j, diff,2);
-                addNormal(normAttrib, -1,0,0);
-                addShade(shadeAttrib, i,j, false);
+                for (int k = 0; k < diff; k++) {
+                    vertAttrib.add(
+                            i+1,j,h2-k,
+                            i+1,j,h2-(1+k),
+                            i+1,j+1,h2-k,
+
+                            i+1,j+1,h2-k,
+                            i+1,j,h2-(1+k),
+                            i+1,j+1,h2-(1+k)
+                    );
+                    if ((k & 1) == 0)
+                        addTex(texAttrib, i,j, 0,2);
+                    else
+                        addTex(texAttrib, i,j, 1,2);
+                    addNormal(normAttrib, -1,0,0);
+                    addShade(shadeAttrib, i,j, false);
+                }
             }
         }
         
         // left wall
-        if (i > 0) {
+        if (i > 0) { // don't draw left walls for far left column
             int h2 = mapData.heightData[i-1][j];
             if (h2 > h) { // if the left tile is higher than this one
                 int diff = h2-h;
-                vertAttrib.add(i,j+1,h2,
-                                 i,j+1,h2-diff,
-                                 i,j,h2,
-                                 i,j,h2,
-                                 i,j+1,h2-diff,
-                                 i,j,h2-diff);
-                // shapes 1 and 4 use the current tile's texture
-                if (mapData.tileData[i][j][1] == 1 || mapData.tileData[i][j][1] == 4)
-                    addTex(texAttrib, i,j, diff,2);
-                else
-                    addTex(texAttrib, i-1,j, diff,2);
-                addNormal(normAttrib, 1,0,0);
-                addShade(shadeAttrib, i,j, false);
+                for (int k = 0; k < diff; k++) {
+                    vertAttrib.add(
+                            i,j+1,h2-k,
+                            i,j+1,h2-(1+k),
+                            i,j,h2-k,
+                            i,j,h2-k,
+                            i,j+1,h2-(1+k),
+                            i,j,h2-(1+k)
+                    );
+                    if ((k & 1) == 0)
+                        addTex(texAttrib, i,j, 0,2);
+                    else
+                        addTex(texAttrib, i,j, 1,2);
+                    addNormal(normAttrib, 1,0,0);
+                    addShade(shadeAttrib, i,j, false);
+                }
             }
         }
     }
+
     /**
      * Adds texture coordinate data for a tile.
      * @param attrib The Attribute to add to.
      * @param i X index.
      * @param j Y index.
-     * @param scale Vertical tile scale, e.g. how many tiles to include vertically in this quad.
+     * @param offset Vertical tiles to offset by, useful for rendering multi-tile textures.
      * @param texType Which "set" of texture coordinates to use, 0 for default, 2 for special.
+     *                0 is currently used for floor textures and 2 for wall textures.
      */
-    private static void addTex(Attribute attrib, int i, int j, float scale, int texType) {
-        float indX = (int)(mapData.tileData[i][j][texType]%Const.TILESHEET_X )*Const.TILE_SIZE_X;
-        float indY = (int)(mapData.tileData[i][j][texType]/Const.TILESHEET_X )*Const.TILE_SIZE_Y;
+    private static void addTex(Attribute attrib, int i, int j, int offset, int texType) {
+        float indX = (int)(mapData.tileData[i][j][texType]%Const.TILESHEET_X)*Const.TILE_SIZE_X;
+        float indY = (int)(mapData.tileData[i][j][texType]/Const.TILESHEET_X)*Const.TILE_SIZE_Y;
+        indY += offset*Const.TILE_SIZE_Y;
 
-        attrib.add(indX, indY,
-                   indX, indY+Const.TILE_SIZE_Y*scale,
-                   indX+Const.TILE_SIZE_X, indY,
-                   indX+Const.TILE_SIZE_X, indY,
-                   indX, indY+Const.TILE_SIZE_Y*scale,
-                   indX+Const.TILE_SIZE_X, indY+Const.TILE_SIZE_Y*scale);
+        attrib.add(
+            indX, indY,
+            indX, indY+Const.TILE_SIZE_Y,
+            indX+Const.TILE_SIZE_X, indY,
+
+            indX+Const.TILE_SIZE_X, indY,
+            indX, indY+Const.TILE_SIZE_Y,
+            indX+Const.TILE_SIZE_X, indY+Const.TILE_SIZE_Y
+        );
     }
+
     /**
      * Similar to addTex, but only a tile index is required.
+     * Adds the "shade" texture, making the edges of platforms a darker color.
+     * Any edge near a ledge or the edge of the map will have shade added to it.
      * @param attrib
      */
     private static void addShade(Attribute attrib, int x, int y, boolean floor) {
@@ -331,13 +362,24 @@ public class MapDataUtility {
         float indX = (int)(ind%Const.TILESHEET_X )*Const.TILE_SIZE_X;
         float indY = (int)(ind/Const.TILESHEET_X )*Const.TILE_SIZE_Y;
 
-        attrib.add(indX, indY,
-                   indX, indY+Const.TILE_SIZE_Y,
-                   indX+Const.TILE_SIZE_X, indY,
-                   indX+Const.TILE_SIZE_X, indY,
-                   indX, indY+Const.TILE_SIZE_Y,
-                   indX+Const.TILE_SIZE_X, indY+Const.TILE_SIZE_Y);
+        attrib.add(
+            indX, indY,
+            indX, indY+Const.TILE_SIZE_Y,
+            indX+Const.TILE_SIZE_X, indY,
+
+            indX+Const.TILE_SIZE_X, indY,
+            indX, indY+Const.TILE_SIZE_Y,
+            indX+Const.TILE_SIZE_X, indY+Const.TILE_SIZE_Y
+        );
     }
+
+    /**
+     * Adds the normal matrix used for lighting and bumpmapping.
+     * @param attrib The array of Attributes for normals.
+     * @param x Normal X value.
+     * @param y Normal Y value.
+     * @param z Normal Z value.
+     */
     private static void addNormal(Attribute[] attrib, float x, float y, float z) {
         for (int i = 0; i < 6; i++) {
             if (x == 0 && y == 1 && z == 0) {

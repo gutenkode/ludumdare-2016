@@ -113,7 +113,7 @@ public enum Item {
                 return false;
             case GRENADE:
                 BattleUIManager.logMessage("You throw the grenade! Boom!");
-                fighter.damage(Element.NONE, 40, 10, 100, false);
+                fighter.damage(Element.EXPLOSIVE, 40, 10, 100, false);
                 discard();
                 return true;
             case ENERGY_DRINK:

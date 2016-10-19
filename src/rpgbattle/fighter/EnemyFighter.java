@@ -54,14 +54,36 @@ public class EnemyFighter extends Fighter {
     public void damage(Element e, int stat, int atkPower, int accuracy, boolean crit) {
         if (calculateHit(accuracy)) {
             int dmg = calculateDamage(e,stat*atkPower,crit);
+
+            if (dmg != 0) {
+                // actually do health subtraction
+                lastHealth = stats.health;
+                stats.health -= dmg;
+                stats.health = Math.max(0, stats.health);
+                addToast("-" + dmg);
+                shakeVel = dmg;
+            }
             
-            // actually do health subtraction
-            lastHealth = stats.health;
-            stats.health -= (int)dmg;
-            stats.health = Math.max(0, stats.health);
-            addToast("-"+dmg);
-            shakeVel = dmg;
-            
+            if (stats.health <= 0)
+                BattleManager.enemyDied(this);
+        } else {
+            addToast("MISS");
+        }
+    }
+    @Override
+    public void cutHealth(Element e, double percent, int accuracy) {
+        if (calculateHit(accuracy)) {
+            int dmg = (int)(stats.health*percent);
+
+            if (dmg != 0) {
+                // actually do health subtraction
+                lastHealth = stats.health;
+                stats.health -= dmg;
+                stats.health = Math.max(0, stats.health);
+                addToast("-" + dmg);
+                shakeVel = dmg;
+            }
+
             if (stats.health <= 0)
                 BattleManager.enemyDied(this);
         } else {

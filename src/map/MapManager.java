@@ -158,6 +158,7 @@ public class MapManager {
         dir *= Math.PI*2;
         
     // render static map mesh
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         ShaderMap.use("ingame_map");
         shadowProj.makeCurrent();
         Uniform.varFloat("ambient", 0,0,0);//Uniform.varFloat("ambient", .2f,.2f,.2f);
@@ -171,6 +172,7 @@ public class MapManager {
         trans.model.setIdentity();
         trans.makeCurrent();
         currentTimeline.getMapData().render();
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         
     // render entity tilesheets
         ShaderMap.use("spritesheet_light");
@@ -186,7 +188,7 @@ public class MapManager {
             trans.model.setIdentity();
             e.render(trans.model);
         }
-        
+
     // render hitboxes
         /*
         ShaderMap.use("color");

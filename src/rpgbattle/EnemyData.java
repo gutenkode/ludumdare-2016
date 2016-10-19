@@ -5,6 +5,9 @@ import org.json.*;
 import rpgbattle.enemyBehavior.*;
 import rpgbattle.fighter.EnemyFighter;
 import rpgbattle.fighter.Fighter;
+import rpgsystem.Element;
+
+import java.util.IllegalFormatException;
 
 /**
  * Provides a blueprint for initializing an EnemyFighter, as well as the sprite
@@ -62,9 +65,11 @@ public class EnemyData {
         stats.evasion = enemyJson.getJSONObject("battle").getJSONObject("stats").getInt("evasion");
         stats.critrate = enemyJson.getJSONObject("battle").getJSONObject("stats").getInt("critrate");
         
-        stats.elementMultiplier = new double[5];
+        stats.elementMultiplier = new double[Element.values().length];
         JSONArray arr = enemyJson.getJSONObject("battle").getJSONArray("elementMult");
-        for (int i = 0; i < 5; i++)
+        if (arr.length() != Element.values().length)
+            throw new IllegalStateException("Incorrect number of element multipliers in enemy definition.");
+        for (int i = 0; i < Element.values().length; i++)
         {
             stats.elementMultiplier[i] = arr.getDouble(i);
         }

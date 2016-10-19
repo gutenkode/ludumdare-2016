@@ -35,7 +35,7 @@ public abstract class EnemyBehavior {
      * @param attackMult Scale for attack stat, 1 is regular power, 2 is double power, etc.
      */
     public void useAttack(double attackMult) {
-        int power = (int)(Math.random()*5)+7;
+        int power = 10;
         boolean crit = Math.random() < fighter.stats.critrate;
         BattleManager.getPlayer().damage(Element.PHYS, (int)(fighter.stats.attack*attackMult), power, 100, crit);
     }

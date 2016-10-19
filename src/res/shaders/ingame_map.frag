@@ -1,8 +1,8 @@
 // texture fragment shader
 #version 330 core
 
-in vec2 texCoord;
-in vec2 shadeCoord;
+noperspective in vec2 texCoord;
+noperspective in vec2 shadeCoord;
 in vec3 vertexPos;
 in mat3 normalMatrix;
 in vec4 shadowCoord;

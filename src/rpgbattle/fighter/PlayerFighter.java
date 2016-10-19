@@ -1,6 +1,8 @@
 package rpgbattle.fighter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+
 import rpgbattle.BattleManager;
 import rpgbattle.PlayerSkills;
 import rpgbattle.fighter.Fighter.Toast.ToastType;
@@ -31,8 +33,9 @@ public class PlayerFighter extends Fighter {
         stats.magic = 10;
         stats.evasion = 0.2;
         stats.critrate = 0.05;
-        
-        stats.elementMultiplier = new double[] {1,1,1,1,1};
+
+        stats.elementMultiplier = new double[Element.values().length];
+        Arrays.fill(stats.elementMultiplier, 1);
     }
     
     @Override
@@ -45,7 +48,7 @@ public class PlayerFighter extends Fighter {
         // stamina regen
         if (statEffects.contains(StatEffect.FATIGUE)) {
             addToast(ToastType.STAMINA.color+"FATIGUE");
-            addToast(ToastType.STAMINA.color+"-5");
+            addToast(ToastType.STAMINA.color+"-"+(stats.attack/2));
             drainStamina(stats.attack/2);
         } else if (stats.stamina != stats.maxStamina) {
             addToast(ToastType.STAMINA.color+"REGEN");
@@ -65,24 +68,33 @@ public class PlayerFighter extends Fighter {
     @Override
     public void damage(Element e, int stat, int atkPower, int accuracy, boolean crit) {
         if (calculateHit(accuracy)) {
-            double staminaCoef = .25 + .75 * (1-((double)stats.stamina/stats.maxStamina)); // .25 to 1, high to low stamina
             int dmg = calculateDamage(e,stat*atkPower,crit);
-            
-            // stamina damage
-            lastStamina = stats.stamina;
-            stats.stamina -= (int)(dmg*.7);
-            stats.stamina = Math.max(0, stats.stamina);
-            addToast(ToastType.STAMINA, "-"+dmg);
-            
-            // take more HP damage at low stamina
-            dmg = (int)(dmg*staminaCoef);
 
-            // actually do health subtraction
-            lastHealth = stats.health;
-            stats.health -= (int)dmg;
-            stats.health = Math.max(0, stats.health);
-            addToast("-"+dmg);
-            shakeVel = dmg;
+            if (dmg != 0) {
+                // actually do health subtraction
+                lastHealth = stats.health;
+                stats.health -= (int)dmg;
+                stats.health = Math.max(0, stats.health);
+                addToast("-" + dmg);
+                shakeVel = dmg;
+            }
+        } else {
+            addToast("MISS");
+        }
+    }
+    @Override
+    public void cutHealth(Element e, double percent, int accuracy) {
+        if (calculateHit(accuracy)) {
+            int dmg = (int)(stats.health*percent);
+
+            if (dmg != 0) {
+                // actually do health subtraction
+                lastHealth = stats.health;
+                stats.health -= dmg;
+                stats.health = Math.max(0, stats.health);
+                addToast("-" + dmg);
+                shakeVel = dmg;
+            }
         } else {
             addToast("MISS");
         }
@@ -168,7 +180,10 @@ public class PlayerFighter extends Fighter {
         return true;
     }
     public int getAttackPower() {
-        return (int)(10*Math.min(1,.25+(stats.stamina/(float)stats.maxStamina)));
+        return (int)(10*
+                Math.min(1,
+                .25+(stats.stamina/(float)stats.maxStamina)
+                ));
     }
     public boolean canUseSkill(MenuHandler handler, Skill skill) {
         if (skill.cost() > stats.mana) {

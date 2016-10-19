@@ -43,6 +43,7 @@ public abstract class Fighter {
     public abstract boolean act();
     
     public abstract void damage(Element e, int stat, int atkPower, int accuracy, boolean crit);
+    public abstract void cutHealth(Element e, double percent, int accuracy);
     /**
      * Runs an accuracy check for an attack against this Fighter.
      * Returns true the % of time the attack should hit.
@@ -61,6 +62,19 @@ public abstract class Fighter {
      * @param crit 
      */
     final int calculateDamage(Element element, int strength, boolean crit) {
+        // use this formula instead, from Persona...
+        /*
+        DMG = 5 x sqrt(ST/EN x ATK) x MOD x HITS X RND
+
+        DMG = Damage
+        ST = Character's Strength stat
+        EN = Enemy's Endurance stat
+        ATK = Atk value of equipped weapon OR Pwr value of used skill
+        MOD = Modifier based on the difference between character level and enemy level
+        HITS= Number of hits (for physical skills)
+        RND = Randomness factor (according to DragoonKain33, may be roughly between 0.95 and 1.05)
+         */
+
         // elemental strength/weakness
         double elementMultVal = stats.elementMultiplier[element.index];
 
@@ -174,16 +188,16 @@ public abstract class Fighter {
     public int lastHealth() { return lastHealth; }
     public int lastStamina() { return lastStamina; }
     public int lastMana() { return lastMana; }
-    
+
     public int shakeValue() {
         shake += shakeVel;
         shakeVel -= shake/6;
         shake *= .9;
         shakeVel *= .9;
-        
+
         return (int)shake;
     }
-    
+
     public class FighterStats {
         public int health, maxHealth,
                    stamina, maxStamina,
@@ -227,7 +241,7 @@ public abstract class Fighter {
             HEAL("@{0,.8,0,1}"),
             STAMINA("@{1,.9,0,1}"),
             MANA("@{.6,.6,1,1}"),
-            POISON("@{1,0,.9,1}");
+            POISON("@{.8,0,.7,1}");
             public final String color;
             ToastType(String c) { color = c; }
         }

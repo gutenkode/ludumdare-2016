@@ -17,31 +17,43 @@ import static rpgsystem.DefaultTarget.*;
  */
 public enum Skill {
     FIRE("Fireball",
-        "Reliable medium strength skill.", "skill_fire", "anim_ice",
-        ENEMY,
+        "Reliable medium strength skill.", "skill_fire",
+        ENEMY, BattleAnimation.Type.FIRE,
         30,     100,    5),
     BOLT("Thunderbolt",
-        "High power, low accuracy.", "skill_fire", "anim_ice",
-        ENEMY,
+        "High power, low accuracy.", "skill_fire",
+        ENEMY, BattleAnimation.Type.ELEC,
         35,     80,     7),
     ICE("Ice",
-        "Weak, but high chance to crit.", "skill_fire", "anim_ice",
-        ENEMY,
+        "Weak, but high chance to crit.", "skill_fire",
+        ENEMY, BattleAnimation.Type.ICE,
         25,     100,    7),
+    RUIN("Ruin",
+        "Does damage based on\ntarget's remaining HP.", "skill_fire",
+        ENEMY, BattleAnimation.Type.FIRE,
+        50,     100,    6),
     CURE("Cure",
-        "Restores HP.", "skill_fire", "anim_ice",
-        PLAYER,
+        "Restores HP.", "skill_fire",
+        PLAYER, BattleAnimation.Type.FIRE,
         50,     0,      10);
 
-    public final String name, desc, spriteName, animName;
-    public final int basePower, baseAccuracy, baseCost;
+    public final String name,
+                        desc, spriteName;
     public final DefaultTarget defaultTarget;
-    Skill(String n, String d, String s, String an, DefaultTarget t, int p, int a, int c) {
+    public final BattleAnimation.Type animType;
+    public final int basePower, baseAccuracy, baseCost;
+    Skill(String n,
+          String d, String s,
+          DefaultTarget t, BattleAnimation.Type at,
+          int p, int a, int c) {
         name = n;
+
         desc = d;
         spriteName = s;
-        animName = an;
+
         defaultTarget = t;
+        animType = at;
+
         basePower = p;
         baseAccuracy = a;
         baseCost = c;
@@ -134,20 +146,19 @@ public enum Skill {
     }
     
     public void useBattle(MenuHandler handler, int magicStat, Fighter... targets) {
-        // TODO: check for MUTLI_TARGET modifier
         switch (this) {
             case FIRE:
                 BattleUIManager.logMessage("You cast Fireball!");
                 for (Fighter f : targets) {
                     f.damage(Element.FIRE, magicStat, power(), accuracy(), false);
-                    f.addAnim(new BattleAnimation(BattleAnimation.Type.FIRE));
+                    f.addAnim(new BattleAnimation(animType));
                 }
                 break;
             case BOLT:
                 BattleUIManager.logMessage("You cast Thunderbolt!");
                 for (Fighter f : targets) {
                     f.damage(Element.ELEC, magicStat, power(), accuracy(), false);
-                    f.addAnim(new BattleAnimation(BattleAnimation.Type.ELEC));
+                    f.addAnim(new BattleAnimation(animType));
                 }
                 break;
             case ICE:
@@ -155,13 +166,22 @@ public enum Skill {
                 for (Fighter f : targets) {
                     boolean crit = Math.random() > .35;
                     f.damage(Element.ICE, magicStat, power(), accuracy(), crit);
-                    f.addAnim(new BattleAnimation(BattleAnimation.Type.ICE));
+                    f.addAnim(new BattleAnimation(animType));
+                }
+                break;
+            case RUIN:
+                BattleUIManager.logMessage("You cast Ruin!");
+                for (Fighter f : targets) {
+                    f.cutHealth(Element.RUIN, power()/100.0, accuracy());
+                    f.addAnim(new BattleAnimation(animType));
                 }
                 break;
             case CURE:
                 BattleUIManager.logMessage("You cast Cure!");
-                for (Fighter f : targets)
+                for (Fighter f : targets) {
                     f.restoreHealth(power());
+                    f.addAnim(new BattleAnimation(animType));
+                }
                 break;
             default:
                 handler.showDialogue("You can't use this here.");

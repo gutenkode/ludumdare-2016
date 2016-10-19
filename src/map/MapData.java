@@ -19,12 +19,15 @@ public class MapData {
     protected final int[][] heightData;
     protected final LinkData[] linkData;
     protected final String[] entities;
-    //protected final StaticObject[] staticObjects;
     
     /**
      * Loads all the data required to define a room in the game.
      * @param mapName The String identifying this room.
-     * @param tileData Ignore this for now.
+     * @param tileData Stores data for texture coordinates and other tile data, in the following layers:
+     *                  texture coordinates,
+     *                  tile "shape",
+     *                  secondary texture coordinates.
+     *                 Tile shape is a value (0,1,2,3): 0,1=draw ground, 2,3=no ground, 0,2=no wall, 1,3=draw wall
      * @param heightData 2D array defining the height of each tile, default is 0.
      * @param linkData Array of LinkData objects for tiles that link to other rooms.
      * @param entities String array of all entities to be constructed.
