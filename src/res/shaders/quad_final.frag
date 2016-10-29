@@ -21,21 +21,24 @@ uniform vec3 colorMult = vec3(1.0);
 
 void main()
 {
+	// the UI texture
+	vec4 ui = texture(tex_ui, texCoord);
+
 	// blend 3D scene with blurred DOF scene
 	vec4 v1 = texture(tex_scene, texCoord);
 	vec4 v2 = texture(tex_dof, texCoord);
 	float dofvalue = texture(tex_dofvalue, texCoord).r + dofCoef;
 	dofvalue = clamp(dofvalue, 0,1);
+	dofvalue = min(dofvalue, 1-ceil(ui.a)); // if there is UI here, use the full blurred texture
 	//FragColor = v1*(texCoord.y) + v2*(1-texCoord.y);
-	//dofvalue = 1.0; // temporary
+	//dofvalue = 0.0; // 0 = blur, 1 = solid
 	FragColor = mix(v2, v1, dofvalue);
 
 	// put the non-blurred UI over all of it
-	vec4 ui = texture(tex_ui, texCoord);
 	FragColor = ui*(ui.a) + FragColor*(1-ui.a);
 
 	// bloom
-	FragColor += /*texture(tex_scanlines, texCoord) */ texture(tex_bloom, texCoord) * bloomCoef;
+	FragColor += /*texture(tex_scanlines, texCoord) */ texture(tex_bloom, texCoord) * .75 * bloomCoef;
 
 	// noise and vignette
 	vec2 noiseCoord = (texCoord + rand) * vec2(aspectRatio,1);
@@ -44,4 +47,6 @@ void main()
 	FragColor *= texture(tex_scanlines, texCoord*vec2(1,128));
 
 	FragColor.xyz *= colorMult; // used for fading in/out
+
+	//FragColor = vec4(vec3(ceil(ui.a)),1);
 }

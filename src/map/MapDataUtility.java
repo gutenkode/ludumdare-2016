@@ -18,7 +18,7 @@ import rpgsystem.Item;
  */
 public class MapDataUtility {
 
-    public static ArrayList<Entity> constructEntities(String[] entityData) {
+    public static ArrayList<Entity> constructEntities(ArrayList<String> entityData) {
         ArrayList<Entity> list = new ArrayList<>();
         int x,y,h,width,height;
         for (String s : entityData) {
@@ -162,7 +162,8 @@ public class MapDataUtility {
         int h = mapData.heightData[i][j];
         
         // ground tile is only drawn for shapes 0,1
-        if (mapData.tileData[i][j][1] < 2) {
+        if (testShapeVal(i,j,1)) {
+        //if (mapData.tileData[i][j][1] < 2) {
             // ground tile
             vertAttrib.add(
                 i,j,h,
@@ -179,7 +180,8 @@ public class MapDataUtility {
         }
         
         // wall tile only drawn for shapes 1,3
-        if (mapData.tileData[i][j][1] == 0 || mapData.tileData[i][j][1] == 2)
+        if (testShapeVal(i,j,0))
+        //if (mapData.tileData[i][j][1] == 0 || mapData.tileData[i][j][1] == 2)
             return;
         
         // back wall
@@ -404,5 +406,9 @@ public class MapDataUtility {
                 attrib[2].add(x,y,z);
             }
         }
+    }
+
+    private static boolean testShapeVal(int x, int y, int index) {
+        return 0 == (mapData.tileData[x][y][1] & (1 << index));
     }
 }

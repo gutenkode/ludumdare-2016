@@ -2,6 +2,8 @@ package map;
 
 import mote4.util.vertex.mesh.Mesh;
 
+import java.util.ArrayList;
+
 /**
  * Container class for an overworld map.
  * Constructed by MapLoader.
@@ -18,7 +20,7 @@ public class MapData {
     protected final int[][][] tileData;
     protected final int[][] heightData;
     protected final LinkData[] linkData;
-    protected final String[] entities;
+    protected final ArrayList<String> entities;
     
     /**
      * Loads all the data required to define a room in the game.
@@ -32,7 +34,7 @@ public class MapData {
      * @param linkData Array of LinkData objects for tiles that link to other rooms.
      * @param entities String array of all entities to be constructed.
      */
-    protected MapData(String mapName, int[][][] tileData, int[][] heightData, LinkData[] linkData, String[] entities) {
+    protected MapData(String mapName, int[][][] tileData, int[][] heightData, LinkData[] linkData, ArrayList<String> entities) {
         width = tileData.length;
         height = tileData[0].length;
         this.mapName = mapName;
@@ -66,6 +68,18 @@ public class MapData {
         
         mesh.render();
     }
+
+    /**
+     * Signals that the current mesh should be rebuilt.
+     * The mesh will not be rebuilt until render() is called again.
+     */
+    public void rebuildMesh() { meshBuilt = false; }
+
+    /**
+     * Used by MapEditor.
+     * @param s
+     */
+    public void addEntity(String s) { entities.add(s); }
     
     public void destroy() {
         mesh.destroy();

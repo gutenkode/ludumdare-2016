@@ -20,8 +20,9 @@ public class LinkData {
     protected final int x,y;
     /**
      * The direction this room link is facing.
+     * Modified by MapEditor.
      */
-    protected final int direction;
+    protected int direction;
     
     public LinkData(char id, String s, int x, int y, int dir) {
         this.id = id;

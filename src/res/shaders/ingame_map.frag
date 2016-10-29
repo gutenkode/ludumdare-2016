@@ -51,7 +51,7 @@ void main()
     float lightDistCoef = 2.0/lengthVal;
 
 	// depth of field interpolation value
-	DOFValue = vec4(2.0/pow(lengthVal,2.0),0,0,1);
+	DOFValue = vec4(1.0/pow(lengthVal,2.0),0,0,1);
 
     // bias is used to reduce weird artifacts in shadow
     float bias = 0.005*tan(acos(max(dot(bumpNormal,L),0)));

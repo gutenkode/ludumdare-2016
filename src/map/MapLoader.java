@@ -78,7 +78,7 @@ public class MapLoader {
         // load entity data
         start = file.indexOf("<entitydata>");
         end = file.indexOf("</entitydata>");
-        String[] entities = loadEntities(start, end, file);
+        ArrayList<String> entities = loadEntities(start, end, file);
         
         loadedMaps.put(fileName, new MapData(fileName, tileData, heightData, linkData, entities));
     }
@@ -236,13 +236,14 @@ public class MapLoader {
      * @param str File to read.
      * @return 
      */
-    private static String[] loadEntities(int s, int e, ArrayList<String> str) {
+    private static ArrayList<String> loadEntities(int s, int e, ArrayList<String> str) {
         // pretty simple
-        String[] list = new String[e-s-1];
+        ArrayList<String> list = new ArrayList<>();//new String[e-s-1];
         int ind = 0;
         for (int i = s+1; i < e; i++) {
-            list[ind] = str.get(i).trim();
-            ind++;
+            list.add(str.get(i).trim());
+            //list[ind] = str.get(i).trim();
+            //ind++;
         }
         return list;
     }

@@ -11,6 +11,7 @@ import rpgsystem.Element;
 import rpgsystem.StatEffect;
 import scenes.RootScene;
 import scenes.RootScene.State;
+import ui.BattleUIManager;
 import ui.components.BattleAnimation;
 
 /**
@@ -126,12 +127,15 @@ public abstract class Fighter {
     public void inflictStatus(StatEffect e) {
         switch (e) {
             case POISON:
+                BattleUIManager.logMessage("You are now poisoned!"); // this dialogue is not versatile enough
                 addToast(ToastType.POISON, e.name.toUpperCase());
                 break;
             case FATIGUE:
+                BattleUIManager.logMessage("You are now fatigued!");
                 addToast(ToastType.STAMINA, e.name.toUpperCase());
                 break;
             default:
+                BattleUIManager.logMessage("You are now ["+e.name()+"]!");
                 addToast(e.name.toUpperCase());
                 break;
         }
