@@ -126,7 +126,7 @@ public class Enemy extends Entity {
         if (MapManager.getPlayer().tileHeight == tileHeight) 
         {
             // BattleManager -> load enemies for battle
-            BattleManager.initEnemies(enemyName,enemyName,enemyName);
+            BattleManager.initEnemies(enemyName,enemyName);
 
             // RootScene -> go to battle
             RootScene.transitionToBattle();

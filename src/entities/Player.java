@@ -1,6 +1,7 @@
 package entities;
 
 import map.MapManager;
+import mote4.scenegraph.Window;
 import mote4.util.matrix.TransformationMatrix;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
@@ -17,7 +18,7 @@ import rpgbattle.BattleManager;
 public class Player extends Entity {
     
     private static Mesh mesh;
-    
+
     private static int[][] dirMat = new int[][] {{5,4,3},
                                                  {6,0,2},
                                                  {7,0,1}};
@@ -45,6 +46,8 @@ public class Player extends Entity {
                   runSpeed = .016f,
                   velX, velY, // movement  velocity
                   elevatorHeight; // smooth height transition
+    private double[] camera = new double[2];
+    private double[] lastCursorPos = new double[2];
     
     private int targetDirection = 0, drainStaminaDelay;
     private int[][] spriteMapInd = new int[][] {
@@ -59,6 +62,7 @@ public class Player extends Entity {
         posY = y;
         hitboxW = .3f;
         hitboxH = .2f;
+        lastCursorPos = Window.getCursorPos();
     }
     
     @Override
@@ -92,12 +96,25 @@ public class Player extends Entity {
      * @return 
      */
     public float facingDirection() { return direction; }
+
+    public double[] cameraRot() { return camera; }
     
     @Override
     public void update() {
         setTileHeight();
         
         setSpriteDirection();
+
+        if (Input.currentLock() == Input.Lock.PLAYER) {
+            // first person camera rotation
+            double[] c = Window.getCursorPos();
+            camera[0] += (lastCursorPos[0]-c[0])*.005;
+            camera[1] += (c[1]-lastCursorPos[1])*.005;
+
+            camera[1] = Math.max(-Math.PI*.4, Math.min(Math.PI*.4, camera[1]));
+
+            lastCursorPos = c;
+        }
         
         float accel;
         boolean running = false;
@@ -111,7 +128,37 @@ public class Player extends Entity {
             } else
                 accel = walkSpeed;
         }
-           
+
+        float[] chg = topDownMovement(accel);
+        //float[] chg = firstPersonMovement(accel);
+        
+        if (running && (chg[0] != 0 || chg[1] != 0)) {
+            if (drainStaminaDelay <= 0) {
+                BattleManager.getPlayer().drainStamina(1);
+                drainStaminaDelay = 2;
+            }
+        }
+        drainStaminaDelay--;
+        
+        // walking animation
+        float spriteChg = Math.abs(chg[0])+Math.abs(chg[1]);
+        if (spriteChg == 0)
+            spriteFrameCycle = 0;
+        else {
+            spriteFrameCycle += spriteChg*15;
+            spriteFrameCycle %= spriteMapInd[1][(int)direction];
+        }
+        
+        velX += chg[0];
+        velY += chg[1];
+        
+        posX += velX;
+        posY += velY;
+        
+        velX *= .75f;
+        velY *= .75f;
+    }
+    private float[] topDownMovement(float accel) {
         float chgX = 0;
         if (Input.currentLock() == Input.Lock.PLAYER)
         {
@@ -122,11 +169,11 @@ public class Player extends Entity {
             }
         }
         if (MapManager.entityCollidesWithSolidEntities(this, velX+chgX, 0) ||
-            MapManager.entityCollidesWithMapAndWalkableEntities(this, velX+chgX, 0)) {
+                MapManager.entityCollidesWithMapAndWalkableEntities(this, velX+chgX, 0)) {
             chgX = 0;
             velX = 0;
         }
-        
+
         float chgY = 0;
         if (Input.currentLock() == Input.Lock.PLAYER)
         {
@@ -137,43 +184,78 @@ public class Player extends Entity {
             }
         }
         if (MapManager.entityCollidesWithSolidEntities(this, 0, velY+chgY) ||
-            MapManager.entityCollidesWithMapAndWalkableEntities(this, 0, velY+chgY)) {
+                MapManager.entityCollidesWithMapAndWalkableEntities(this, 0, velY+chgY)) {
             chgY = 0;
             velY = 0;
         }
-        
+
         // keep diagonal speed the same as one-directional
         if (chgX != 0 && chgY != 0) {
             chgX *= .7;
             chgY *= .7;
         }
-        
-        if (running && (chgX != 0 || chgY != 0)) {
-            if (drainStaminaDelay <= 0) {
-                BattleManager.getPlayer().drainStamina(1);
-                drainStaminaDelay = 2;
+
+        return new float[] {chgX, chgY};
+    }
+    private float[] firstPersonMovement(float accel) {
+        float chgX = 0;
+        boolean lr = false, ud = false;
+        if (Input.currentLock() == Input.Lock.PLAYER)
+        {
+            if (Input.isKeyDown(Input.Keys.RIGHT)) {
+                lr = true;
+                chgX = (float)Math.cos(camera[0])*-accel;
+            } else if (Input.isKeyDown(Input.Keys.LEFT)) {
+                lr = true;
+                chgX = (float)Math.cos(camera[0])*accel;
+            }
+            if (Input.isKeyDown(Input.Keys.UP)) {
+                ud = true;
+                chgX += (float)Math.sin(camera[0])*accel;
+            } else if (Input.isKeyDown(Input.Keys.DOWN)) {
+                ud = true;
+                chgX += (float)Math.sin(camera[0])*-accel;
             }
         }
-        drainStaminaDelay--;
-        
-        // walking animation
-        float spriteChg = Math.abs(chgX)+Math.abs(chgY);
-        if (spriteChg == 0)
-            spriteFrameCycle = 0;
-        else {
-            spriteFrameCycle += spriteChg*15;
-            spriteFrameCycle %= spriteMapInd[1][(int)direction];
+        if (MapManager.entityCollidesWithSolidEntities(this, velX+chgX, 0) ||
+                MapManager.entityCollidesWithMapAndWalkableEntities(this, velX+chgX, 0)) {
+            chgX = 0;
+            velX = 0;
         }
-        
-        velX += chgX;
-        velY += chgY;
-        
-        posX += velX;
-        posY += velY;
-        
-        velX *= .75f;
-        velY *= .75f;
+
+        float chgY = 0;
+        if (Input.currentLock() == Input.Lock.PLAYER)
+        {
+            if (Input.isKeyDown(Input.Keys.RIGHT)) {
+                lr = true;
+                chgY = (float)Math.sin(camera[0])*accel;
+            } else if (Input.isKeyDown(Input.Keys.LEFT)) {
+                lr = true;
+                chgY = (float)Math.sin(camera[0])*-accel;
+            }
+            if (Input.isKeyDown(Input.Keys.UP)) {
+                ud = true;
+                chgY += (float)Math.cos(camera[0])*accel;
+            } else if (Input.isKeyDown(Input.Keys.DOWN)) {
+                ud = true;
+                chgY += (float)Math.cos(camera[0])*-accel;
+            }
+        }
+        if (MapManager.entityCollidesWithSolidEntities(this, 0, velY+chgY) ||
+                MapManager.entityCollidesWithMapAndWalkableEntities(this, 0, velY+chgY)) {
+            chgY = 0;
+            velY = 0;
+        }
+
+        // keep diagonal speed the same as one-directional
+        if (ud && lr) {
+            chgX *= .7;
+            chgY *= .7;
+        }
+
+        return new float[] {chgX, chgY};
     }
+
     /**
      * Set direction for sprite rendering, does not affect velocity
      * or collision detection.

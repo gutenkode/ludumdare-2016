@@ -10,8 +10,8 @@ layout(location = 4) in vec3 NormalIn3;
 
 layout(location = 5) in vec2 ShadeIn;
 
-noperspective out vec2 texCoord;
-noperspective out vec2 shadeCoord;
+/*noperspective*/ out vec2 texCoord;
+/*noperspective*/ out vec2 shadeCoord;
 out vec3 vertexPos;
 out mat3 normalMatrix;
 out vec4 shadowCoord;
@@ -25,7 +25,7 @@ uniform mat4 depthProj = mat4(1.0);
 void main()
 {
 	gl_Position = projectionMatrix * viewMatrix * modelMatrix * VertexIn;
-	gl_Position = floor(gl_Position*35)/35;
+	//gl_Position = floor(gl_Position*50.0)/50.0;
 
 	texCoord = TexIn;
 	shadeCoord = ShadeIn;

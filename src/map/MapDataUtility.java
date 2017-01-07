@@ -408,6 +408,14 @@ public class MapDataUtility {
         }
     }
 
+    /**
+     * Test the shape value for a tile.
+     * Tile values are stored in a single int as separate bits; index is the offset of the bit to test.
+     * @param x Tile X.
+     * @param y Tile Y.
+     * @param index Index of tile value to test.
+     * @return
+     */
     private static boolean testShapeVal(int x, int y, int index) {
         return 0 == (mapData.tileData[x][y][1] & (1 << index));
     }

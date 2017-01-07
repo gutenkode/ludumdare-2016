@@ -1,5 +1,7 @@
 package map;
 
+import java.util.ArrayList;
+
 /**
  * Container class for the map editor, a sort of API for modifying a map file.
  * @author Peter
@@ -62,6 +64,23 @@ public class MapEditor {
         mapData.rebuildMesh();
     }
 
+    public void addLink(int x, int y, String roomname) {
+        ArrayList<Character> ids = new ArrayList<>();
+        for (LinkData ld : mapData.linkData) {
+            if ((ld.x == x && ld.y == y) || roomname.equals(ld.mapName))
+                return; // there is already a LinkData here or it links to the same room
+            ids.add(ld.id);
+        }
+        // no LinkData was found
+        for (int i = 'a'; i <= 'z'; i++) {
+            if (!ids.contains(i)) {
+                mapData.linkData.add(new LinkData((char) i, roomname, x, y, 0));
+                return;
+            }
+        }
+        // this room links to too many other rooms, somehow...
+    }
+
     /**
      * If there is a room link on this tile, edits its orientation.
      * @param x
@@ -76,6 +95,7 @@ public class MapEditor {
                 return;
             }
         }
+        // no LinkData was found
     }
 
     /**

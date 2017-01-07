@@ -21,6 +21,8 @@ import rpgbattle.BattleManager;
 public class Ingame implements Scene {
     
     private static final DepthTexture depthTexture;
+
+    private static boolean firstPerson = false;
     
     static {
         depthTexture = new DepthTexture(1024,1024);
@@ -30,6 +32,7 @@ public class Ingame implements Scene {
     private Transform trans;
     private final GenericMatrix shadowProj;
     private int playerRestoreStaminaDelay;
+    private float[] flashlightDir = new float[2];
     
     public Ingame() {
         trans = new Transform();
@@ -47,26 +50,42 @@ public class Ingame implements Scene {
             BattleManager.getPlayer().restoreStamina(1);
         } else
             playerRestoreStaminaDelay--;
-        
-        float dir = MapManager.getPlayer().facingDirection();
-        dir /= 8;
-        dir *= Math.PI*2;
-        
-        // normal camera view
-        trans.view.setIdentity();
-        trans.view.translate(0, 0, -5); // pull camera back
-        trans.view.rotate(-(float)Math.PI/4, 1, 0, 0); // angle down, otherwise view is top-down
-        
-        // dynamic angle changing based on the players location in the current map
-        int[] mapSize = MapManager.currentMapSize();
-        float xAngle = MapManager.getPlayer().posX()/mapSize[0]-.5f;
-        float yAngle = MapManager.getPlayer().posY()/mapSize[1]-.5f;
-        trans.view.rotate(yAngle*.2f, 1, 0, 0);
-        trans.view.rotate(xAngle*.4f, 0, 0, 1);
-        
-        trans.view.translate(-MapManager.getPlayer().posX(), MapManager.getPlayer().posY(), -MapManager.getPlayer().elevatorHeight());
-        trans.view.scale(1, -1, 1);
-        
+
+        if (firstPerson) {
+            double[] r = MapManager.getPlayer().cameraRot();
+            flashlightDir[0] = (float)r[0];
+            flashlightDir[1] = (float)r[1];
+
+            trans.view.setIdentity();
+            trans.view.rotate(-(float) Math.PI/2, 1, 0, 0); // angle up to be level with horizon
+            trans.view.rotate((float)r[1],1,0,0);
+            trans.view.rotate(-(float)(r[0]+Math.PI),0,0,1);
+
+            // move to player
+            trans.view.translate(-MapManager.getPlayer().posX(), MapManager.getPlayer().posY(), -MapManager.getPlayer().elevatorHeight()-1.2f);
+            trans.view.scale(1, -1, 1);
+        } else {
+            flashlightDir[1] = (float)Math.PI/2;
+            flashlightDir[0] = MapManager.getPlayer().facingDirection();
+            flashlightDir[0] /= 8;
+            flashlightDir[0] *= Math.PI*2;
+
+            // normal camera view
+            trans.view.setIdentity();
+            trans.view.translate(0, 0, -5); // pull camera back
+            trans.view.rotate(-(float) Math.PI / 4, 1, 0, 0); // angle down, otherwise view is top-down
+
+            // dynamic angle changing based on the players location in the current map
+            int[] mapSize = MapManager.currentMapSize();
+            float xAngle = MapManager.getPlayer().posX() / mapSize[0] - .5f;
+            float yAngle = MapManager.getPlayer().posY() / mapSize[1] - .5f;
+            trans.view.rotate(yAngle * .2f, 1, 0, 0);
+            trans.view.rotate(xAngle * .4f, 0, 0, 1);
+
+            // move to player
+            trans.view.translate(-MapManager.getPlayer().posX(), MapManager.getPlayer().posY(), -MapManager.getPlayer().elevatorHeight());
+            trans.view.scale(1, -1, 1);
+        }
         // shadow map camera view
         shadowProj.setIdentity();
         
@@ -77,8 +96,9 @@ public class Ingame implements Scene {
         shadowProj.setPerspective(1, 1, .1f, 10, 140); // FOV is in degrees
         shadowProj.scale(-1, 1, 1);
         shadowProj.rotate(-(float)Math.PI/2, 1, 0, 0); // face forward, not down
-        
-        shadowProj.rotate(dir, 0, 0, 1); // rotate to match flashlight
+
+        //shadowProj.translate(.5f,0,-.25f); // offset for first person view
+        shadowProj.rotate(flashlightDir[0], 0, 0, 1); // rotate to match flashlight
         shadowProj.translate(-MapManager.getPlayer().posX(), -MapManager.getPlayer().posY(), -MapManager.getPlayer().elevatorHeight()-1.1f);
         
     }
@@ -90,15 +110,15 @@ public class Ingame implements Scene {
     
     // render depth data from camera perspective
         depthTexture.makeCurrent();
-        GL11.glClearColor(1, 1, 1, 1); // for depth buffer values
+        glClearColor(1, 1, 1, 1); // for depth buffer values
         glClear(GL_DEPTH_BUFFER_BIT);
         MapManager.renderForShadow(trans.model, shadowProj);
         
     // normal scene, using contents of depth texture for shadow rendering
         t.makeCurrent();
-        GL11.glClearColor(0, 0, 0, 0); // for regular rendering
+        glClearColor(0, 0, 0, 0); // for regular rendering
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-        MapManager.render(trans, shadowProj);
+        MapManager.render(trans, shadowProj, flashlightDir);
     }
     
     @Override

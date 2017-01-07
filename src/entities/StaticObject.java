@@ -96,7 +96,7 @@ public class StaticObject extends Entity {
             case FLUORESCENT:
                 Uniform.varFloat("spriteInfo", 2,1,0);
                 Uniform.varFloat("spriteInfoEmissive", 2,1,1);
-                Uniform.varFloat("emissiveMult", 1);
+                Uniform.varFloat("emissiveMult", 3);
                 model.translate(posX, posY, tileHeight+2);
                 model.scale(.25f,.75f,1);
                 model.rotate((float)Math.PI, 1, 0, 0);

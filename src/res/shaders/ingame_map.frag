@@ -1,8 +1,8 @@
 // texture fragment shader
 #version 330 core
 
-noperspective in vec2 texCoord;
-noperspective in vec2 shadeCoord;
+/*noperspective*/ in vec2 texCoord;
+/*noperspective*/ in vec2 shadeCoord;
 in vec3 vertexPos;
 in mat3 normalMatrix;
 in vec4 shadowCoord;
@@ -51,13 +51,14 @@ void main()
     float lightDistCoef = 2.0/lengthVal;
 
 	// depth of field interpolation value
-	DOFValue = vec4(1.0/pow(lengthVal,2.0),0,0,1);
+	float dofLength = length(lightPos.y-vertexPos.y);
+	DOFValue = vec4(1.0-1.0/pow(dofLength,3.0),0,0,1);//vec4(fogDepth);
 
     // bias is used to reduce weird artifacts in shadow
     float bias = 0.005*tan(acos(max(dot(bumpNormal,L),0)));
     bias = clamp(bias, 0, 0.01);
     float shadow = textureProj(shadowMap, shadowCoord+vec4(0,0,-bias,0));
-		shadow = shadow*.9+.1;
+	shadow = shadow*.9+.1;
 
     // apply lighting to fragment, cannot be brighter than the diffuse texture
     FragColor.rgb *= max(ambient, vec3(clamp(

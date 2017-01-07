@@ -58,10 +58,6 @@ public class IngameUIManager implements MenuHandler {
         flavorTextRenderYOffset = 0;
     }
     
-    private IngameUIManager() {
-       
-    }
-    
     public static void update() {
         if (gamePaused) 
         {

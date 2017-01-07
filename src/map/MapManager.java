@@ -152,17 +152,22 @@ public class MapManager {
      * @param trans
      * @param shadowProj
      */
-    public static void render(Transform trans, GenericMatrix shadowProj) {
-        float dir = player.facingDirection();
-        dir /= 8;
-        dir *= Math.PI*2;
+    public static void render(Transform trans, GenericMatrix shadowProj, float[] flashlightDir) {
+        float[] lightVector = new float[3];
+        lightVector[0] = -(float)Math.sin(flashlightDir[0]);
+        lightVector[1] = -(float)Math.cos(flashlightDir[0]);
+        lightVector[2] = 0;
+        //lightVector[0] = -(float)(Math.sin(flashlightDir[0])*Math.cos(flashlightDir[1]));
+        //lightVector[1] = -(float)(Math.cos(flashlightDir[0])*Math.cos(flashlightDir[1]));
+        //lightVector[2] = (float)Math.cos(flashlightDir[1]);
         
     // render static map mesh
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         ShaderMap.use("ingame_map");
         shadowProj.makeCurrent();
         Uniform.varFloat("ambient", 0,0,0);//Uniform.varFloat("ambient", .2f,.2f,.2f);
-        Uniform.varFloat("flashlightAngle", -(float)Math.sin(dir),-(float)Math.cos(dir),0);
+        Uniform.varFloat("flashlightAngle", lightVector);
+        //Uniform.varFloat("flashlightAngle", -(float)Math.sin(flashlightDir[0]),-(float)Math.cos(flashlightDir[0]),0);
         Uniform.varFloat("lightPos", player.posX(), player.posY()+player.hitboxH(), player.elevatorHeight()+1f);
         Uniform.samplerAndTextureFiltered("shadowMap", 1, "fbo_depth");
         
@@ -178,7 +183,8 @@ public class MapManager {
         ShaderMap.use("spritesheet_light");
         shadowProj.makeCurrent();
         Uniform.varFloat("ambient", 0,0,0);//Uniform.varFloat("ambient", .2f,.2f,.2f);
-        Uniform.varFloat("flashlightAngle", -(float)Math.sin(dir),-(float)Math.cos(dir),0);
+        Uniform.varFloat("flashlightAngle", lightVector);
+        //Uniform.varFloat("flashlightAngle", -(float)Math.sin(flashlightDir[0]),-(float)Math.cos(flashlightDir[0]),0);
         Uniform.varFloat("lightPos", player.posX(), player.posY()+player.hitboxH(), player.elevatorHeight()+1f);
         Uniform.samplerAndTextureFiltered("shadowMap", 1, "fbo_depth");
         
@@ -225,8 +231,7 @@ public class MapManager {
         
         // render entity tilesheets
         for (Entity e : currentTimeline.getEntities()) {
-            if (e instanceof Water)
-                continue; // water does not cast shadows
+            // add a check for whether this entity should render shadows
             shadowModel.setIdentity();
             shadowModel.makeCurrent();
             e.render(shadowModel);

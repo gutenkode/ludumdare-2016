@@ -55,14 +55,15 @@ public class Water extends Entity {
         
         Uniform.varFloat("spriteInfo", 1,1,1);
         TextureMap.bindUnfiltered("entity_water");
-        for (int i = 0; i < 6; i++)
-        {
-            Uniform.varFloat("colorMult", 1,1,1,.65f-.1f*i);
+        //for (int i = 0; i < 6; i++)
+        //{
+            Uniform.varFloat("colorMult", 1,1,1,.55f);
+            //Uniform.varFloat("colorMult", 1,1,1,.65f-.1f*i);
             //model.translate((float)Math.sin(offset*Math.PI), (float)Math.sin(offset*Math.PI)/2, .1f);
             model.translate(0,0, .1f);
             model.makeCurrent();
             mesh.render();
-        }
+        //}
         Uniform.varFloat("colorMult", 1,1,1,1);
     }
 }

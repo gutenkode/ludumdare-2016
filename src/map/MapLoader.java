@@ -73,7 +73,7 @@ public class MapLoader {
         // load room link data
         start = file.indexOf("<linkdesc>");
         end = file.indexOf("</linkdesc>");
-        LinkData[] linkData = loadLinkDesc(start, end, file);
+        ArrayList<LinkData> linkData = loadLinkDesc(start, end, file);
         
         // load entity data
         start = file.indexOf("<entitydata>");
@@ -201,8 +201,8 @@ public class MapLoader {
      * @param str File to read.
      * @return 
      */
-    private static LinkData[] loadLinkDesc(int s, int e, ArrayList<String> str) {
-        LinkData[] data = new LinkData[e-s-1];
+    private static ArrayList<LinkData> loadLinkDesc(int s, int e, ArrayList<String> str) {
+        ArrayList<LinkData> data = new ArrayList<>();//LinkData[] data = new LinkData[e-s-1];
         for (int i = s+1; i < e; i++) {
             StringTokenizer tok = new StringTokenizer(str.get(i),",");
             // characters starting from 'a'
@@ -210,12 +210,12 @@ public class MapLoader {
             // starting with 'a'
             char id = (char)(i-s-1+97);
             int[] pos = roomLinkLocations.get(id); // read position data created in loadLinkPosition
-            data[i-s-1] = new LinkData(
+            data.add(new LinkData(
                 id,
                 tok.nextToken(), // room name
                 pos[0],
                 pos[1],
-                Integer.parseInt(tok.nextToken())); // direction of the link
+                Integer.parseInt(tok.nextToken()))); // direction of the link
         }
         // make sure there isn't more then one link to the same room
         // this is undefined behavoir in the engine

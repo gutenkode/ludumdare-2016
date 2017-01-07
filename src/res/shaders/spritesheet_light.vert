@@ -39,7 +39,7 @@ vec2 getSpriteCoords(vec3 info) {
 void main()
 {
 	gl_Position = projectionMatrix * viewMatrix * modelMatrix * VertexIn;
-	gl_Position = floor(gl_Position*35)/35;
+	//gl_Position = floor(gl_Position*50.0)/50.0;
 
 	// light location value is in model space, so vertexPos must be in model space
 	vertexPos = vec3(modelMatrix * VertexIn);

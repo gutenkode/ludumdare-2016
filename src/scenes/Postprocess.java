@@ -77,24 +77,26 @@ public class Postprocess implements Scene {
         ShaderMap.use("quad");
         TextureMap.bindUnfiltered("fbo_ui");
         MeshMap.render("quad");
+
+    // create DOF scene from dithered scene
+        createDOFTexture("fbo_dither");
         
-    // render 3D scene and UI to the combined FBO
+    // render DOF scene and UI to the combined FBO
     // used to create the bloom scene
         combineScene.makeCurrent();
         glClear(GL_COLOR_BUFFER_BIT);
         
         ShaderMap.use("quad_dither");
         Uniform.varFloat("screenSize", width, height);
-        TextureMap.bindFiltered("fbo_scene");
+        TextureMap.bindFiltered("fbo_dof2");
         MeshMap.render("quad");
         
         ShaderMap.use("quad");
         TextureMap.bindFiltered("fbo_ui");
         MeshMap.render("quad");
         
-    // create a bloom and fov texture from the combined scene
+    // create a bloom texture from the combined scene
         createBloomTexture("fbo_combine");
-        createDOFTexture("fbo_dither");
         //createBloomTexture("fbo_dof2");
         
    // render final mix shader to screen
@@ -107,14 +109,14 @@ public class Postprocess implements Scene {
         Uniform.varFloat("rand", random.nextFloat(), random.nextFloat());
         
         // TEMPORARY
-        Uniform.samplerAndTextureFiltered("tex_scene", 1, "fbo_dither");
+        //Uniform.samplerAndTextureFiltered("tex_scene", 1, "fbo_dither");
         Uniform.samplerAndTextureFiltered("tex_ui", 2, "fbo_ui_upscale");
         Uniform.samplerAndTextureFiltered("tex_bloom", 3, "fbo_hdr");
         Uniform.samplerAndTextureFiltered("tex_dof", 4, "fbo_dof2");
-        Uniform.samplerAndTextureFiltered("tex_dofvalue", 5, "fbo_dofvalue");
+        //Uniform.samplerAndTextureFiltered("tex_dofvalue", 5, "fbo_dofvalue");
         Uniform.samplerAndTextureFiltered("tex_noise", 6, "post_noise");
         Uniform.samplerAndTextureFiltered("tex_vignette", 7, "post_vignette");
-        Uniform.samplerAndTextureFiltered("tex_scanlines", 8, "post_scanlines");
+        //Uniform.samplerAndTextureFiltered("tex_scanlines", 8, "post_scanlines");
 
         TextureMap.bindFiltered("fbo_combine");
         MeshMap.render("quad");
@@ -187,7 +189,17 @@ public class Postprocess implements Scene {
      * @param texName The texture to blur.
      */
     public void createDOFTexture(String texName) {
-        
+
+        dofScene2.makeCurrent();
+        ShaderMap.use("quad_dofBlur");
+        Uniform.samplerAndTextureFiltered("bgl_DepthTexture", 1, "fbo_dofvalue");
+        Uniform.varFloat("bgl_RenderedTextureWidth", width);
+        Uniform.varFloat("bgl_RenderedTextureHeight", height);
+        Uniform.varFloat("focalDepth", 0);
+        TextureMap.bindFiltered(texName);
+        glClear(GL_COLOR_BUFFER_BIT);
+        MeshMap.render("quad");
+        /*
     // FIRST PASS
         
         dofScene1.makeCurrent();
@@ -219,6 +231,7 @@ public class Postprocess implements Scene {
         TextureMap.bindFiltered("fbo_dof1");
         glClear(GL_COLOR_BUFFER_BIT);
         MeshMap.render("quad");
+        */
     }
 
     @Override

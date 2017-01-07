@@ -12,8 +12,7 @@ import mote4.util.vertex.mesh.MeshMap;
 import scenes.Postprocess;
 import scenes.RootScene;
 
-import static org.lwjgl.glfw.GLFW.GLFW_DONT_CARE;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowSizeLimits;
+import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
@@ -27,6 +26,7 @@ public class Nullset_Ludumdare {
             System.setProperty("java.awt.headless", "true"); // prevents ImageIO from hanging on OS X
         //Window.initFullscreen();
         //Window.initWindowed(1920/2, 1080/2);
+        Window.setVsync(false);
         Window.initWindowedPercent(.75, 16/9.0);
         
         Input.createCharCallback();
@@ -37,7 +37,8 @@ public class Nullset_Ludumdare {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         //glEnable(GL_CULL_FACE);
-        
+
+        //glfwSetInputMode(Window.getWindowID(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         glfwSetWindowSizeLimits(Window.getWindowID(), 640, 360, GLFW_DONT_CARE, GLFW_DONT_CARE);
         //glfwSetWindowAspectRatio(Window.getWindowID(), 16, 9);
         
@@ -63,6 +64,7 @@ public class Nullset_Ludumdare {
         ShaderUtils.addProgram("texture.vert", "texture.frag", "texture");
         ShaderUtils.addProgram("texture_color.vert", "texture_color.frag", "texture_color");
         ShaderUtils.addProgram("color.vert", "color.frag", "color");
+        ShaderUtils.addProgram("titlebg.vert", "titlebg.frag", "titlebg");
         ShaderUtils.addProgram("quad_dither.vert", "quad_dither.frag", "quad_dither");
         ShaderUtils.addProgram("spritesheet_nolight.vert", "spritesheet_nolight.frag", "spritesheet_nolight");
         ShaderUtils.addProgram("spritesheet_light.vert", "spritesheet_light.frag", "spritesheet_light");
@@ -83,6 +85,7 @@ public class Nullset_Ludumdare {
         ShaderUtils.addProgram("quad_transition.vert", "quad_transition.frag", "quad_transition");
         ShaderUtils.addProgram("quad.vert", "quad_vertBlur.frag", "quad_vertBlur");
         ShaderUtils.addProgram("quad.vert", "quad_horizBlur.frag", "quad_horizBlur");
+        ShaderUtils.addProgram("quad.vert", "quad_dofBlur.frag", "quad_dofBlur");
         ShaderUtils.addProgram("quad.vert", "quad_hdr.frag", "quad_hdr");
         ShaderUtils.addProgram("quad.vert", "quad_final.frag", "quad_final");
         
@@ -95,5 +98,6 @@ public class Nullset_Ludumdare {
         MeshMap.add(StaticMeshBuilder.loadQuadMesh(), "quad");
         MeshMap.add(StaticMeshBuilder.constructVAOFromOBJ("cube", false), "cube");
         MeshMap.add(StaticMeshBuilder.constructVAOFromOBJ("barrel", false), "barrel");
+        MeshMap.add(StaticMeshBuilder.constructVAOFromOBJ("hexahedron", false), "hexahedron");
     }
 }

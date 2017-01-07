@@ -1,0 +1,32 @@
+{
+  "1a": [
+    "Hello, can you hear me?  Hello?\nOh thank god, I thought I was the only one left.",
+    "Listen, I've been trapped here for a very long time.\nBut with your help, I think we both\nmight be able to escape.",
+    "$PROMPT_Where am I?_$A_What's going on?_$A",
+    "$A",
+        "...You don't remember?\nHm...",
+        "Alright, I'll get you up to speed.\nBut you need to keep moving first.",
+    "$PROMPT_Who are you?_$B_Why should I trust you?_$C",
+    "$B",
+        "I'll explain as we go.\nBut you can't stay down there for too long.",
+        "$END",
+    "$C",
+        "You don't have much reason to trust me now, I know.",
+    "$END",
+    "I can't do much for now.  But please.\nThe lives of a lot of people depend on what you do here."
+  ],
+  "1b": [
+      "This used to be a research facility.",
+      "These bottom foundation layers haven't seen much\nactivity for a long time, though.",
+      "There's nothing down here.  You need to reach a\nservice elevator that still works."
+  ],
+  "1c": [
+      "I don't know why you're down there or where your\nmemories went, but I do know what happened here.",
+      "It's all still a bit of a fuzzy mess,\nit all happened so quickly.",
+      "But... the facility's AI went rogue.  It\nlocked down the place and... started killing everyone.",
+      "Every door locked at the same time, and the security\nturrets had an easy time of it.",
+      "This place was designed to be a fortress, but I\ndon't think anyone ever expected this to happen.",
+      "I don't think there are many people left.",
+      "But we can't just give up."
+  ]
+}

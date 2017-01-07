@@ -2,6 +2,7 @@ tileset/foundation		tileset_1
 tileset/foundation_NRM		tileset_1_NRM
 tileset/shade			tileset_shade
 
+ui/title			ui_title
 ui/scalablemenu_2		ui_scalablemenu
 ui/arrow_cursor			ui_cursor
 ui/statbars			ui_statbars

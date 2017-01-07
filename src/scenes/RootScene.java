@@ -6,6 +6,9 @@ import mote4.scenegraph.target.MultiColorFBO;
 import mote4.util.texture.TextureMap;
 import rpgbattle.BattleManager;
 
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.glClear;
+
 /**
  * Top-level scene to allow easy switching between sets of Scenes for rendering.
  * @author Peter
@@ -13,6 +16,7 @@ import rpgbattle.BattleManager;
 public class RootScene implements Scene {
     
     public enum State {
+        TITLE,
         INGAME,
         BATTLE_INTRO,
         BATTLE;
@@ -38,14 +42,14 @@ public class RootScene implements Scene {
     public static int height() { return renderHeight; }
     
     private static State currentState;
-    private Scene[] ingame;
+    private Scene[] title, ingame, battle;
     private static Scene transition;
-    private Scene[] battle;
     private MultiColorFBO sceneFbo;
     private FBO uiFbo;
     
     public RootScene() {
-        currentState = State.INGAME;
+        currentState = State.TITLE;
+        title = new Scene[] {new Title(), new TitleUI()};
         ingame = new Scene[] {new Ingame(), new IngameUI(), new TerminalScene()};
         battle = new Scene[] {new Battle(), new BattleUI()};
         if (currentState == State.BATTLE) // test battle
@@ -55,6 +59,10 @@ public class RootScene implements Scene {
     @Override
     public void update(double delta) {
         switch (currentState) {
+            case TITLE:
+                for (Scene s : title)
+                    s.update(delta);
+                break;
             case INGAME:
                 for (Scene s : ingame)
                     s.update(delta);
@@ -72,6 +80,12 @@ public class RootScene implements Scene {
     @Override
     public void render(double delta) {
         switch (currentState) {
+            case TITLE:
+                sceneFbo.makeCurrent();
+                title[0].render(delta);
+                uiFbo.makeCurrent();
+                title[1].render(delta);
+                break;
             case INGAME:
                 sceneFbo.makeCurrent();
                 ingame[0].render(delta);
@@ -89,7 +103,6 @@ public class RootScene implements Scene {
                 battle[1].render(delta);
                 break;
         }
-        
     }
 
     @Override
@@ -113,7 +126,9 @@ public class RootScene implements Scene {
         uiFbo.addToTextureMap("fbo_ui");
         
         Postprocess.resizeBuffers(renderWidth, renderHeight);
-        
+
+        for (Scene s : title)
+            s.framebufferResized(renderWidth,renderHeight);
         for (Scene s : ingame)
             s.framebufferResized(renderWidth,renderHeight);
         for (Scene s : battle)

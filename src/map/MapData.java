@@ -19,7 +19,7 @@ public class MapData {
     protected final String mapName;
     protected final int[][][] tileData;
     protected final int[][] heightData;
-    protected final LinkData[] linkData;
+    protected final ArrayList<LinkData> linkData;
     protected final ArrayList<String> entities;
     
     /**
@@ -34,7 +34,7 @@ public class MapData {
      * @param linkData Array of LinkData objects for tiles that link to other rooms.
      * @param entities String array of all entities to be constructed.
      */
-    protected MapData(String mapName, int[][][] tileData, int[][] heightData, LinkData[] linkData, ArrayList<String> entities) {
+    protected MapData(String mapName, int[][][] tileData, int[][] heightData, ArrayList<LinkData> linkData, ArrayList<String> entities) {
         width = tileData.length;
         height = tileData[0].length;
         this.mapName = mapName;
