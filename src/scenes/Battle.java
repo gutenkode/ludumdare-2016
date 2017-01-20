@@ -88,7 +88,7 @@ public class Battle implements Scene {
         Uniform.varFloat("cycle", cycle);
         TextureMap.bindUnfiltered("ui_bg_red");
         background.render();
-        
+        /*
         ShaderMap.use("texture");
         trans.view.setIdentity();
         trans.view.translate(0, -.4f, -5);
@@ -97,6 +97,7 @@ public class Battle implements Scene {
         trans.makeCurrent();
         TextureMap.bindUnfiltered("ui_floor_tile1");
         MeshMap.render("quad");
+        */
     }
     
     @Override

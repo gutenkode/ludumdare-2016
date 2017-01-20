@@ -42,7 +42,7 @@ void main()
 	FragColor = ui*(ui.a) + FragColor*(1-ui.a);
 
 	// bloom
-	FragColor += /*texture(tex_scanlines, texCoord) */ texture(tex_bloom, texCoord) * bloomCoef;
+	FragColor += /*texture(tex_scanlines, texCoord) */ texture(tex_bloom, texCoord) * .7 * bloomCoef;
 
 	// noise and vignette
 	vec2 noiseCoord = (texCoord + rand) * vec2(aspectRatio,1);

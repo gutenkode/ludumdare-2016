@@ -37,17 +37,18 @@ public class LaserGrid extends Entity {
     
     @Override
     public void update() {
-        cycle += .3;
-        cycle %= 6;
+        cycle += 1;
+        cycle %= Math.PI*2;
     }
     
     @Override
     public void render(TransformationMatrix model) {
-        model.translate(posX-hitboxW, posY, tileHeight);
+        float bob = (float)(Math.sin(cycle)+1)*.1f;
+        model.translate(posX-hitboxW, posY, tileHeight-bob);
         model.scale(hitboxW*2, 1, 1);
         model.makeCurrent();
-        Uniform.varFloat("spriteInfo", 6,1,(int)cycle);
-        Uniform.varFloat("spriteInfoEmissive", 6,1,(int)cycle);
+        Uniform.varFloat("spriteInfo", 6,1,(int)(cycle%2));
+        Uniform.varFloat("spriteInfoEmissive", 6,1,(int)(cycle%2));
         Uniform.varFloat("emissiveMult", 1);
         TextureMap.bindUnfiltered("entity_laserGrid");
         mesh.render();

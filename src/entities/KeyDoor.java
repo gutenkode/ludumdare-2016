@@ -19,10 +19,10 @@ public class KeyDoor extends Entity {
     
     private static Mesh mesh;
     
-    private float rot;
+    private float rot, openVal = 0;
     private int keycardLevel;
-    private int openVal = 0, delay = 0, alertCycle = 0;
-    private boolean playerOn = false;
+    private int delay = 0, alertCycle = 0;
+    private boolean playerOn = false, flicker;
     
     static {
         mesh = StaticMeshBuilder.constructVAO(GL11.GL_TRIANGLE_FAN, 
@@ -79,9 +79,7 @@ public class KeyDoor extends Entity {
     }
     
     @Override
-    public boolean isSolid() {
-        return openVal == 0;
-    }
+    public boolean isSolid() { return openVal <= 0; }
 
     @Override
     public void update() {
@@ -90,6 +88,7 @@ public class KeyDoor extends Entity {
         // if the player is in range of the door
         if (dist < 1.5) {
             // only open if the player has the right keycard
+            // higher-level keycards can open lower-level doors
             switch (keycardLevel) {
                 case 0:
                     playerOn = true;
@@ -109,36 +108,96 @@ public class KeyDoor extends Entity {
                     break;
             }
         }
-        
-        delay--;
-        if (delay <= 0) {
-            delay = 6;
-            
-            if (MapManager.getTimelineState().isAlertTriggered()) {
-                openVal = 0;
+
+        if (MapManager.getTimelineState().isAlertTriggered()) {
+            openVal = 0;
+            delay--;
+            if (delay <= 0) {
+                delay = 6;
                 alertCycle++;
                 alertCycle %= 4;
-            } else {
-                if (playerOn) {
-                    if (openVal < 3)
-                        openVal++;
-                } else {
-                    if (openVal > 0)
-                        openVal--;
-                }
             }
-            
-            playerOn = false;
+        } else {
+            if (playerOn) {
+                if (openVal < 1)
+                    openVal += .05;
+            } else {
+                if (openVal > 0)
+                    openVal -= .05;
+            }
         }
+
+        playerOn = false;
+        flicker = !flicker;
     }
 
     @Override
     public void render(TransformationMatrix model) {
-        model.translate((float)posX, (float)posY, tileHeight());
+        model.translate(posX, posY, tileHeight());
         model.rotate(rot, 0, 0, 1);
         model.translate(-.5f, 0);
         model.scale(1,1,2);
         model.makeCurrent();
+
+        TextureMap.bindUnfiltered("entity_keyDoor");
+        Uniform.varFloat("spriteInfo", 3,5,0);
+        mesh.render();
+
+        model.push();
+        model.translate(-.5f*openVal, -.05f, 0);
+        model.makeCurrent();
+        Uniform.varFloat("spriteInfo", 3,5,1);
+        mesh.render();
+        model.translate(2*.5f*openVal, 0, 0);
+        model.makeCurrent();
+        Uniform.varFloat("spriteInfo", 3,5,2);
+        mesh.render();
+        model.pop();
+
+        model.push();
+        if (keycardLevel > 0 && openVal < 1) {
+            int offset = 5;
+            float slide = openVal*.6f;
+            if (flicker) {
+                offset += 6;
+                slide *= -1;
+            }
+            Uniform.varFloat("emissiveMult", 1);
+            Uniform.varFloat("spriteInfo", 3,10,keycardLevel+offset);
+            Uniform.varFloat("spriteInfoEmissive", 3,10,keycardLevel+offset);
+            model.translate(slide, .1f, .25f);
+            model.scale(1,1,.5f);
+            model.makeCurrent();
+            mesh.render();
+            Uniform.varFloat("emissiveMult", 0);
+        }
+        model.pop();
+
+        if (MapManager.getTimelineState().isAlertTriggered()) {
+            int offset = 10;
+            if (flicker)
+                offset += 6;
+            Uniform.varFloat("emissiveMult", 1);
+
+            // moving red lines
+            Uniform.varFloat("spriteInfo", 3,10,alertCycle+offset+8);
+            Uniform.varFloat("spriteInfoEmissive", 3,10,alertCycle+offset+8);
+            model.scale(1,1,.5f);
+            model.translate(0, .15f, .5f);
+            model.makeCurrent();
+            mesh.render();
+
+            // flashing yellow warning sign
+            Uniform.varFloat("spriteInfo", 3,10,alertCycle/2+offset);
+            Uniform.varFloat("spriteInfoEmissive", 3,10,alertCycle/2+offset);
+            model.translate(0, .05f, 0);
+            model.makeCurrent();
+            mesh.render();
+
+            Uniform.varFloat("emissiveMult", 0);
+        }
+
+        /*
         Uniform.varFloat("spriteInfo", 3,7,keycardLevel+3*openVal);
         TextureMap.bindUnfiltered("entity_keyDoor");
         mesh.render();
@@ -157,6 +216,7 @@ public class KeyDoor extends Entity {
             mesh.render();
             Uniform.varFloat("emissiveMult", 0);
         }
+        */
     }
 
     @Override
