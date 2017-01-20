@@ -7,24 +7,24 @@ import mote4.util.texture.TextureMap;
 import nullset.Const;
 import scenes.RootScene;
 import ui.components.SelectionMenu;
+import ui.selectionmenubehavior.editor.RootEditorMenu;
 import ui.selectionmenubehavior.SelectionMenuBehavior;
-import ui.selectionmenubehavior.TitleMenu;
 
 import java.util.Stack;
 
 /**
  * Created by Peter on 12/31/16.
  */
-public class TitleUIManager implements MenuHandler {
+public class EditorUIManager implements MenuHandler {
 
-    private static final TitleUIManager manager;
+    private static final EditorUIManager manager;
     private static final Stack<SelectionMenu> selectionMenus;
 
     static {
-        manager = new TitleUIManager();
+        manager = new EditorUIManager();
         selectionMenus = new Stack<>();
 
-        manager.openMenu(new TitleMenu(manager));
+        manager.openMenu(new RootEditorMenu(manager));
     }
 
     public static void update() {
@@ -38,7 +38,7 @@ public class TitleUIManager implements MenuHandler {
         TextureMap.bindUnfiltered("font_1");
 
         model.setIdentity();
-        model.translate(RootScene.width()/2-50, RootScene.height()/2,0);
+        model.translate(Const.UI_SCALE/2, Const.UI_SCALE/2,0);
         for (SelectionMenu sm : selectionMenus) {
             model.translate(Const.UI_SCALE/2, Const.UI_SCALE/2);
             model.makeCurrent();

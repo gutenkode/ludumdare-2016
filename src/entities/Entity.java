@@ -23,6 +23,7 @@ public abstract class Entity {
     public float hitboxW() { return hitboxW; }
     public float hitboxH() { return hitboxH; }
     public final int tileHeight() { return tileHeight; }
+    public abstract String getName();
     
     /**
      * Whether this entity should be treated as a solid object.

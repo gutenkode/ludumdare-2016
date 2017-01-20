@@ -1,10 +1,13 @@
-package ui.selectionmenubehavior;
+package ui.selectionmenubehavior.battle;
 
 import rpgbattle.BattleManager;
 import rpgbattle.fighter.Fighter;
-import rpgbattle.fighter.Fighter.FighterStats;
 import ui.BattleUIManager;
 import ui.MenuHandler;
+import ui.selectionmenubehavior.SelectionMenuBehavior;
+import ui.selectionmenubehavior.battle.BattleItemMenu;
+import ui.selectionmenubehavior.battle.BattleSkillMenu;
+import ui.selectionmenubehavior.battle.EnemySelectionMenu;
 
 /**
  * The root menu for battles.

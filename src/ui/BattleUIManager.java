@@ -19,9 +19,8 @@ import ui.components.PlayerStatBar;
 import ui.components.ScriptChoiceMenu;
 import ui.components.SelectionMenu;
 import ui.components.SpriteMenu;
-import ui.script.ScriptLoader;
 import ui.script.ScriptReader;
-import ui.selectionmenubehavior.RootBattleMenu;
+import ui.selectionmenubehavior.battle.RootBattleMenu;
 import ui.selectionmenubehavior.SelectionMenuBehavior;
 
 /**

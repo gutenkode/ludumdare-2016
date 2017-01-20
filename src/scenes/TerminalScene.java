@@ -1,13 +1,11 @@
 package scenes;
 
 import mote4.scenegraph.Scene;
-import mote4.scenegraph.Window;
 import mote4.util.matrix.Transform;
 import mote4.util.shader.ShaderMap;
 import mote4.util.texture.TextureMap;
 import nullset.Const;
 import nullset.Input;
-import org.lwjgl.glfw.GLFW;
 import terminal.TerminalSession;
 
 /**
@@ -20,7 +18,7 @@ public class TerminalScene implements Scene {
     private static TerminalSession session;
     private static String INPUT_HEAD = ""; // should be left blank, as programs can also define their own input heads
     
-    private StringBuilder input; // IMPORTANT, this should be saved as part of TerminalSession to preserve state
+    private StringBuilder input; // TODO, this should be saved as part of a TerminalSession to preserve state
     private String lastInput;
     private Transform trans;
     private int backspaceDelay, // frames to wait while holding down backspace before auto-delete is enabled
@@ -93,7 +91,7 @@ public class TerminalScene implements Scene {
             } else {
                 Input.getTyped();
             }
-            if (GLFW.glfwGetKey(Window.getWindowID(), GLFW.GLFW_KEY_ESCAPE) == GLFW.GLFW_PRESS)
+            if (Input.isKeyNew(Input.Keys.ESC))
                 closeTerminal();
             
             if (closeTerminal) {

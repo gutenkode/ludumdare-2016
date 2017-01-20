@@ -52,5 +52,7 @@ public class ScriptTrigger extends Entity {
      * Will reset this script's trigger, so the script can play again.
      */
     public void reset() { triggered = false; }
-    
+
+    @Override
+    public String getName() { return "Script"; }
 }

@@ -42,12 +42,6 @@ public class Terminal extends Entity {
     
     @Override
     public void render(TransformationMatrix model) {
-        delay--;
-        if (delay <= 0) {
-            index++;
-            index %= 2;
-            delay = 15;
-        }
         
         model.translate((float)posX-.5f, (float)posY-.05f, tileHeight());
         //model.rotate(.78f, 1, 0, 0);
@@ -68,5 +62,15 @@ public class Terminal extends Entity {
     }
 
     @Override
-    public void update() {}
+    public void update() {
+        delay--;
+        if (delay <= 0) {
+            index++;
+            index %= 2;
+            delay = 15;
+        }
+    }
+
+    @Override
+    public String getName() { return "Terminal"; }
 }

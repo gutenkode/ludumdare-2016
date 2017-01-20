@@ -5,7 +5,7 @@ in vec2 texCoord;
 
 out vec4 FragColor;
 
-//uniform sampler2D tex_scene;
+uniform sampler2D tex_scene;
 uniform sampler2D tex_ui;
 uniform sampler2D tex_bloom;
 uniform sampler2D tex_dof;
@@ -25,24 +25,24 @@ void main()
 	vec4 ui = texture(tex_ui, texCoord);
 
 	// blend 3D scene with blurred DOF scene
-	/*
+
 	vec4 v1 = texture(tex_scene, texCoord);
 	vec4 v2 = texture(tex_dof, texCoord);
 	float dofvalue = texture(tex_dofvalue, texCoord).r + dofCoef;
-	dofvalue *=2;
+	//dofvalue *=2;
 	dofvalue = clamp(dofvalue, 0,1);
 	dofvalue = min(dofvalue, 1-ceil(ui.a)); // if there is UI here, use the full blurred texture
 	//FragColor = v1*(texCoord.y) + v2*(1-texCoord.y);
 	//dofvalue = 0.0; // 0 = blur, 1 = solid
 	FragColor = mix(v2, v1, dofvalue);
-	*/
-	FragColor = texture(tex_dof, texCoord);
+
+	//FragColor = texture(tex_scene, texCoord);
 
 	// put the non-blurred UI over all of it
 	FragColor = ui*(ui.a) + FragColor*(1-ui.a);
 
 	// bloom
-	FragColor += /*texture(tex_scanlines, texCoord) */ texture(tex_bloom, texCoord) * .7 * bloomCoef;
+	FragColor += /*texture(tex_scanlines, texCoord) */ texture(tex_bloom, texCoord) * bloomCoef;
 
 	// noise and vignette
 	vec2 noiseCoord = (texCoord + rand) * vec2(aspectRatio,1);

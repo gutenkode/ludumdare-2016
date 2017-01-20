@@ -19,10 +19,10 @@ void main()
 	//FragColor = texture(texture1, t);
 	FragColor = texture(texture1, t+vec2(-cycle,cycle/4.0)); // normal shifting effect
 	FragColor += .5 * texture(texture1, vec2(.5)+t+vec2(-cycle*2.0,cycle/2.0)); // darker "echo" texture
-	
+
 	//FragColor = texture(texture1, texCoord+vec2(-cycle,cycle/4.0)); // normal shifting effect
 	//FragColor += .5 * texture(texture1, texCoord+vec2(-cycle*2.0,cycle/2.0)); // darker "echo" texture
 
 	// prevent DOF rendering
-	DOFValue = vec4(1);
+	DOFValue = vec4(1.0);
 }

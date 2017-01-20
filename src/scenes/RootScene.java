@@ -19,7 +19,8 @@ public class RootScene implements Scene {
         TITLE,
         INGAME,
         BATTLE_INTRO,
-        BATTLE;
+        BATTLE,
+        EDITOR;
     }
     
     public static void transitionToBattle() {
@@ -42,7 +43,7 @@ public class RootScene implements Scene {
     public static int height() { return renderHeight; }
     
     private static State currentState;
-    private Scene[] title, ingame, battle;
+    private Scene[] title, ingame, battle, editor;
     private static Scene transition;
     private MultiColorFBO sceneFbo;
     private FBO uiFbo;
@@ -52,6 +53,7 @@ public class RootScene implements Scene {
         title = new Scene[] {new Title(), new TitleUI()};
         ingame = new Scene[] {new Ingame(), new IngameUI(), new TerminalScene()};
         battle = new Scene[] {new Battle(), new BattleUI()};
+        editor = new Scene[] {new Editor(), new EditorUI(), new TerminalScene()};
         if (currentState == State.BATTLE) // test battle
             BattleManager.initEnemies("SLIME","SLIME");
     }
@@ -72,6 +74,10 @@ public class RootScene implements Scene {
                 break;
             case BATTLE:
                 for (Scene s : battle)
+                    s.update(delta);
+                break;
+            case EDITOR:
+                for (Scene s : editor)
                     s.update(delta);
                 break;
         }
@@ -101,6 +107,13 @@ public class RootScene implements Scene {
                 battle[0].render(delta);
                 uiFbo.makeCurrent();
                 battle[1].render(delta);
+                break;
+            case EDITOR:
+                sceneFbo.makeCurrent();
+                editor[0].render(delta);
+                uiFbo.makeCurrent();
+                editor[1].render(delta);
+                editor[2].render(delta);
                 break;
         }
     }
@@ -132,6 +145,8 @@ public class RootScene implements Scene {
         for (Scene s : ingame)
             s.framebufferResized(renderWidth,renderHeight);
         for (Scene s : battle)
+            s.framebufferResized(renderWidth,renderHeight);
+        for (Scene s : editor)
             s.framebufferResized(renderWidth,renderHeight);
     }
 

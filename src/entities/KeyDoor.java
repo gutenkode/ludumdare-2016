@@ -158,5 +158,7 @@ public class KeyDoor extends Entity {
             Uniform.varFloat("emissiveMult", 0);
         }
     }
-    
+
+    @Override
+    public String getName() { return "Door"; }
 }

@@ -97,4 +97,7 @@ public class ItemPickup extends Entity {
             IngameUIManager.logMessage("Obtained a " + item.name + ".");
         }
     }
+
+    @Override
+    public String getName() { return "Item"; }
 }

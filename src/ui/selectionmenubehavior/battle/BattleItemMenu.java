@@ -1,4 +1,4 @@
-package ui.selectionmenubehavior;
+package ui.selectionmenubehavior.battle;
 
 import java.util.ArrayList;
 import rpgbattle.BattleManager;
@@ -7,6 +7,7 @@ import rpgsystem.Inventory;
 import rpgsystem.Item;
 import ui.BattleUIManager;
 import ui.MenuHandler;
+import ui.selectionmenubehavior.SelectionMenuBehavior;
 
 /**
  * In-battle inventory menu.

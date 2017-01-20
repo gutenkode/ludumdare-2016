@@ -135,4 +135,7 @@ public class Enemy extends Entity {
             MapManager.removeEntity(this);
         }
     }
+
+    @Override
+    public String getName() { return "Enemy: "+enemyName; }
 }

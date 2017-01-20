@@ -60,6 +60,7 @@ public class Nullset_Ludumdare {
     
     private static void loadResources() {
         ShaderUtils.addProgram("ingame_map.vert", "ingame_map.frag", "ingame_map");
+        ShaderUtils.addProgram("ingame_nolight.vert", "ingame_nolight.frag", "ingame_nolight");
         //ShaderUtils.addProgram("ingame_object.vert", "ingame_object.frag", "ingame_object");
         ShaderUtils.addProgram("texture.vert", "texture.frag", "texture");
         ShaderUtils.addProgram("texture_color.vert", "texture_color.frag", "texture_color");

@@ -1,5 +1,7 @@
 package map;
 
+import entities.Entity;
+
 import java.util.ArrayList;
 
 /**
@@ -9,17 +11,38 @@ import java.util.ArrayList;
 public class MapEditor {
 
     private MapData mapData;
+    private ArrayList<Entity> entities;
+    private boolean entitiesRefreshed;
 
     public MapEditor(MapData md) {
         mapData = md;
+        entitiesRefreshed = false;
+    }
+    public void refreshEntities() {
+        entities = MapDataUtility.constructEntities(mapData.entities);
+        for (Entity e : entities)
+            e.onRoomInit();
+        entitiesRefreshed = true;
     }
 
+    /**
+     * Edits the floor texture coordinates of the tile.
+     * @param x
+     * @param y
+     * @param chg
+     */
     public void editTileInd1(int x, int y, int chg) {
         if (mapData.tileData[x][y][0]+chg >= 0) {
             mapData.tileData[x][y][0] += chg;
             mapData.rebuildMesh();
         }
     }
+    /**
+     * Edits the wall texture coordinates of the tile.
+     * @param x
+     * @param y
+     * @param chg
+     */
     public void editTileInd2(int x, int y, int chg) {
         if (mapData.tileData[x][y][2]+chg >= 0) {
             mapData.tileData[x][y][2] += chg;
@@ -79,8 +102,8 @@ public class MapEditor {
             }
         }
         // this room links to too many other rooms, somehow...
+        throw new IllegalStateException("Too many room links!");
     }
-
     /**
      * If there is a room link on this tile, edits its orientation.
      * @param x
@@ -100,8 +123,8 @@ public class MapEditor {
 
     /**
      * Adds the specified entity to the map.
-     * The entity descriptor string will be added to the map but if it is not
-     * recognized it will not be constructed.
+     * The entity descriptor string will be added to the map, but if it is not
+     * recognized at load time it will not be constructed.
      * @param vars
      */
     public void addEntity(String... vars) {
@@ -115,6 +138,13 @@ public class MapEditor {
         }
         System.out.println("Adding entity to map: "+sb.toString());
         mapData.addEntity(sb.toString());
-        //mapData.entities.add(sb.toString());
+
+        entitiesRefreshed = false;
     }
+    public ArrayList<Entity> getEntities() {
+        if (!entitiesRefreshed)
+            refreshEntities();
+        return entities;
+    }
+    public MapData getMapData() { return mapData; }
 }

@@ -15,7 +15,7 @@ public class MapData {
     private boolean meshBuilt = false;
     private Mesh mesh;
     
-    protected final int width, height;
+    public final int width, height;
     protected final String mapName;
     protected final int[][][] tileData;
     protected final int[][] heightData;
@@ -82,6 +82,7 @@ public class MapData {
     public void addEntity(String s) { entities.add(s); }
     
     public void destroy() {
-        mesh.destroy();
+        if (mesh != null)
+            mesh.destroy();
     }
 }

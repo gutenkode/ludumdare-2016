@@ -1,24 +1,26 @@
-package ui.selectionmenubehavior;
+package ui.selectionmenubehavior.editor;
 
+import entities.Entity;
+import scenes.Editor;
 import ui.MenuHandler;
-import ui.selectionmenubehavior.skill.RootSkillMenu;
-
+import ui.selectionmenubehavior.OptionsMenu;
+import ui.selectionmenubehavior.SelectionMenuBehavior;
 
 /**
- * The root pause menu for the overworld.
- * @author Peter
+ * Created by Peter on 1/19/17.
  */
-public class RootIngameMenu implements SelectionMenuBehavior {
-    
-    private MenuHandler handler;
-    
-    private String title = "MENU";
-    private String[] options = {"Inventory","Skills","Options","Exit"};
+public class EntityModMenu implements SelectionMenuBehavior {
 
-    public RootIngameMenu(MenuHandler h) {
+    private MenuHandler handler;
+
+    private String title;
+    private String[] options = {"Move", "Attributes", "Delete", "Exit"};
+
+    public EntityModMenu(MenuHandler h, Entity e) {
+        title = e.getName();
         handler = h;
     }
-    
+
     @Override
     public String getTitle() {
         return title;
@@ -37,14 +39,11 @@ public class RootIngameMenu implements SelectionMenuBehavior {
     @Override
     public void onAction(int index) {
         switch (getElementName(index)) {
-            case "Inventory":
-                handler.openMenu(new IngameItemMenu(handler));
+            case "Move":
                 break;
-            case "Skills":
-                handler.openMenu(new RootSkillMenu(handler));
+            case "Attributes":
                 break;
-            case "Options":
-                handler.openMenu(new OptionsMenu(handler));
+            case "Delete":
                 break;
             case "Exit":
                 handler.closeMenu();
@@ -53,15 +52,18 @@ public class RootIngameMenu implements SelectionMenuBehavior {
     }
 
     @Override
-    public void onHighlight(int index) {}
+    public void onHighlight(int index) {
+    }
 
     @Override
-    public void onFocus() {}
+    public void onFocus() {
+    }
 
     @Override
     public void onClose() {
         handler.closeMenu();
     }
+
     @Override
     public void onCloseCleanup() {}
 }

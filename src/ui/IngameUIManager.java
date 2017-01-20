@@ -17,9 +17,8 @@ import scenes.RootScene;
 import ui.components.FlavorTextMenu;
 import ui.components.PlayerStatBar;
 import ui.components.ScriptChoiceMenu;
-import ui.script.ScriptLoader;
 import ui.script.ScriptReader;
-import ui.selectionmenubehavior.RootIngameMenu;
+import ui.selectionmenubehavior.ingame.RootIngameMenu;
 import ui.selectionmenubehavior.SelectionMenuBehavior;
 
 /**

@@ -2,6 +2,7 @@ package map;
 
 import mote4.scenegraph.Window;
 import mote4.util.FileIO;
+import scenes.Editor;
 import ui.script.ScriptLoader;
 
 import java.io.BufferedReader;
@@ -77,10 +78,12 @@ public class MapLevelManager {
             ScriptLoader.setLevelPath(levelDirs[currentLevelNum-1]);
             MapLoader.setLevelPath(levelDirs[currentLevelNum-1]);
             MapManager.createNewTimelines(firstMapName[currentLevelNum-1]);
+            //Editor.unloadMap();
         }
     }
     
     public static int[] playerStartPos() {
         return playerInitPos[currentLevelNum-1];
     }
+    public static String levelPath() { return levelDirs[currentLevelNum-1]; }
 }

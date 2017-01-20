@@ -13,7 +13,10 @@ import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
 import nullset.Input;
 import static org.lwjgl.opengl.GL11.*;
+
+import scenes.Editor;
 import scenes.Postprocess;
+import scenes.RootScene;
 
 /**
  * Manages rendering and updating maps and entities.
@@ -250,8 +253,14 @@ public class MapManager {
      * @param y
      * @return 
      */
-    public static int getTileHeight(int x, int y) { return currentTimeline.getMapData().heightData[x][y]; }
-    
+    public static int getTileHeight(int x, int y) {
+        // somewhat hackish solution to making entities load in the editor
+        // the engine wasn't designed to be used withouth the MapManagerz
+        if (RootScene.currentState() == RootScene.State.EDITOR)
+            return Editor.getMapEditor().getMapData().heightData[x][y];
+        return currentTimeline.getMapData().heightData[x][y];
+    }
+
     /**
      * Tests whether an entity is colliding with the heightmap of any loaded maps.
      * Out of bounds is invalid.

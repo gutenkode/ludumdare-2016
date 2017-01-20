@@ -12,7 +12,7 @@ public class TitleMenu implements  SelectionMenuBehavior {
     private MenuHandler handler;
 
     private String title = "MAIN MENU";
-    private String[] options = {"New Game","Options","Quit"};
+    private String[] options = {"New Game","Options","Editor","Quit"};
 
     public TitleMenu(MenuHandler h) {
         handler = h;
@@ -41,6 +41,9 @@ public class TitleMenu implements  SelectionMenuBehavior {
                 break;
             case "Options":
                 handler.openMenu(new OptionsMenu(handler));
+                break;
+            case "Editor":
+                RootScene.setState(RootScene.State.EDITOR);
                 break;
             case "Quit":
                 Window.destroy();

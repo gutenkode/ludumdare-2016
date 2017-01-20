@@ -57,5 +57,7 @@ public class SolidPlatform extends Entity {
         TextureMap.bindUnfiltered("entity_solidPlatform");
         mesh.render();
     }
-    
+
+    @Override
+    public String getName() { return "Solid Platform"; }
 }

@@ -1,6 +1,5 @@
-package ui.selectionmenubehavior;
+package ui.selectionmenubehavior.battle;
 
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import rpgbattle.BattleManager;
 import rpgbattle.PlayerSkills;
@@ -10,6 +9,7 @@ import rpgsystem.SkillModifier;
 import ui.BattleUIManager;
 import ui.MenuHandler;
 import ui.components.PlayerStatBar;
+import ui.selectionmenubehavior.SelectionMenuBehavior;
 
 /**
  * A list of skills usable by the player in battle.

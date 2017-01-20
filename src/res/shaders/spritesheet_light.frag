@@ -44,7 +44,7 @@ void main()
 
 	// depth of field interpolation value
 	float dofLength = length(lightPos.y-vertexPos.y);
-	DOFValue = vec4(1.0-1.0/pow(dofLength,3.0),0,0,1);
+	DOFValue = vec4(1.0);//vec4(1.0-1.0/pow(dofLength,3.0),0,0,1);
 
     // bias is used to reduce weird artifacts in shadow
     float bias = 0.005*tan(acos(max(dot(normal,L),0)));

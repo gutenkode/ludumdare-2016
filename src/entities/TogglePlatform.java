@@ -86,5 +86,7 @@ public class TogglePlatform extends Entity {
         mesh.render();
         Uniform.varFloat("emissiveMult", 0);
     }
-    
+
+    @Override
+    public String getName() { return "Toggle Platform"; }
 }

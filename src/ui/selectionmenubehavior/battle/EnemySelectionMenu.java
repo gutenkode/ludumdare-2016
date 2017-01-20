@@ -1,10 +1,11 @@
-package ui.selectionmenubehavior;
+package ui.selectionmenubehavior.battle;
 
 import rpgbattle.BattleManager;
 import rpgbattle.fighter.EnemyFighter;
 import rpgbattle.fighter.Fighter;
 import scenes.Battle;
 import ui.MenuHandler;
+import ui.selectionmenubehavior.SelectionMenuBehavior;
 
 import java.util.ArrayList;
 import java.util.function.Consumer;

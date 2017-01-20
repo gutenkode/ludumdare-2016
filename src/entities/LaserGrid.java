@@ -61,4 +61,7 @@ public class LaserGrid extends Entity {
             IngameUIManager.logMessage("Security alert triggered.");
         }
     }
+
+    @Override
+    public String getName() { return "Laser Wall"; }
 }

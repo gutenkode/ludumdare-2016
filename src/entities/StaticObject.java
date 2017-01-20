@@ -131,5 +131,7 @@ public class StaticObject extends Entity {
                 break;
         }
     }
-    
+
+    @Override
+    public String getName() { return "Static: "+TYPE.name(); }
 }

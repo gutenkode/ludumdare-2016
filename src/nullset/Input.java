@@ -39,7 +39,8 @@ public class Input {
         UP_ARROW(9),
         TIMELINE_1(10),
         TIMELINE_2(11),
-        TIMELINE_3(12);
+        TIMELINE_3(12),
+        ESC(13);
         
         int index;
         Keys(int i) {
@@ -165,6 +166,9 @@ public class Input {
                     break;
                 case GLFW.GLFW_KEY_3:
                     callbackAction(action, 12);
+                    break;
+                case GLFW.GLFW_KEY_ESCAPE:
+                    callbackAction(action, 13);
                     break;
             }
         });

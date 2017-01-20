@@ -328,4 +328,7 @@ public class Player extends Entity {
         
         mesh.render();
     }
+
+    @Override
+    public String getName() { return "Player"; }
 }
