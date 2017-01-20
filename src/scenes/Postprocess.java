@@ -67,7 +67,7 @@ public class Postprocess implements Scene {
         
         ShaderMap.use("quad_dither");
         Uniform.varFloat("screenSize", width, height);
-        TextureMap.bindFiltered("fbo_scene");
+        TextureMap.bindUnfiltered("fbo_scene");
         MeshMap.render("quad");
         
     // render UI scene to UI upscale scene - simple upscale to improve filtering effects
