@@ -20,7 +20,7 @@ public class KeyDoor extends Entity {
     private static Mesh mesh;
     
     private float rot, openVal = 0;
-    private int keycardLevel;
+    private int keycardLevel, tileX, tileY;
     private int delay = 0, alertCycle = 0;
     private boolean playerOn = false, flicker;
     
@@ -38,6 +38,8 @@ public class KeyDoor extends Entity {
     }
     
     public KeyDoor(int x, int y, int l, int dir) {
+        tileX = x;
+        tileY = y;
         // dir defines the wall that the door is against
         // 0 = up, 1 = right, 2 = down, 3 = left
         switch (dir) {
@@ -225,7 +227,7 @@ public class KeyDoor extends Entity {
     @Override
     public boolean hasLight() { return keycardLevel > 0; }
     @Override
-    public float[] lightPos() { return new float[] {posX,posY,tileHeight+1f}; }
+    public float[] lightPos() { return new float[] {tileX,tileY,tileHeight+1f}; }
     @Override
     public float[] lightColor() { return new float[] {1,0,0}; }
 }

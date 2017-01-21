@@ -136,7 +136,7 @@ public class MapManager {
 
         runOnRoomInit();
     }
-    private static void runOnRoomInit() {
+    private static void runOnRoomInit() { // TODO add lighting refresh call - e.g. doors can toggle alert status
         int numLights = 0;
         eLightPos = new float[10*3];
         eLightColor = new float[10*3];
