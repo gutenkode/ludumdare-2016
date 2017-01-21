@@ -72,10 +72,10 @@ public class KeyDoor extends Entity {
         rot = dir*(float)(Math.PI/2);
         keycardLevel = l;
     }
-    
+
     @Override
     public void onRoomInit() {
-        // doors are complicated, I'll deal with this later...
+        tileHeight = MapManager.getTileHeight((int)posX, (int)posY);
     }
     
     @Override
@@ -221,4 +221,11 @@ public class KeyDoor extends Entity {
 
     @Override
     public String getName() { return "Door"; }
+
+    @Override
+    public boolean hasLight() { return keycardLevel > 0; }
+    @Override
+    public float[] lightPos() { return new float[] {posX,posY,tileHeight+1f}; }
+    @Override
+    public float[] lightColor() { return new float[] {1,0,0}; }
 }

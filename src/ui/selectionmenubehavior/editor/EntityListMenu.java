@@ -56,7 +56,8 @@ public class EntityListMenu implements SelectionMenuBehavior {
         if (index < entities.size()) {
             Entity e = entities.get(index);
             Editor.lookAt(e);
-        }
+        } else
+            Editor.lookAt(null);
     }
 
     @Override
@@ -65,6 +66,7 @@ public class EntityListMenu implements SelectionMenuBehavior {
 
     @Override
     public void onClose() {
+        Editor.lookAt(null);
         handler.closeMenu();
     }
 

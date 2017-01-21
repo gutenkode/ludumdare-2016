@@ -16,11 +16,11 @@ public class MapData {
     private Mesh mesh;
     
     public final int width, height;
-    protected final String mapName;
-    protected final int[][][] tileData;
-    protected final int[][] heightData;
-    protected final ArrayList<LinkData> linkData;
-    protected final ArrayList<String> entities;
+    public final String mapName;
+    public final int[][][] tileData;
+    public final int[][] heightData;
+    public final ArrayList<LinkData> linkData;
+    public final ArrayList<String> entities;
     
     /**
      * Loads all the data required to define a room in the game.

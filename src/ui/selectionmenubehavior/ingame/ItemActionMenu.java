@@ -1,7 +1,9 @@
-package ui.selectionmenubehavior;
+package ui.selectionmenubehavior.ingame;
 
 import rpgsystem.Item;
 import ui.MenuHandler;
+import ui.selectionmenubehavior.ConfirmMenu;
+import ui.selectionmenubehavior.SelectionMenuBehavior;
 
 /**
  *
@@ -47,13 +49,19 @@ public class ItemActionMenu implements SelectionMenuBehavior {
                 break;
             case "Discard":
                 if (item.canDiscard)
-                    handler.openMenu(new ItemDiscardMenu(item, handler));
+                    handler.openMenu(new ConfirmMenu(handler, "DISCARD?", this::discardCallback));
                 else
                     handler.showDialogue("You can't discard this item.",item.spriteName);
                 break;
             case "Exit":
                 handler.closeMenu();
                 break;
+        }
+    }
+    private void discardCallback(boolean b) {
+        if (b) {
+            item.discard();
+            handler.closeMenu();
         }
     }
 

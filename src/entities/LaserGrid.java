@@ -32,7 +32,11 @@ public class LaserGrid extends Entity {
         hitboxH = .2f;
         posX = x+hitboxW;
         posY = y+.5f;
-        tileHeight = MapManager.getTileHeight(x, y);
+    }
+
+    @Override
+    public void onRoomInit() {
+        tileHeight = MapManager.getTileHeight((int)posX, (int)posY);
     }
     
     @Override
@@ -65,4 +69,12 @@ public class LaserGrid extends Entity {
 
     @Override
     public String getName() { return "Laser Wall"; }
+
+
+    @Override
+    public boolean hasLight() { return true; }
+    @Override
+    public float[] lightPos() { return new float[] {posX,posY,tileHeight+1.5f}; }
+    @Override
+    public float[] lightColor() { return new float[] {4,0,0}; }
 }

@@ -1,5 +1,6 @@
 package entities;
 
+import map.MapManager;
 import mote4.util.matrix.TransformationMatrix;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
@@ -39,11 +40,16 @@ public class Terminal extends Entity {
         index = 0;
         delay = 0;
     }
+
+    @Override
+    public void onRoomInit() {
+        tileHeight = MapManager.getTileHeight((int)posX, (int)posY);
+    }
     
     @Override
     public void render(TransformationMatrix model) {
         
-        model.translate((float)posX-.5f, (float)posY-.05f, tileHeight());
+        model.translate((float)posX-.5f, (float)posY-.05f, tileHeight);
         //model.rotate(.78f, 1, 0, 0);
         model.makeCurrent();
         Uniform.varFloat("spriteInfo", 2,2,index);
@@ -73,4 +79,11 @@ public class Terminal extends Entity {
 
     @Override
     public String getName() { return "Terminal"; }
+
+    @Override
+    public boolean hasLight() { return true; }
+    @Override
+    public float[] lightPos() { return new float[] {posX,posY,tileHeight+1f}; }
+    @Override
+    public float[] lightColor() { return new float[] {0,0,2}; }
 }

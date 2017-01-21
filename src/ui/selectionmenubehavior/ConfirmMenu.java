@@ -1,25 +1,26 @@
 package ui.selectionmenubehavior;
 
-import rpgsystem.Item;
 import ui.MenuHandler;
 
+import java.util.function.Consumer;
+
 /**
- *
- * @author Peter
+ * Created by Peter on 1/20/17.
  */
-public class ItemDiscardMenu implements SelectionMenuBehavior {
-    
+public class ConfirmMenu implements SelectionMenuBehavior {
+
     private MenuHandler handler;
-    
-    private Item item;
-    private String title = "DISCARD?";
+    private Consumer callback;
+
+    private String title;
     private String[] options = {"Yes","No"};
 
-    public ItemDiscardMenu(Item i, MenuHandler h) {
-        item = i;
+    public ConfirmMenu(MenuHandler h, String t, Consumer<Boolean> cb) {
+        title = t;
+        callback = cb;
         handler = h;
     }
-    
+
     @Override
     public String getTitle() {
         return title;
@@ -37,21 +38,15 @@ public class ItemDiscardMenu implements SelectionMenuBehavior {
 
     @Override
     public void onAction(int index) {
-        switch (index) {
-            case 0:
-                item.discard();
-                handler.closeMenu();
-                // no break; is INTENTIONAL
-            case 1:
-                handler.closeMenu();
-                break;
-        }
+        if (index == 0)
+            callback.accept(true);
+        else
+            callback.accept(false);
+        handler.closeMenu();
     }
 
     @Override
-    public void onHighlight(int index) {
-        //handler.showDialogue(item.desc, item.spriteName);
-    }
+    public void onHighlight(int index) {}
 
     @Override
     public void onFocus() {

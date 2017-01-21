@@ -202,7 +202,7 @@ public class Postprocess implements Scene {
         */
 
     // FIRST PASS
-        
+
         dofScene1.makeCurrent();
         ShaderMap.use("quad_horizBlur");
         Uniform.varFloat("blurSize", 1f/width);

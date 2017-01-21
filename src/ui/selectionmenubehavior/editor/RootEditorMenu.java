@@ -13,7 +13,7 @@ public class RootEditorMenu implements SelectionMenuBehavior {
     private MenuHandler handler;
 
     private String title = "EDITOR";
-    private String[] options = {"Tools", "Maps", "Entities", "Options"};
+    private String[] options = {"File", "Entities", "Options"};
 
     public RootEditorMenu(MenuHandler h) {
         handler = h;
@@ -37,15 +37,14 @@ public class RootEditorMenu implements SelectionMenuBehavior {
     @Override
     public void onAction(int index) {
         switch (getElementName(index)) {
-            case "Tools":
+            case "File":
                 handler.openMenu(new ToolsMenu(handler));
-                break;
-            case "Maps":
-                handler.openMenu(new MapListMenu(handler));
                 break;
             case "Entities":
                 if (Editor.getMapEditor() != null)
                     handler.openMenu(new EntityListMenu(handler, Editor.getMapEditor().getEntities()));
+                break;
+            case "Room Links":
                 break;
             case "Options":
                 handler.openMenu(new OptionsMenu(handler));

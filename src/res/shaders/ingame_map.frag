@@ -23,6 +23,9 @@ uniform vec4 colorMult = vec4(1.0);
 uniform vec4 colorAdd = vec4(0.0);
 uniform vec3 flashlightAngle = vec3(1,0,0);
 
+uniform vec3[10] eLightPos;
+uniform vec3[10] eLightColor;
+
 void main()
 {
 	// calcuate the normal for the surface with the bumpmap texture
@@ -46,12 +49,11 @@ void main()
 
     // distance from this fragment to the light source
     float lengthVal = length(lightPos-vertexPos);
-
     // light attenuation, farther away = less light
     float lightDistCoef = 2.0/lengthVal;
 
 	// depth of field interpolation value
-	float dofLength = length(lightPos.y-vertexPos.y);
+	//float dofLength = length(lightPos.y-vertexPos.y);
 	DOFValue = vec4(1.0);//vec4(1.0-1.0/pow(dofLength,3.0),0,0,1);//vec4(fogDepth);
 
     // bias is used to reduce weird artifacts in shadow
@@ -61,11 +63,22 @@ void main()
 	shadow = shadow*.9+.1;
 
     // apply lighting to fragment, cannot be brighter than the diffuse texture
-    FragColor.rgb *= max(ambient, vec3(clamp(
+    vec3 light = max(ambient, vec3(clamp(
         lightDistCoef*flashlightAmbient + // dark ambient circle, ignore shadows
         lightDistCoef*diffuseCoef*shadow, // flashlight cone and shadow map
         0.0, 1.0)));
 
+	// entity lights
+	for (int i = 0; i < 10; i++)
+	{
+		vec3 l1 = normalize(eLightPos[i] - vertexPos);
+		float l2 = length(eLightPos[i]-vertexPos);
+		lightDistCoef = 1.0 / (1.0 + 0.01*l2 + 1.3*l2*l2);
+	    light += dot(bumpNormal,l1)*eLightColor[i]*lightDistCoef;
+	}
+
+	light = clamp(light,vec3(0),vec3(2));
+	FragColor.rgb *= light;
     // final global color adjustement, colorMult takes precedence over colorAdd
 	FragColor = colorMult * (colorAdd + FragColor);
 }

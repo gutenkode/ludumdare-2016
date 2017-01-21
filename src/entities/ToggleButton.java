@@ -40,6 +40,11 @@ public class ToggleButton extends Entity {
     }
 
     @Override
+    public void onRoomInit() {
+        tileHeight = MapManager.getTileHeight((int)posX, (int)posY);
+    }
+
+    @Override
     public void playerPointIn() {
         if (cooldown <= 0)
             MapManager.getTimelineState().toggleMapState(index);
@@ -75,4 +80,19 @@ public class ToggleButton extends Entity {
 
     @Override
     public String getName() { return "Toggle Button"; }
+    @Override
+    public boolean hasLight() { return true; }
+    @Override
+    public float[] lightPos() { return new float[] {posX,posY,tileHeight+.2f}; }
+    @Override
+    public float[] lightColor() {
+        switch (index) {
+            case 0:
+                return new float[] {1,0,0};
+            case 1:
+                return new float[] {0,0,1};
+            default:
+                return new float[] {0,0,0};
+        }
+    }
 }

@@ -21,6 +21,9 @@ uniform sampler2D texture1;
 uniform sampler2DShadow shadowMap; // shadow depth texture
 uniform vec3 flashlightAngle = vec3(1,0,0);
 
+uniform vec3[10] eLightPos;
+uniform vec3[10] eLightColor;
+
 void main()
 {
 	// color texture component
@@ -53,7 +56,20 @@ void main()
 		shadow = shadow*.9+.1;
 
     // apply lighting to fragment, cannot be brighter than the diffuse texture
-    FragColor.rgb *= max(ambient, vec3(clamp(lightDistCoef*flashlightAmbient+lightDistCoef*diffuseCoef*shadow, 0.0, 1.0)));
+    vec3 light = max(ambient, vec3(clamp(lightDistCoef*flashlightAmbient+lightDistCoef*diffuseCoef*shadow, 0.0, 1.0)));
+
+	// entity lights
+	for (int i = 0; i < 10; i++)
+	{
+		vec3 l1 = normalize(eLightPos[i] - vertexPos);
+		float l2 = length(eLightPos[i]-vertexPos);
+		lightDistCoef = 1.0 / (1.0 + 0.01*l2 + 1.3*l2*l2);
+		light += dot(normal,l1)*eLightColor[i]*lightDistCoef;
+	}
+
+	light = clamp(light,vec3(0),vec3(2));
+	FragColor.rgb *= light;
+
 	// emissive texture ignores lighting, does not affect alpha
     FragColor.rgb += texture(texture1, texCoordEmissive).rgb * emissiveMult;
 

@@ -60,8 +60,11 @@ public class ItemPickup extends Entity {
         hitboxW = .35f;
         hitboxH = .35f;
         item = i;
-        
-        tileHeight = MapManager.getTileHeight(x, y);
+    }
+
+    @Override
+    public void onRoomInit() {
+        tileHeight = MapManager.getTileHeight((int)posX, (int)posY);
     }
     
     @Override

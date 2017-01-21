@@ -111,4 +111,11 @@ public abstract class Entity {
         return (x > posX-hitboxW && x < posX+hitboxW &&
                 y > posY-hitboxH && y < posY+hitboxH);
     }
+
+    /**
+     * Whether this entity projects a light.
+     */
+    public boolean hasLight() { return false; }
+    public float[] lightPos() { return new float[] {posX,posY,tileHeight+.5f}; }
+    public float[] lightColor() { return new float[] {1,1,1}; }
 }

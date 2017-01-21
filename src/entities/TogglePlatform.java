@@ -89,4 +89,20 @@ public class TogglePlatform extends Entity {
 
     @Override
     public String getName() { return "Toggle Platform"; }
+
+    @Override
+    public boolean hasLight() { return true; }
+    @Override
+    public float[] lightPos() { return new float[] {posX,posY,tileHeight+.2f}; }
+    @Override
+    public float[] lightColor() {
+        switch (index) {
+            case 0:
+                return new float[] {1,0,0};
+            case 1:
+                return new float[] {0,0,1};
+            default:
+                return new float[] {0,0,0};
+        }
+    }
 }

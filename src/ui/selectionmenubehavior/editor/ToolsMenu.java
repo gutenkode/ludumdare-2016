@@ -1,6 +1,9 @@
 package ui.selectionmenubehavior.editor;
 
+import map.MapLoader;
 import scenes.Editor;
+import scenes.RootScene;
+import ui.EditorUIManager;
 import ui.MenuHandler;
 import ui.selectionmenubehavior.OptionsMenu;
 import ui.selectionmenubehavior.SelectionMenuBehavior;
@@ -13,7 +16,7 @@ public class ToolsMenu implements SelectionMenuBehavior {
     private MenuHandler handler;
 
     private String title = "TOOLS";
-    private String[] options = {"Tile Editor", "Save", "Exit"};
+    private String[] options = {"New","Save", "Load", "Delete", "Quit Editor", "Exit"};
 
     public ToolsMenu(MenuHandler h) {
         handler = h;
@@ -37,6 +40,29 @@ public class ToolsMenu implements SelectionMenuBehavior {
     @Override
     public void onAction(int index) {
         switch (getElementName(index)) {
+            case "New":
+                EditorUIManager.logMessage("Not supported yet.");
+                break;
+            case "Save":
+                if (Editor.getMapEditor() != null) {
+                    if (MapLoader.saveMapFile(Editor.getMapEditor().getMapData()))
+                        EditorUIManager.logMessage("File written successfully.");
+                    else
+                        EditorUIManager.logMessage("Error writing file.");
+                } else
+                    EditorUIManager.logMessage("No file loaded.");
+                break;
+            case "Load":
+                handler.openMenu(new MapListMenu(handler, MapListMenu.Action.LOAD));
+                break;
+            case "Delete":
+                handler.openMenu(new MapListMenu(handler, MapListMenu.Action.DELETE));
+                break;
+            case "Quit Editor":
+                Editor.unloadMap();
+                EditorUIManager.closeAllMenus();
+                RootScene.setState(RootScene.State.TITLE);
+                break;
             case "Exit":
                 handler.closeMenu();
                 break;

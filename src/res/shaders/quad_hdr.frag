@@ -18,5 +18,5 @@ void main()
 	float luminance = sum(FragColor.rgb * vec3(0.299, 0.587, 0.114));
 	// to prevent pure white scenes from being washed out, the total brightness is cut for very luminant fragments
 	// less luminant fragments have relatively little brightness cut, giving a better range
-	FragColor = (FragColor-.5)*2.0*(1-luminance/2);
+	FragColor = (FragColor-.666)*3.0*(1-luminance*.5);
 }

@@ -10,7 +10,13 @@ import mote4.util.matrix.Transform;
 import mote4.util.shader.ShaderMap;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
+import mote4.util.vertex.builder.MeshBuilder;
+import mote4.util.vertex.mesh.Mesh;
+import mote4.util.vertex.mesh.MeshMap;
+import nullset.Const;
+import nullset.Input;
 import org.lwjgl.glfw.GLFW;
+import ui.EditorUIManager;
 
 import java.util.ArrayList;
 
@@ -21,6 +27,11 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class Editor implements Scene {
 
+    private static final Mesh cursor;
+    private static float cursorRot;
+    private static int xPos, yPos, zPos;
+    private static boolean keyPressed = true;
+
     private static MapEditor me;
     private static float r;
 
@@ -28,6 +39,37 @@ public class Editor implements Scene {
     private static float[] lookAtPos, defaultPos, cameraPos;
     private static Entity lookAtEntity;
     private static double lookAtGlow;
+
+    static {
+        // cursor mesh
+        MeshBuilder mb = new MeshBuilder(3);
+        // sides
+        mb.vertices(0,0,0);
+        mb.vertices(1,0,1);
+        mb.vertices(0,.5f,1);
+
+        mb.vertices(0,0,0);
+        mb.vertices(0,-.5f,1);
+        mb.vertices(1,0,1);
+
+        mb.vertices(0,0,0);
+        mb.vertices(0,.5f,1);
+        mb.vertices(-1,0,1);
+
+        mb.vertices(0,0,0);
+        mb.vertices(-1,0,1);
+        mb.vertices(0,-.5f,1);
+
+        // top
+        mb.vertices(0,-.5f,1);
+        mb.vertices(-1,0,1);
+        mb.vertices(0,.5f,1);
+
+        mb.vertices(0,-.5f,1);
+        mb.vertices(0,.5f,1);
+        mb.vertices(1,0,1);
+        cursor = mb.constructVAO(GL_TRIANGLES);
+    }
 
     private Transform trans;
 
@@ -43,16 +85,38 @@ public class Editor implements Scene {
         lookAt = false;
         lookAtEntity = null;
 
-        defaultPos = new float[] {me.getMapData().width/2, me.getMapData().height/2, 0};
+        xPos = me.getMapData().width/2;
+        yPos = me.getMapData().height/2;
+        zPos = me.getMapData().heightData[xPos][yPos];
         cameraPos = new float[] {me.getMapData().width/2, me.getMapData().height/2, 0};
+
+        EditorUIManager.logMessage("Loaded map: "+mapName);
     }
     public static void unloadMap() { me = null; }
     public static MapEditor getMapEditor() { return me; }
 
+    /**
+     * The texture indices for the current tile, used by EditorUI
+     * to preview the tilemap.
+     * @return
+     */
+    public static int[] currentTileTexInds() {
+        int[] ans = new int[] {0,0};
+        if (me == null) return ans;
+        ans[0] = me.getMapData().tileData[xPos][yPos][0];
+        ans[1] = me.getMapData().tileData[xPos][yPos][2];
+        return ans;
+    }
+
     public static void lookAt(Entity e) {
-        lookAtEntity = e;
-        lookAtPos = new float[] {e.posX(), e.posY(), e.tileHeight()};
-        lookAt = true;
+        if (e == null) {
+            lookAt = false;
+            lookAtEntity = null;
+        } else {
+            lookAtEntity = e;
+            lookAtPos = new float[]{e.posX(), e.posY(), e.tileHeight()};
+            lookAt = true;
+        }
     }
 
     @Override
@@ -63,18 +127,85 @@ public class Editor implements Scene {
         for (Entity e : me.getEntities())
             e.update();
 
-        if (GLFW.glfwGetKey(Window.getWindowID(), GLFW.GLFW_KEY_Q) == GLFW.GLFW_PRESS)
-            r -= .02;
-        else if (GLFW.glfwGetKey(Window.getWindowID(), GLFW.GLFW_KEY_E) == GLFW.GLFW_PRESS)
-            r += .02;
+        if (Input.currentLock() != Input.Lock.TERMINAL)
+        {
+            // rotate camera, can rotate scene while in a menu
+            if (GLFW.glfwGetKey(Window.getWindowID(), GLFW.GLFW_KEY_Q) == GLFW.GLFW_PRESS)
+                r -= .02;
+            else if (GLFW.glfwGetKey(Window.getWindowID(), GLFW.GLFW_KEY_E) == GLFW.GLFW_PRESS)
+                r += .02;
+        }
+        if (Input.currentLock() != Input.Lock.TERMINAL &&
+            Input.currentLock() != Input.Lock.MENU)
+        {
+            // cursor movement
+            if (Input.isKeyNew(Input.Keys.LEFT)) {
+                if (xPos > 0)
+                    xPos--;
+            } else if (Input.isKeyNew(Input.Keys.RIGHT)) {
+                if (xPos < me.getMapData().width-1)
+                    xPos++;
+            }
+            if (Input.isKeyNew(Input.Keys.UP)) {
+                if (yPos > 0)
+                    yPos--;
+            } else if (Input.isKeyNew(Input.Keys.DOWN)) {
+                if (yPos < me.getMapData().height-1)
+                    yPos++;
+            }
+            zPos = me.getMapData().heightData[xPos][yPos];
+
+            // tile height
+            if (GLFW.glfwGetKey(Window.getWindowID(), GLFW.GLFW_KEY_EQUAL) == GLFW.GLFW_PRESS) {
+                if (!keyPressed)
+                    me.editHeight(xPos,yPos,1);
+                keyPressed = true;
+            } else if (GLFW.glfwGetKey(Window.getWindowID(), GLFW.GLFW_KEY_MINUS) == GLFW.GLFW_PRESS) {
+                if (!keyPressed)
+                    me.editHeight(xPos,yPos,-1);
+                keyPressed = true;
+            }
+            // tile shape
+            else if (GLFW.glfwGetKey(Window.getWindowID(), GLFW.GLFW_KEY_LEFT_BRACKET) == GLFW.GLFW_PRESS) {
+                if (!keyPressed)
+                    me.toggleGroundTile(xPos,yPos);
+                keyPressed = true;
+            } else if (GLFW.glfwGetKey(Window.getWindowID(), GLFW.GLFW_KEY_RIGHT_BRACKET) == GLFW.GLFW_PRESS) {
+                if (!keyPressed)
+                    me.toggleWallTile(xPos,yPos);
+                keyPressed = true;
+            }
+            // texture coords
+            else if (GLFW.glfwGetKey(Window.getWindowID(), GLFW.GLFW_KEY_J) == GLFW.GLFW_PRESS) {
+                if (!keyPressed)
+                    me.editTileInd1(xPos,yPos,-1);
+                keyPressed = true;
+            } else if (GLFW.glfwGetKey(Window.getWindowID(), GLFW.GLFW_KEY_L) == GLFW.GLFW_PRESS) {
+                if (!keyPressed)
+                    me.editTileInd1(xPos,yPos,1);
+                keyPressed = true;
+            } else if (GLFW.glfwGetKey(Window.getWindowID(), GLFW.GLFW_KEY_I) == GLFW.GLFW_PRESS) {
+                if (!keyPressed)
+                    me.editTileInd1(xPos,yPos,-(int)Const.TILESHEET_X);
+                keyPressed = true;
+            } else if (GLFW.glfwGetKey(Window.getWindowID(), GLFW.GLFW_KEY_K) == GLFW.GLFW_PRESS) {
+                if (!keyPressed)
+                    me.editTileInd1(xPos,yPos,(int)Const.TILESHEET_Y);
+                keyPressed = true;
+            } else
+                keyPressed = false;
+        }
 
         lookAtGlow += .1;
+        cursorRot += .05;
 
         if (lookAt) {
             for (int i = 0; i < 3; i++) {
                 cameraPos[i] -= (cameraPos[i]-lookAtPos[i])/15;
             }
         } else {
+            defaultPos = new float[] {xPos+.5f,yPos+.5f,zPos};
+
             for (int i = 0; i < 3; i++) {
                 cameraPos[i] -= (cameraPos[i]-defaultPos[i])/15;
             }
@@ -89,7 +220,6 @@ public class Editor implements Scene {
         // translate to correct position
         trans.view.rotate(r, 0, 0, 1);
         trans.view.translate(-cameraPos[0], -cameraPos[1], -cameraPos[2]);
-
     }
 
     @Override
@@ -109,6 +239,17 @@ public class Editor implements Scene {
             trans.makeCurrent();
             me.getMapData().render();
 
+            // render cursor, BEFORE entities
+            ShaderMap.use("color");
+            float cval = ((float)Math.cos(cursorRot)+1)/4+.25f;
+            Uniform.varFloat("colorMult", cval, 0, 0, cval);
+            trans.model.setIdentity();
+            trans.model.translate(xPos+.5f,yPos+.5f,zPos+.05f);
+            //trans.model.rotate(cursorRot,0,0,1);
+            trans.model.scale(.5f,.5f,1);
+            trans.makeCurrent();
+            MeshMap.render("quad");
+
             if (me.getEntities() != null && !me.getEntities().isEmpty())
             {
                 // render entity tilesheets
@@ -123,6 +264,7 @@ public class Editor implements Scene {
                 ShaderMap.use("color");
                 Uniform.varFloat("colorMult", 1, 1, 1, 1);
                 glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                glEnable(GL_CULL_FACE);
                 trans.makeCurrent();
                 trans.model.setIdentity();
                 for (Entity e : me.getEntities()) {
@@ -135,6 +277,7 @@ public class Editor implements Scene {
                     } else
                         e.renderHitbox(trans.model);
                 }
+                glDisable(GL_CULL_FACE);
                 glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             }
         }

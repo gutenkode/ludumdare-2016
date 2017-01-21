@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import rpgsystem.Inventory;
 import rpgsystem.Item;
 import ui.MenuHandler;
-import ui.selectionmenubehavior.ItemActionMenu;
 import ui.selectionmenubehavior.SelectionMenuBehavior;
 
 /**

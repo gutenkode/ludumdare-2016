@@ -3,8 +3,11 @@ package ui;
 import mote4.util.matrix.ModelMatrix;
 import mote4.util.matrix.Transform;
 import mote4.util.shader.ShaderMap;
+import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
+import mote4.util.vertex.mesh.ScrollingText;
 import nullset.Const;
+import nullset.Input;
 import scenes.RootScene;
 import ui.components.SelectionMenu;
 import ui.selectionmenubehavior.editor.RootEditorMenu;
@@ -20,15 +23,17 @@ public class EditorUIManager implements MenuHandler {
     private static final EditorUIManager manager;
     private static final Stack<SelectionMenu> selectionMenus;
 
+    private static ScrollingText logMessage; // simple string that appears to announce events in the overworld
+    private static int logMessageTimeout = 0;
+
     static {
         manager = new EditorUIManager();
         selectionMenus = new Stack<>();
-
-        manager.openMenu(new RootEditorMenu(manager));
     }
 
     public static void update() {
-        selectionMenus.peek().update();
+        if (!selectionMenus.empty())
+            selectionMenus.peek().update();
     }
     public static void render(Transform trans) {
         ModelMatrix model = trans.model;
@@ -36,6 +41,21 @@ public class EditorUIManager implements MenuHandler {
         ShaderMap.use("texture");
         trans.makeCurrent();
         TextureMap.bindUnfiltered("font_1");
+
+        if (logMessageTimeout > 0) {
+            logMessageTimeout--;
+            model.setIdentity();
+            model.translate(80, RootScene.height()-80);
+            model.makeCurrent();
+            TextureMap.bindUnfiltered("font_1");
+            Uniform.varFloat("colorMult",0,0,0,1);
+            logMessage.render();
+
+            model.translate(-1, -1);
+            model.makeCurrent();
+            Uniform.varFloat("colorMult",1,1,1,1);
+            logMessage.render();
+        }
 
         model.setIdentity();
         model.translate(Const.UI_SCALE/2, Const.UI_SCALE/2,0);
@@ -48,10 +68,29 @@ public class EditorUIManager implements MenuHandler {
         }
     }
 
+    public static void openRootMenu() {
+        if (selectionMenus.empty() && Input.currentLock() != Input.Lock.MENU)
+            manager.openMenu(new RootEditorMenu(manager));
+    }
+    public static void closeAllMenus() {
+        if (Input.currentLock() == Input.Lock.MENU) {
+            while (!selectionMenus.empty())
+                manager.closeMenu();
+        }
+    }
+    public static void logMessage(String message) {
+        if (logMessage != null)
+            logMessage.destroy();
+        logMessage = new ScrollingText(message, "font_1", 0, 0, Const.UI_SCALE, Const.UI_SCALE, 1);
+        logMessageTimeout = 100;
+    }
+
     // menu methods
 
     @Override
     public void openMenu(SelectionMenuBehavior b) {
+        if (selectionMenus.empty())
+            Input.pushLock(Input.Lock.MENU);
         SelectionMenu sm = new SelectionMenu(b);
         selectionMenus.push(sm);
         sm.onFocus();
@@ -66,9 +105,12 @@ public class EditorUIManager implements MenuHandler {
     }
     @Override
     public void closeMenu() {
-        if (selectionMenus.size() > 1) {
+        if (selectionMenus.size() > 0) {
             selectionMenus.pop();
-            selectionMenus.peek().onFocus();
+            if (selectionMenus.empty())
+                Input.popLock();
+            else
+                selectionMenus.peek().onFocus();
         }
     }
 

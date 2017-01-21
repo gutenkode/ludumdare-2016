@@ -25,7 +25,7 @@ void main()
 	vec4 ui = texture(tex_ui, texCoord);
 
 	// blend 3D scene with blurred DOF scene
-
+	
 	vec4 v1 = texture(tex_scene, texCoord);
 	vec4 v2 = texture(tex_dof, texCoord);
 	float dofvalue = texture(tex_dofvalue, texCoord).r + dofCoef;
@@ -36,7 +36,7 @@ void main()
 	//dofvalue = 0.0; // 0 = blur, 1 = solid
 	FragColor = mix(v2, v1, dofvalue);
 
-	//FragColor = texture(tex_scene, texCoord);
+	//FragColor = texture(tex_dof, texCoord);
 
 	// put the non-blurred UI over all of it
 	FragColor = ui*(ui.a) + FragColor*(1-ui.a);

@@ -30,9 +30,12 @@ public class MapManager {
     // temporary list of entities that should be deleted, to avoid ConcurrentModificationExceptions
     private static ArrayList<Entity> deleteList = new ArrayList<>(); 
     private static LinkData loadLinkData; // stored link data while a fadeout is performed
-    
-    public static Player getPlayer() { return player; }
-    public static TimelineState getTimelineState() { return currentTimeline.getState(); }
+
+    // data for entity lights in shaders
+    private static float[] eLightPos, eLightColor;
+
+    // initialization and timelines
+
     /**
      * Creates new timelines.
      * @param firstRoom
@@ -59,26 +62,15 @@ public class MapManager {
         currentTimelineInd = i;
         currentTimeline = timelines.get(currentTimelineInd);
         
-        for (Entity e : currentTimeline.getEntities())
-            e.onRoomInit();
+        //for (Entity e : currentTimeline.getEntities())
+        //    e.onRoomInit();
         player = currentTimeline.getPlayer();
-        player.onRoomInit();
+        //player.onRoomInit();
+        runOnRoomInit();
     }
-    
-    /**
-     * Attempts to remove the specified entity from the current room.
-     * If the entity is not present in the current room,
-     * no entity will be deleted.
-     * @param e 
-     */
-    public static void removeEntity(Entity e) {
-        for (Entity e1 : currentTimeline.getEntities())
-            if (e1 == e) {
-                deleteList.add(e1);
-                return;
-            }
-    }
-    
+
+    // update and room load process methods
+
     public static void update() {
         if (Input.currentLock() == Input.Lock.FADE)
             return;
@@ -141,14 +133,34 @@ public class MapManager {
         int[] loc = newLink.getFrontTile();
         player.moveTo(loc[0]+.5f, loc[1]+.5f); // move the player to the new location
         currentTimeline.setMapData(newMapData);
-        // now called by setMapData()
-        //currentTimeline.createEntities(md); // create new entities if necessary
-        for (Entity e : currentTimeline.getEntities())
+
+        runOnRoomInit();
+    }
+    private static void runOnRoomInit() {
+        int numLights = 0;
+        eLightPos = new float[10*3];
+        eLightColor = new float[10*3];
+        for (Entity e : currentTimeline.getEntities()) {
             e.onRoomInit();
+            if (e.hasLight()) {
+                if (numLights >= eLightPos.length/3)
+                    throw new IllegalStateException("Room has more entity lights than maximum.");
+                float[] pos = e.lightPos();
+                eLightPos[numLights*3] = pos[0];
+                eLightPos[numLights*3+1] = pos[1];
+                eLightPos[numLights*3+2] = pos[2];
+                float[] color = e.lightColor();
+                eLightColor[numLights*3] = color[0];
+                eLightColor[numLights*3+1] = color[1];
+                eLightColor[numLights*3+2] = color[2];
+                numLights++;
+            }
+        }
         player.onRoomInit();
     }
-    
-    static double cycle;
+
+    // rendering
+
     /**
      * Renders static map mesh, entity sprites, and static object meshes using
      * lighting shaders and textures.
@@ -160,18 +172,17 @@ public class MapManager {
         lightVector[0] = -(float)Math.sin(flashlightDir[0]);
         lightVector[1] = -(float)Math.cos(flashlightDir[0]);
         lightVector[2] = 0;
-        //lightVector[0] = -(float)(Math.sin(flashlightDir[0])*Math.cos(flashlightDir[1]));
-        //lightVector[1] = -(float)(Math.cos(flashlightDir[0])*Math.cos(flashlightDir[1]));
-        //lightVector[2] = (float)Math.cos(flashlightDir[1]);
         
     // render static map mesh
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         ShaderMap.use("ingame_map");
         shadowProj.makeCurrent();
-        Uniform.varFloat("ambient", 0,0,0);//Uniform.varFloat("ambient", .2f,.2f,.2f);
+        Uniform.arrayFloat("eLightPos",3, eLightPos);
+        Uniform.arrayFloat("eLightColor",3, eLightColor);
+        Uniform.varFloat("ambient", 0,0,0);
         Uniform.varFloat("flashlightAngle", lightVector);
-        //Uniform.varFloat("flashlightAngle", -(float)Math.sin(flashlightDir[0]),-(float)Math.cos(flashlightDir[0]),0);
-        Uniform.varFloat("lightPos", player.posX(), player.posY()+player.hitboxH(), player.elevatorHeight()+1f);
+        Uniform.varFloat("lightPos", player.posX(),
+                                                    player.posY()+player.hitboxH(),
+                                                    player.elevatorHeight()+1f);
         Uniform.samplerAndTextureFiltered("shadowMap", 1, "fbo_depth");
         
         TextureMap.bindUnfiltered("tileset_1");
@@ -180,15 +191,17 @@ public class MapManager {
         trans.model.setIdentity();
         trans.makeCurrent();
         currentTimeline.getMapData().render();
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         
     // render entity tilesheets
         ShaderMap.use("spritesheet_light");
         shadowProj.makeCurrent();
-        Uniform.varFloat("ambient", 0,0,0);//Uniform.varFloat("ambient", .2f,.2f,.2f);
+        Uniform.arrayFloat("eLightPos",3, eLightPos);
+        Uniform.arrayFloat("eLightColor",3, eLightColor);
+        Uniform.varFloat("ambient", 0,0,0);
         Uniform.varFloat("flashlightAngle", lightVector);
-        //Uniform.varFloat("flashlightAngle", -(float)Math.sin(flashlightDir[0]),-(float)Math.cos(flashlightDir[0]),0);
-        Uniform.varFloat("lightPos", player.posX(), player.posY()+player.hitboxH(), player.elevatorHeight()+1f);
+        Uniform.varFloat("lightPos", player.posX(),
+                                                    player.posY()+player.hitboxH(),
+                                                    player.elevatorHeight()+1f);
         Uniform.samplerAndTextureFiltered("shadowMap", 1, "fbo_depth");
         
         trans.makeCurrent();
@@ -241,7 +254,9 @@ public class MapManager {
         }
         
     }
-    
+
+    // state management methods
+
     /**
      * The size of the current map.
      * @return 
@@ -260,6 +275,23 @@ public class MapManager {
             return Editor.getMapEditor().getMapData().heightData[x][y];
         return currentTimeline.getMapData().heightData[x][y];
     }
+    public static Player getPlayer() { return player; }
+    public static TimelineState getTimelineState() { return currentTimeline.getState(); }
+    /**
+     * Attempts to remove the specified entity from the current room.
+     * If the entity is not present in the current room,
+     * no entity will be deleted.
+     * @param e
+     */
+    public static void removeEntity(Entity e) {
+        for (Entity e1 : currentTimeline.getEntities())
+            if (e1 == e) {
+                deleteList.add(e1);
+                return;
+            }
+    }
+
+    // collision detection methods
 
     /**
      * Tests whether an entity is colliding with the heightmap of any loaded maps.

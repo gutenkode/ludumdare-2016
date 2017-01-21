@@ -5,6 +5,7 @@ tileset/shade			tileset_shade
 ui/title			ui_title
 ui/scalablemenu			ui_scalablemenu
 ui/arrow_cursor			ui_cursor
+ui/square_cursor		ui_square_cursor
 ui/statbars			ui_statbars
 
 ui/battlebg/red			ui_bg_red

@@ -28,7 +28,6 @@ public class StaticObject extends Entity {
         val0 = val;
         posX = x+.5f;
         posY = y+.5f;
-        tileHeight = MapManager.getTileHeight((int)x, (int)y);
         hitboxW = .3f;
         hitboxH = .3f;
         
@@ -60,6 +59,11 @@ public class StaticObject extends Entity {
             default:
                 throw new IllegalArgumentException("Unrecognized StaticObject type: "+model);
         }
+    }
+
+    @Override
+    public void onRoomInit() {
+        tileHeight = MapManager.getTileHeight((int)posX, (int)posY);
     }
 
     @Override
@@ -134,4 +138,11 @@ public class StaticObject extends Entity {
 
     @Override
     public String getName() { return "Static: "+TYPE.name(); }
+
+    @Override
+    public boolean hasLight() { return TYPE == Type.FLUORESCENT; }
+    @Override
+    public float[] lightPos() { return new float[] {posX,posY,tileHeight+1}; }
+    @Override
+    public float[] lightColor() { return new float[] {2,2,2}; }
 }

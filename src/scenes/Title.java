@@ -32,7 +32,7 @@ public class Title implements Scene {
         glClearColor(0, 0, 0, 0);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         ShaderMap.use("titlebg");
-        Uniform.varFloat("colorAdd", .0f,.1f,.4f,1);
+        Uniform.varFloat("colorAdd", .2f,.3f,.7f,1);
         Uniform.varFloat("colorMult", .5f,.5f,.55f,1);
         trans.makeCurrent();
         MeshMap.render("hexahedron");

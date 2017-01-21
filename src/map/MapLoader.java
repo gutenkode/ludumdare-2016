@@ -1,8 +1,8 @@
 package map;
 
-import java.io.BufferedReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 import mote4.scenegraph.Window;
@@ -14,7 +14,7 @@ import mote4.util.FileIO;
  */
 public class MapLoader {
     
-    private static final String FILE_EXTENSION = ".rf2";
+    public static final String FILE_EXTENSION = ".rf2";
     private static String levelPath = ""; // the folder (or folders) the set of levels is in
     private static HashMap<String, MapData> loadedMaps = new HashMap<>();
     
@@ -246,5 +246,106 @@ public class MapLoader {
             //ind++;
         }
         return list;
+    }
+
+    /**
+     * Write a map out to a file, used with the editor.
+     * @param md
+     */
+    public static boolean saveMapFile(MapData md) {
+        try {
+            File file = new File("./src/res/maps/"+levelPath+"/"+md.mapName+"_NEW"+FILE_EXTENSION);
+            if (!file.exists())
+                file.createNewFile();
+            System.out.println(file.getPath());
+            FileWriter fWriter = new FileWriter(file);
+            BufferedWriter out = new BufferedWriter(fWriter);
+
+            String outString = "";
+
+            // write meta
+            outString += "<meta>\nwidth="+md.width+"\nheight="+md.height+"\n</meta>";
+            out.write(outString);
+            out.newLine();
+
+            // write tile data
+            out.write("<tiledata>");
+            out.newLine();
+            for (int i = 0; i < md.height; i++) {
+                outString = "";
+                for (int j = 0; j < md.width; j++) {
+                    outString += md.tileData[j][i][0] + "," + md.tileData[j][i][1] + "," + md.tileData[j][i][2] + " ";
+                }
+                out.write(outString);
+                out.newLine();
+            }
+            out.write("</tiledata>");
+            out.newLine();
+
+            // write tile height
+            out.write("<walkdata>");
+            out.newLine();
+            for (int i = 0; i < md.height; i++) {
+                outString = "";
+                for (int j = 0; j < md.width; j++) {
+                    outString += md.heightData[j][i]+" ";
+                }
+                out.write(outString);
+                out.newLine();
+            }
+            out.write("</walkdata>");
+            out.newLine();
+
+            // write link data
+            out.write("<linkdata>");
+            out.newLine();
+            char[][] links = new char[md.height][md.width];
+            for (char[] c : links)
+                Arrays.fill(c, '.');
+            for (LinkData ld : md.linkData)
+                links[ld.y][ld.x] = ld.id;
+            for (int i = 0; i < md.height; i++) {
+                outString = "";
+                for (int j = 0; j < md.width; j++) {
+                    outString += links[i][j];
+                }
+                out.write(outString);
+                out.newLine();
+            }
+            out.write("</linkdata>");
+            out.newLine();
+
+            // write link desc data
+            out.write("<linkdesc>");
+            out.newLine();
+            for (LinkData ld : md.linkData) {
+                out.write(ld.mapName+","+ld.direction);
+                out.newLine();
+            }
+            out.write("</linkdesc>");
+            out.newLine();
+
+            out.write("<entitydata>");
+            out.newLine();
+            for (String s : md.entities) {
+                out.write(s);
+                out.newLine();
+            }
+            out.write("</entitydata>");
+            out.newLine();
+
+            out.close();
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static boolean deleteMapFile(String mapName) {
+        File file = new File("./src/res/maps/"+levelPath+"/"+mapName+FILE_EXTENSION);
+        if (file.exists())
+            return file.delete();
+        return false;
     }
 }
