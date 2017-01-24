@@ -73,8 +73,9 @@ void main()
 	{
 		vec3 l1 = normalize(eLightPos[i] - vertexPos);
 		float l2 = length(eLightPos[i]-vertexPos);
-		lightDistCoef = 1.0 / (1.0 + 0.01*l2 + 1.3*l2*l2);
-	    light += dot(bumpNormal,l1)*eLightColor[i]*lightDistCoef;
+		lightDistCoef = 1.0 / (1.0 + 0.01*l2 + 1.8*l2*l2);
+		vec3 thisLight = dot(bumpNormal,l1)*eLightColor[i]*lightDistCoef;
+	    light = max(light,thisLight);
 	}
 
 	light = clamp(light,vec3(0),vec3(2));

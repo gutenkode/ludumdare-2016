@@ -227,7 +227,7 @@ public class KeyDoor extends Entity {
     @Override
     public boolean hasLight() { return keycardLevel > 0; }
     @Override
-    public float[] lightPos() { return new float[] {tileX,tileY,tileHeight+1f}; }
+    public float[] lightPos() { return new float[] {tileX+.5f,tileY+.5f,tileHeight+1f}; }
     @Override
-    public float[] lightColor() { return new float[] {1,0,0}; }
+    public float[] lightColor() { return new float[] {1.5f,0,0}; }
 }

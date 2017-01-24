@@ -58,6 +58,17 @@ public class Postprocess implements Scene {
     public void render(double delta) {
         glClear(GL_COLOR_BUFFER_BIT);
         glDisable(GL_DEPTH_TEST);
+
+        // render transition effect, if active
+        if (RootScene.currentState() == RootScene.State.BATTLE_INTRO) {
+            ShaderMap.use("quad");
+            Uniform.varFloat("colorMult", colorMult,colorMult,colorMult);
+            TextureMap.bindFiltered("fbo_transition1");
+            MeshMap.render("quad");
+            Uniform.varFloat("colorMult", 1,1,1);
+            return;
+        }
+
         Target framebuffer = Target.getCurrent();
         
     // render 3D scene to dither FBO
@@ -71,6 +82,7 @@ public class Postprocess implements Scene {
         MeshMap.render("quad");
         
     // render UI scene to UI upscale scene - simple upscale to improve filtering effects
+    // ditherScene is also upscaled, for the scene
         uiUpscaleScene.makeCurrent();
         glClear(GL_COLOR_BUFFER_BIT);
         
@@ -78,63 +90,44 @@ public class Postprocess implements Scene {
         TextureMap.bindUnfiltered("fbo_ui");
         MeshMap.render("quad");
 
-    // create DOF scene from dithered scene
+    // create DOF scene from dithered scene, just a simple blur
         createDOFTexture("fbo_dither");
         
-    // render scene and UI to the combined FBO,
-    // used to create the bloom scene
+    // render scene and UI to the combineScene,
+    // which is used to create the bloom scene
         combineScene.makeCurrent();
         glClear(GL_COLOR_BUFFER_BIT);
         
         ShaderMap.use("quad");
-        //Uniform.varFloat("screenSize", width, height);
-        TextureMap.bindFiltered("fbo_scene"); // fbo_dof2
+        TextureMap.bindFiltered("fbo_scene");
         MeshMap.render("quad");
-        
-        ShaderMap.use("quad");
         TextureMap.bindFiltered("fbo_ui");
         MeshMap.render("quad");
         
     // create a bloom texture from the combined scene
         createBloomTexture("fbo_combine");
-        //createBloomTexture("fbo_dof2");
         
-   // render final mix shader to screen
+    // render final mix shader to screen
         framebuffer.makeCurrent();
         ShaderMap.use("quad_final");
         
         Uniform.varFloat("dofCoef", dofCoef);
         //Uniform.varFloat("bloomCoef", .5f);
         Uniform.varFloat("colorMult", colorMult,colorMult,colorMult);
-        Uniform.varFloat("rand", random.nextFloat(), random.nextFloat());
+        Uniform.varFloat("rand", random.nextFloat(), random.nextFloat()); // random position for static
         
-        // TEMPORARY
-        Uniform.samplerAndTextureFiltered("tex_scene", 1, "fbo_dither");
-        Uniform.samplerAndTextureFiltered("tex_ui", 2, "fbo_ui_upscale");
-        Uniform.samplerAndTextureFiltered("tex_bloom", 3, "fbo_hdr");
-        Uniform.samplerAndTextureFiltered("tex_dof", 4, "fbo_dof2");
-        Uniform.samplerAndTextureFiltered("tex_dofvalue", 5, "fbo_dofvalue");
-        Uniform.samplerAndTextureFiltered("tex_noise", 6, "post_noise");
-        Uniform.samplerAndTextureFiltered("tex_vignette", 7, "post_vignette");
-        //Uniform.samplerAndTextureFiltered("tex_scanlines", 8, "post_scanlines");
+        // TODO make this one-time initialization, must coordinate with sampler indices in MapManager
+        TextureMap.bindFiltered("fbo_dither"); // upscaled/dithered scene, binds to "tex_scene"
+        //Uniform.samplerAndTextureFiltered("tex_scene", 1, "fbo_dither");
+        Uniform.samplerAndTextureFiltered("tex_ui", 1, "fbo_ui_upscale"); // upscaled UI
+        Uniform.samplerAndTextureFiltered("tex_bloom", 2, "fbo_hdr"); // bloom scene
+        Uniform.samplerAndTextureFiltered("tex_dof", 3, "fbo_dof2"); // scene blur
+        Uniform.samplerAndTextureFiltered("tex_dofvalue", 4, "fbo_dofvalue"); // scene blur mix data
+        Uniform.samplerAndTextureFiltered("tex_noise", 5, "post_noise"); // postprocess
+        Uniform.samplerAndTextureFiltered("tex_vignette", 6, "post_vignette"); // postprocess
+        //Uniform.samplerAndTextureFiltered("tex_scanlines", 7, "post_scanlines");
 
-        TextureMap.bindFiltered("fbo_combine");
         MeshMap.render("quad");
-        
-    // render transition effect, if active
-        if (RootScene.currentState() == RootScene.State.BATTLE_INTRO) {
-            //glBlendFunc(GL_ONE, GL_ONE);
-            ShaderMap.use("quad");
-            Uniform.varFloat("colorMult", colorMult,colorMult,colorMult);
-            if (BattleTransition.bufferSwitch())
-                TextureMap.bindUnfiltered("fbo_transition1");
-            else
-                TextureMap.bindUnfiltered("fbo_transition2");
-            MeshMap.render("quad");
-            Uniform.varFloat("colorMult", 1,1,1);
-            //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        }
-        
     }
     
     /**
@@ -252,7 +245,10 @@ public class Postprocess implements Scene {
         combineScene = new FBO(width,height,false,false,null);
         TextureMap.delete("fbo_combine");
         combineScene.addToTextureMap("fbo_combine");
-        
+
+        // ditherScene and uiUpscaleScene are double the resolution of the scene,
+        // to improve texture filtering effects
+
         if (ditherScene != null)
             ditherScene.destroy();
         ditherScene = new FBO(width*2,height*2,false,false,null);

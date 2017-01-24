@@ -14,11 +14,11 @@ height=7
 <walkdata>
 2 2 2 2 2 2 2
 2 0 0 0 0 0 2
-2 0 -1 -2 0 0 2
-2 0 -1 -4 0 0 0
-2 0 0 -4 -1 0 2
-2 0 0 -4 -2 -2 2
-2 -3 -4 -4 -4 -3 2
+2 0 -2 -2 0 0 2
+2 0 -2 -2 0 0 0
+2 0 0 -2 -2 0 2
+2 0 0 -2 -2 -2 2
+2 -2 -2 -2 -2 -2 2
 </walkdata>
 <linkdata>
 .......
@@ -33,11 +33,13 @@ height=7
 1h_intro,0
 </linkdesc>
 <entitydata>
-Water,-2
 Terminal,1,1
 KeyDoor,5,3,0,1
 StaticObject,5,1,Crate
 StaticObject,4,3,Barrel
-StaticObject,4,2,Fluorescent
+StaticObject,5,1.5,Fluorescent
 StaticObject,1,1,Ceiling
+Elevator,5,5,2
+Enemy,3,3,SLIME
+Water,-2
 </entitydata>

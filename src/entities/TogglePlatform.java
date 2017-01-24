@@ -98,9 +98,9 @@ public class TogglePlatform extends Entity {
     public float[] lightColor() {
         switch (index) {
             case 0:
-                return new float[] {1,0,0};
+                return new float[] {2,0,0};
             case 1:
-                return new float[] {0,0,1};
+                return new float[] {0,0,2};
             default:
                 return new float[] {0,0,0};
         }

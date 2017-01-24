@@ -25,7 +25,7 @@ void main()
 	vec4 ui = texture(tex_ui, texCoord);
 
 	// blend 3D scene with blurred DOF scene
-	
+
 	vec4 v1 = texture(tex_scene, texCoord);
 	vec4 v2 = texture(tex_dof, texCoord);
 	float dofvalue = texture(tex_dofvalue, texCoord).r + dofCoef;
@@ -50,9 +50,10 @@ void main()
 	FragColor *= texture(tex_vignette, texCoord);
 	//FragColor *= texture(tex_scanlines, texCoord*vec2(1,128));
 
-	FragColor.xyz *= colorMult; // used for fading in/out
-	FragColor.a = 1;
+	FragColor.rgb *= colorMult; // used for fading in/out
+	//FragColor.a = 1;
 
-	//FragColor = texture(tex_dof, texCoord);
-	//FragColor = vec4(vec3(dofvalue),1);
+	// gamma correction, 2.2 is normal
+    float gamma = 2.0;
+    //FragColor.rgb = pow(FragColor.rgb, vec3(1.0/gamma));
 }

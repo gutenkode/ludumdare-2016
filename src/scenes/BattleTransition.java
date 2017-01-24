@@ -16,12 +16,12 @@ public class BattleTransition implements Scene {
     
     private FBO fbo1, fbo2;
     private int delay;
-    private float cycle;
+    private float frameCount;
     private ModelMatrix model;
     private static boolean bufferSwitch;
     
     public BattleTransition() {
-        delay = 45;
+        delay = 45*3;
         
         fbo1 = new FBO(512,512,false,false,null);
         TextureMap.delete("fbo_transition1");
@@ -34,6 +34,7 @@ public class BattleTransition implements Scene {
         model = new ModelMatrix();
         
         bufferSwitch = true;
+        frameCount = 0;
         
         fbo2.makeCurrent();
         glClear(GL_COLOR_BUFFER_BIT);
@@ -46,11 +47,11 @@ public class BattleTransition implements Scene {
 
     @Override
     public void update(double delta) {
-        //cycle += .1f;
+        frameCount++;
         //model.setIdentity();
-        model.scale(1.001f, 1.0015f, 1);
-        model.translate(.0001f, .0001f);
-        model.rotate(.0005f, 0, 0, 1);
+        model.scale(1.001f, 1.001f, 1);
+        //model.translate(.0001f, .0001f);
+        model.rotate(.0003f, 0, 0, 1);
         
         //model.scale(1.04f, 1.045f, 1);
         //model.rotate(.02f, 0, 0, 1);
@@ -80,7 +81,7 @@ public class BattleTransition implements Scene {
         MeshMap.render("quad");
         
         bufferSwitch = !bufferSwitch;
-        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
     @Override
@@ -92,7 +93,5 @@ public class BattleTransition implements Scene {
         fbo1.destroy();
         fbo2.destroy();
     }
-    
-    public static boolean bufferSwitch() { return bufferSwitch; }
     
 }

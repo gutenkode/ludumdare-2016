@@ -101,7 +101,7 @@ public class StaticObject extends Entity {
                 Uniform.varFloat("spriteInfo", 2,1,0);
                 Uniform.varFloat("spriteInfoEmissive", 2,1,1);
                 Uniform.varFloat("emissiveMult", 3);
-                model.translate(posX, posY, tileHeight+2);
+                model.translate(posX, posY, tileHeight+1.75f);
                 model.scale(.25f,.75f,1);
                 model.rotate((float)Math.PI, 1, 0, 0);
                 model.makeCurrent();
@@ -142,7 +142,7 @@ public class StaticObject extends Entity {
     @Override
     public boolean hasLight() { return TYPE == Type.FLUORESCENT; }
     @Override
-    public float[] lightPos() { return new float[] {posX,posY,tileHeight+1}; }
+    public float[] lightPos() { return new float[] {posX,posY,tileHeight+1.75f}; }
     @Override
-    public float[] lightColor() { return new float[] {2,2,2}; }
+    public float[] lightColor() { return new float[] {4,4,4}; }
 }

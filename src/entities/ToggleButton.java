@@ -83,7 +83,7 @@ public class ToggleButton extends Entity {
     @Override
     public boolean hasLight() { return true; }
     @Override
-    public float[] lightPos() { return new float[] {posX,posY,tileHeight+.2f}; }
+    public float[] lightPos() { return new float[] {posX,posY,tileHeight+.3f}; }
     @Override
     public float[] lightColor() {
         switch (index) {
