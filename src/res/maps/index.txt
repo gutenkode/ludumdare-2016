@@ -7,3 +7,4 @@
 2,_mylevel2,1a,2,3
 1,_mylevel1,1a_start,2,5
 3,old,newStart,2,5
+#1i_puzzle2,2,5

@@ -44,7 +44,7 @@ public class RootBattleMenu implements SelectionMenuBehavior {
     public void onAction(int index) {
         switch (getElementName(index)) {
             case "Attack":
-                handler.openMenu(new EnemySelectionMenu(handler, this::attackCallback, false));
+                handler.openMenu(new EnemySelectionMenu(handler, this::attackCallback, false,true,false));
                 //if (BattleManager.getPlayer().useAttack(handler))
                 //    BattleUIManager.endPlayerTurn();
                 break;

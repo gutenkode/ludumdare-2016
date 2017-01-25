@@ -18,6 +18,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class Battle implements Scene {
     
     private static Mesh background;
+    private static String bgname = "";
     private float cycle, 
                   fov = 50;
     
@@ -70,6 +71,10 @@ public class Battle implements Scene {
         trans = new Transform();
     }
 
+    public static void setBackground(String bg) {
+        bgname = bg;
+    }
+
     @Override
     public void update(double delta) {
         cycle += delta*.1f;
@@ -86,7 +91,7 @@ public class Battle implements Scene {
         trans.view.rotate(cycle, 0, 0, 1);
         trans.makeCurrent();
         Uniform.varFloat("cycle", cycle);
-        TextureMap.bindUnfiltered("ui_bg_red");
+        TextureMap.bindUnfiltered("ui_bg_"+bgname);
         background.render();
         /*
         ShaderMap.use("texture");

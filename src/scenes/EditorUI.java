@@ -1,5 +1,6 @@
 package scenes;
 
+import map.MapData;
 import mote4.scenegraph.Scene;
 import mote4.util.matrix.Transform;
 import mote4.util.shader.ShaderMap;
@@ -18,11 +19,17 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class EditorUI implements Scene {
 
+    private static MapData mapPreview = null;
+
     private TerminalSession session;
     private Transform trans;
 
     public EditorUI() {
         trans = new Transform();
+    }
+
+    public static void setMapPreview(MapData md) {
+        mapPreview = md;
     }
 
     @Override
@@ -50,6 +57,38 @@ public class EditorUI implements Scene {
         glDisable(GL_DEPTH_TEST);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        renderTilesetPreview();
+        renderMapPreview();
+
+        if (Input.currentLock() != Input.Lock.TERMINAL)
+            EditorUIManager.render(trans);
+    }
+    private void renderMapPreview() {
+        if (mapPreview != null) {
+            ShaderMap.use("color");
+            trans.makeCurrent();
+            trans.model.setIdentity();
+            trans.model.translate(160,60);
+            trans.model.scale(3,3,1);
+            for (int[] arr : mapPreview.heightData) {
+                trans.model.push();
+                for (int i : arr) {
+                    trans.model.makeCurrent();
+                    if (i == 0)
+                        Uniform.varFloat("colorMult",1,1,1,1);
+                    else if (i > 0)
+                        Uniform.varFloat("colorMult",1-i/4f,0,0,1);
+                    else
+                        Uniform.varFloat("colorMult",0,0,1+i/4f,1);
+                    MeshMap.render("quad");
+                    trans.model.translate(0,2);
+                }
+                trans.model.pop();
+                trans.model.translate(2,0);
+            }
+        }
+    }
+    private void renderTilesetPreview() {
         // texture sheet
         ShaderMap.use("texture");
         trans.model.setIdentity();
@@ -80,9 +119,6 @@ public class EditorUI implements Scene {
         Uniform.varFloat("colorMult",1,1,0,1);
         MeshMap.render("quad");
         Uniform.varFloat("colorMult",1,1,1,1);
-
-        if (Input.currentLock() != Input.Lock.TERMINAL)
-            EditorUIManager.render(trans);
     }
 
     @Override

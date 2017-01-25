@@ -3,6 +3,7 @@ package ui.selectionmenubehavior.battle;
 import java.util.ArrayList;
 import rpgbattle.BattleManager;
 import rpgbattle.fighter.Fighter;
+import rpgsystem.DefaultTarget;
 import rpgsystem.Inventory;
 import rpgsystem.Item;
 import ui.BattleUIManager;
@@ -48,7 +49,10 @@ public class BattleItemMenu implements SelectionMenuBehavior {
             handler.closeMenu();
         else {
             currentItem = items.get(index);
-            handler.openMenu(new EnemySelectionMenu(handler, this::itemCallback, false));
+            boolean e = false;
+            if (currentItem.defaultTarget == DefaultTarget.ENEMY)
+                e = true;
+            handler.openMenu(new EnemySelectionMenu(handler, this::itemCallback, false, e, !e));
         }
     }
     public void itemCallback(Fighter... f) {

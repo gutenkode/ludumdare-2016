@@ -26,7 +26,7 @@ public class PlayerFighter extends Fighter {
     public PlayerFighter() {
         stats.health = stats.maxHealth = 100;
         stats.stamina = stats.maxStamina = 80;
-        stats.mana = stats.maxMana = 40;
+        stats.mana = stats.maxMana = 80;
         
         stats.attack = 20;
         stats.defense = 10;

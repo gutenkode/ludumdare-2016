@@ -73,7 +73,13 @@ public class EnemyFighter extends Fighter {
     @Override
     public void cutHealth(Element e, double percent, int accuracy) {
         if (calculateHit(accuracy)) {
-            int dmg = (int)(stats.health*percent);
+            double elementMultVal = stats.elementMultiplier[e.index];
+            if (elementMultVal > 1)
+                addToast("WEAK");
+            else if (elementMultVal < 1)
+                addToast("RESIST...");
+
+            int dmg = (int)(stats.health*percent*elementMultVal);
 
             if (dmg != 0) {
                 // actually do health subtraction

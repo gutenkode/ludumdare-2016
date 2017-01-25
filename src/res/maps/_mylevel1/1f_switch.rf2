@@ -61,7 +61,7 @@ TogglePlatform,4,5,0,0,3,true
 TogglePlatform,2,7,0,1,3,true
 TogglePlatform,8,5,0,1,3,false
 TogglePlatform,10,7,0,0,3,false
-#Enemy,6,9,NOISE
+Enemy,6,9,NOISE
 Water,-1
 KeyDoor,6,1,0,0
 </entitydata>

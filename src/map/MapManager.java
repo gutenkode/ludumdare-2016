@@ -138,8 +138,8 @@ public class MapManager {
     }
     private static void runOnRoomInit() { // TODO add lighting refresh call - e.g. doors can toggle alert status
         int numLights = 0;
-        eLightPos = new float[10*3];
-        eLightColor = new float[10*3];
+        eLightPos = new float[16*3];
+        eLightColor = new float[16*3];
         for (Entity e : currentTimeline.getEntities()) {
             e.onRoomInit();
             if (e.hasLight()) {

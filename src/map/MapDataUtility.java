@@ -22,6 +22,8 @@ public class MapDataUtility {
         ArrayList<Entity> list = new ArrayList<>();
         int x,y,h,width,height;
         for (String s : entityData) {
+            if (s.isEmpty())
+                continue;
             StringTokenizer tok = new StringTokenizer(s,",");
             switch (tok.nextToken()) {
                 case "StaticObject":
@@ -103,7 +105,8 @@ public class MapDataUtility {
                     x = Integer.valueOf(tok.nextToken());
                     y = Integer.valueOf(tok.nextToken());
                     height = Integer.valueOf(tok.nextToken());
-                    list.add(new Elevator(x,y,height));
+                    boolean up = Boolean.parseBoolean(tok.nextToken());
+                    list.add(new Elevator(x,y,height,up));
                     break;
                 case "Water":
                     h = Integer.valueOf(tok.nextToken());

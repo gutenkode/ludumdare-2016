@@ -16,6 +16,7 @@ ui/battlefloor/tile1		ui_floor_tile1
 font/misterpixel/misterpixel	font_1
 font/6px/6px			font_6px
 font/terminal/terminal		font_terminal
+font/terminal/terminal_inv	font_terminal_inv
 
 entity/solidsnake		entity_player
 

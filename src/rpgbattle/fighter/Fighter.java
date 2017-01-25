@@ -214,7 +214,7 @@ public abstract class Fighter {
     // text "toasts" for displaying damage/restore amounts
     
     private ArrayList<Toast> toast = new ArrayList<>();
-    private static final int TOAST_DELAY = 10; // frames to wait for every toast already in the queue
+    private static final int TOAST_DELAY = 30; // frames to wait for every toast already in the queue
     void addToast(int val) {
         addToast(String.valueOf(val));
     }
@@ -255,8 +255,8 @@ public abstract class Fighter {
         Toast(String text, int d) {
             delay = d;
             timeout = 0;
-            randX = (int)(Math.random()*10)-5;
-            randY = (int)(Math.random()*10)-5;
+            randX = 0;//(int)(Math.random()*10)-5;
+            randY = 0;//(int)(Math.random()*10)-5;
             FontUtils.useMetric("font_1");
             mesh = FontUtils.createStringColor(text, 0, 0, Const.UI_SCALE, Const.UI_SCALE);
             

@@ -37,13 +37,13 @@ public class Elevator extends Entity {
                 0, null, new float[] {0,0,1, 0,0,1, 0,0,1, 0,0,1});
     }
     
-    public Elevator(int x, int y, int h) {
+    public Elevator(int x, int y, int h, boolean up) {
         posX = x+.5f;
         posY = y+.5f;
         maxHeight = h;
         height = 0;
         onRoomInit();
-        state = true;
+        state = up;
     }
     
     @Override

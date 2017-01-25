@@ -24,25 +24,25 @@ public class SlimeBehavior extends EnemyBehavior {
     public void initAct() {
         actDelay = 60;
         performActTime = 40;
-        
+        /*
         if (fighter.stats.health < fighter.stats.maxHealth/2 
             && Math.random() > .85) 
         {
             BattleUIManager.logMessage("The Slime heals itself.");
             action = 1;
         } 
-        else if (!BattleManager.getPlayer().hasStatus(StatEffect.POISON)
+        else */if (!BattleManager.getPlayer().hasStatus(StatEffect.POISON)
             && Math.random() > .85) 
         {
             BattleUIManager.logMessage("The Slime spits acid!");
             action = 2;
-        } 
+        } /*
         else if (!BattleManager.getPlayer().hasStatus(StatEffect.FATIGUE)
             && Math.random() > .85) 
         {
             BattleUIManager.logMessage("The Slime casts an oppressive aura!");
             action = 3;
-        } 
+        } */
         else if (Math.random() > .8) 
         {
             BattleUIManager.logMessage("The Slime eyes you carefully.");
@@ -62,7 +62,7 @@ public class SlimeBehavior extends EnemyBehavior {
                 useAttack();
                 break;
             case 1:
-                fighter.restoreHealth(40);
+                fighter.restoreHealth(20);
                 break;
             case 2: 
                 BattleManager.getPlayer().inflictStatus(StatEffect.POISON);

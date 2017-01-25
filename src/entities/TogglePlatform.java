@@ -80,8 +80,8 @@ public class TogglePlatform extends Entity {
         model.makeCurrent();
         
         Uniform.varFloat("emissiveMult", 1);
-        Uniform.varFloat("spriteInfo", 3,1,0);
-        Uniform.varFloat("spriteInfoEmissive", 3,1,index+1);
+        Uniform.varFloat("spriteInfo", 3,2,0);
+        Uniform.varFloat("spriteInfoEmissive", 3,2,index+1);
         TextureMap.bindUnfiltered("entity_togglePlatform");
         mesh.render();
         Uniform.varFloat("emissiveMult", 0);
@@ -101,6 +101,10 @@ public class TogglePlatform extends Entity {
                 return new float[] {1.5f,0,0};
             case 1:
                 return new float[] {0,0,1.5f};
+            case 2:
+                return new float[] {1.5f,1.5f,0};
+            case 3:
+                return new float[] {0,1.5f,0};
             default:
                 return new float[] {0,0,0};
         }

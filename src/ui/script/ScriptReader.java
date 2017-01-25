@@ -4,6 +4,7 @@ import java.util.Arrays;
 import map.MapManager;
 import rpgsystem.Inventory;
 import rpgsystem.Item;
+import ui.IngameUIManager;
 import ui.MenuHandler;
 
 /**
@@ -85,6 +86,22 @@ public class ScriptReader {
             String[] list = s.split(" ");
             if (MapManager.getTimelineState().isAlertTriggered())
                 gotoTag(list[1]);
+            advance(eh); // call advance again
+        } else if (s.startsWith("$TRIGGER_SECRALRT")) {
+            MapManager.getTimelineState().triggerAlert(true);
+            IngameUIManager.logMessage("Security alert triggered.");
+            advance(eh); // call advance again
+        } else if (s.startsWith("$SETVAR")) { // $SETVAR_key_value
+            // set an environment variable
+            String[] list = s.split("_");
+            MapManager.getTimelineState().setVar(list[1],list[2]);
+            advance(eh); // call advance again
+        } else if (s.startsWith("$TESTVAR")) { // $TESTVAR_key_value_$TAG
+            // if an environment variable matches a value, jump
+            String[] list = s.split("_");
+            if (MapManager.getTimelineState().getVar(list[1]).equals(list[2])) {
+                gotoTag(list[3]);
+            }
             advance(eh); // call advance again
         } else if (s.startsWith("$SPRITE")) {
             // change the talksprite

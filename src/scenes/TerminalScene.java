@@ -74,7 +74,7 @@ public class TerminalScene implements Scene {
                     if (Input.isKeyNew(Input.Keys.ENTER)) 
                     {
                         lastInput = input.toString();
-                        session.addCompleteLine(INPUT_HEAD+input.toString());
+                        session.addCompleteLine(INPUT_HEAD+input.toString(),true);
                         session.parse(input.toString());
                         input = new StringBuilder();
                         updateWriteLine();
@@ -112,7 +112,6 @@ public class TerminalScene implements Scene {
         if (Input.currentLock() == Input.Lock.TERMINAL) 
         {
             ShaderMap.use("texture");
-            TextureMap.bindUnfiltered("font_terminal");
             trans.model.setIdentity();
             trans.makeCurrent();
             session.render(trans.model);

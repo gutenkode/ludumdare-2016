@@ -125,8 +125,14 @@ public class Enemy extends Entity {
     public void playerPointIn() {
         if (MapManager.getPlayer().tileHeight == tileHeight) 
         {
+            // randomly select the number of enemies to encounter
+            int maxEnemies = EnemyData.getMaxNumEnemies(enemyName);
+            int numEnemies = (int)(Math.random()*maxEnemies)+1;
+            String[] enemies = new String[numEnemies];
+            Arrays.fill(enemies,enemyName);
+
             // BattleManager -> load enemies for battle
-            BattleManager.initEnemies(enemyName); // list multiple enemies here if needed
+            BattleManager.initEnemies(enemies); // list multiple enemies here
 
             // RootScene -> go to battle
             RootScene.transitionToBattle();

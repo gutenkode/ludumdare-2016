@@ -19,29 +19,32 @@ public class EnemySelectionMenu implements SelectionMenuBehavior {
     private Consumer callback;
 
     private String title = "TARGET";
-    private String[] options;
-    private Fighter[] fighters;
+    private ArrayList<String> options;
+    private ArrayList<Fighter> fighters;
     private boolean multiTarget;
 
-    public EnemySelectionMenu(MenuHandler h, Consumer<Fighter[]> cb, boolean mt) {
+    public EnemySelectionMenu(MenuHandler h, Consumer<Fighter[]> cb, boolean mt, boolean inclEnemies, boolean inclPlayer) {
         handler = h;
         callback = cb;
         multiTarget = mt;
 
         if (multiTarget) {
-            options = new String[] {"All"};
+            options = new ArrayList<String>();
+            options.add("All");
         } else {
-            ArrayList<EnemyFighter> enemies = BattleManager.getEnemies();
-            fighters = new Fighter[enemies.size() + 1];
-            options = new String[enemies.size() + 1];
-            int i = 0;
-            for (EnemyFighter f : enemies) {
-                fighters[i] = f;
-                options[i] = f.displayName;
-                i++;
+            fighters = new ArrayList<>();
+            options = new ArrayList<>();
+            if (inclEnemies) {
+                ArrayList<EnemyFighter> enemies = BattleManager.getEnemies();
+                for (EnemyFighter f : enemies) {
+                    fighters.add(f);
+                    options.add(f.displayName);
+                }
             }
-            fighters[i] = BattleManager.getPlayer();
-            options[i] = "Self";
+            if (inclPlayer) {
+                fighters.add(BattleManager.getPlayer());
+                options.add("Player");
+            }
         }
     }
 
@@ -52,13 +55,11 @@ public class EnemySelectionMenu implements SelectionMenuBehavior {
 
     @Override
     public int getNumElements() {
-        return options.length;
+        return options.size();
     }
 
     @Override
-    public String getElementName(int index) {
-        return options[index];
-    }
+    public String getElementName(int index) { return options.get(index); }
 
     @Override
     public void onAction(int index) {
@@ -67,15 +68,13 @@ public class EnemySelectionMenu implements SelectionMenuBehavior {
             f = BattleManager.getEnemies().toArray(new Fighter[0]);
         else {
             f = new Fighter[1];
-            f[0] = fighters[index];
+            f[0] = fighters.get(index);
         }
         callback.accept(f);
     }
 
     @Override
-    public void onHighlight(int index) {
-
-    }
+    public void onHighlight(int index) {}
 
     @Override
     public void onFocus() {

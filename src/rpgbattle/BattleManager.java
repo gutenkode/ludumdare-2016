@@ -6,6 +6,7 @@ import rpgbattle.fighter.EnemyFighter;
 import rpgbattle.fighter.PlayerFighter;
 import rpgsystem.Element;
 import rpgsystem.StatEffect;
+import scenes.Battle;
 import scenes.Postprocess;
 import scenes.RootScene;
 import ui.BattleUIManager;
@@ -42,6 +43,8 @@ public class BattleManager {
             BattleUIManager.initEnemies(enemies);
             BattleUIManager.logMessage(enemy.encounterString);
         }
+
+        Battle.setBackground(EnemyData.getBattleBackground(enemyNames[0]));
         
         currentFighter = playerFighter;
         currentFighter.initAct();

@@ -8,17 +8,39 @@
     "Look for a command console or something!\nYou might be able to shut down the alert."
   ],
   "walkwayRoomEnter": [
-    "Your goal is on the other side of this room.",
-    "Keep going."
+    "There's an elevator to a higher level in a room farther ahead.",
+    "Once you're there I'll explain where you are."
   ],
-  "boilerRoomEnter": [
-    "Not too much farther now.",
-    "Is your health holding up?"
+  "terminalRoomExit": [
+    "$INVCHECK KEYCARD2 $PASS",
+    "$RESET",
+    "$PASS",
+    "$TRIGGER_SECRALRT",
+    "$SETVAR_aiTriggered_true",
+    "$END"
+  ],
+  "terminalRoom": [
+    "With that keycard you'll be able to go\nthrough the last door in the hub.",
+    "Is your health holding up?\nGet ready for what's on the other side."
+  ],
+  "askAboutAI": [
+    "$TESTVAR_aiTriggered_true_$PASS",
+    "$RESET",
+    "$PASS",
+    "The security alert triggered again back there...",
+    "You didn't encounter anything strange, did you?",
+    "$PROMPT_Yes_$YES_No_$NO",
+    "$NO",
+    "...",
+    "I hope you're not lying to me.\nIf we're going to get out, we need to trust each other.",
+    "$GOTO $END",
+    "$YES",
+    "Whatever it was, ignore it.\nNothing good will come of it.",
+    "$END"
   ],
   "doorIsLocked": [
     "$INVCHECK KEYCARD1 $PASS",
     "That door in front of you is locked.\nYou'll need a level one keycard to open it.",
-    "Look around the control room downstairs.",
     "$GOTO $END",
     "$PASS",
     "Good, you got the keycard.\nHead on through.",
@@ -67,7 +89,7 @@
     "$END"
   ],
   "intro2": [
-    "Listen, you need to get to the room\nnorth of here.",
+    "Listen, you need to get through the door\nwith a '2' on it.",
     "There's someone who doesn't want to let\nus out of here. I can't fight them, but\nmaybe you can.",
     "If you want to get out, you'll need to...",
     "...",
@@ -90,7 +112,7 @@
     "You've used a computer before, right?\nOf course you have. This will be simple.",
     "There should be a program to shut down\nthe security alert on that terminal."
   ],
-  "test": [
+  "laser": [
     "There's a keycard over there.\nYou'll need it to get through.",
     "Looks like you'll trigger a security alert if\nyou pass through that barrier, though..."
   ],

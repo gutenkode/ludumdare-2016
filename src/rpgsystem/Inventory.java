@@ -12,7 +12,7 @@ public class Inventory {
     
     static {
         inventory = new ArrayList<>();
-        inventory.add(Item.KEYCARD4);
+        inventory.add(Item.KEYCARD1);
         inventory.add(Item.POTION);
         inventory.add(Item.ENERGY_DRINK);
         inventory.add(Item.MANA_HYPO);
@@ -20,7 +20,7 @@ public class Inventory {
     }
     
     public static ArrayList<Item> get() { return inventory; }
-    public static void addItem(Item i) { 
+    public static void addItem(Item i) {
         switch (i) {
             // you can only have one keycard at a time
             // you can only collect one of every level,

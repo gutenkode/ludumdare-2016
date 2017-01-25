@@ -61,7 +61,7 @@ public enum Item {
                 return false;
                 
             case POTION:
-                if (BattleManager.getPlayer().restoreHealth(25)) {
+                if (BattleManager.getPlayer().restoreHealth(60)) {
                     discard();
                     handler.closeMenu();
                     handler.showDialogue("You drink the potion.\nDelicious!");
@@ -104,7 +104,7 @@ public enum Item {
     public boolean useBattle(MenuHandler handler, Fighter fighter) {
         switch (this) {
             case POTION:
-                if (fighter.restoreHealth(25)) {
+                if (fighter.restoreHealth(60)) {
                     BattleUIManager.logMessage("You drink the potion. Delicious!");
                     discard();
                     return true;
@@ -113,7 +113,7 @@ public enum Item {
                 return false;
             case GRENADE:
                 BattleUIManager.logMessage("You throw the grenade! Boom!");
-                fighter.damage(Element.EXPLOSIVE, 40, 10, 100, false);
+                fighter.damage(Element.EXPLOSIVE, 90, 10, 100, false);
                 discard();
                 return true;
             case ENERGY_DRINK:

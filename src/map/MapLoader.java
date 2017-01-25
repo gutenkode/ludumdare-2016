@@ -342,6 +342,20 @@ public class MapLoader {
         return false;
     }
 
+    public static void makeEmptyMap(String fileName, int x, int y) {
+        int[][][] tileData = new int[x][y][3]; //3,1,0
+        for (int i = 0; i < tileData.length; i++)
+            for (int j = 0; j < tileData[0].length; j++) {
+                tileData[i][j][0] = 1;
+                tileData[i][j][1] = 1;
+                tileData[i][j][2] = 0;
+            }
+        int[][] heightData = new int[x][y];
+        ArrayList<LinkData> linkData = new ArrayList<>();
+        ArrayList<String> entities = new ArrayList<>();
+        loadedMaps.put(fileName, new MapData(fileName, tileData, heightData, linkData, entities));
+    }
+
     public static boolean deleteMapFile(String mapName) {
         File file = new File("./src/res/maps/"+levelPath+"/"+mapName+FILE_EXTENSION);
         if (file.exists())

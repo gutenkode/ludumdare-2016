@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 import mote4.util.matrix.ModelMatrix;
+import mote4.util.texture.TextureMap;
 import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.mesh.Mesh;
 import mote4.util.vertex.mesh.ScrollingText;
@@ -22,6 +23,7 @@ public class TerminalSession {
     private static final String METRIC = "monospace";
     
     private ArrayList<ScrollingText> writtenLines;
+    private ArrayList<Boolean> inverted;
     private Queue<String> bufferedLines;
     private Mesh writeLine;
     
@@ -29,6 +31,7 @@ public class TerminalSession {
     
     public TerminalSession() {
         writtenLines = new ArrayList<>();
+        inverted = new ArrayList<>();
         bufferedLines = new LinkedList<>();
         
         FontUtils.useMetric(METRIC);
@@ -54,7 +57,7 @@ public class TerminalSession {
      * Passes the queue for lines to write completely.
      * @param s 
      */
-    public void addCompleteLine(String s) {
+    public void addCompleteLine(String s, boolean inv) {
             if (s.contains("\n")) 
             {
                 // split multi-line strings
@@ -63,6 +66,7 @@ public class TerminalSession {
                     ScrollingText t = new ScrollingText(s1,METRIC, 0,0, WIDTH,HEIGHT, WRITE_SPEED);
                     t.complete();
                     writtenLines.add(t);
+                    inverted.add(inv);
                 }
             } else {
                 //FontUtils.setCharPixelWidth(9);
@@ -70,10 +74,13 @@ public class TerminalSession {
                 t.complete();
                 //FontUtils.setCharPixelWidth(16);
                 writtenLines.add(t);
+                inverted.add(inv);
             }
             // while instead of if - this call can add multiple lines at once
-            while (writtenLines.size() > MAX_LINES)
+            while (writtenLines.size() > MAX_LINES) {
                 writtenLines.remove(0);
+                inverted.remove(0);
+            }
     }
     /**
      * Add a line to the queue for writing to the console.
@@ -98,6 +105,7 @@ public class TerminalSession {
         for (ScrollingText t : writtenLines)
             t.destroy();
         writtenLines.clear();
+        inverted.clear();
     }
     
     /**
@@ -121,15 +129,25 @@ public class TerminalSession {
         if ((writtenLines.isEmpty() || writtenLines.get(writtenLines.size()-1).isDone()) && !bufferedLines.isEmpty()) {
             String s = bufferedLines.remove();
             writtenLines.add(new ScrollingText(s,METRIC, 0,0, WIDTH,HEIGHT, WRITE_SPEED));
+            inverted.add(false);
             if (writtenLines.size() > MAX_LINES) {
                 writtenLines.get(0).destroy();
                 writtenLines.remove(0);
+                inverted.remove(0);
             }
         }
 
         //FontUtils.setCharPixelWidth(9);
-        for (ScrollingText t : writtenLines) {
-            t.render();
+        TextureMap.bindUnfiltered("font_terminal");
+        for (int i = 0; i < writtenLines.size(); i++) {
+        //for (ScrollingText t : writtenLines) {
+            ScrollingText t = writtenLines.get(i);
+            if (inverted.get(i)) {
+                TextureMap.bindUnfiltered("font_terminal_inv");
+                t.render();
+                TextureMap.bindUnfiltered("font_terminal");
+            } else
+                t.render();
             model.translate(0, Const.UI_SCALE);
             model.makeCurrent();
         }

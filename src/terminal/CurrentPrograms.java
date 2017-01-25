@@ -15,6 +15,7 @@ public class CurrentPrograms {
         programs.add(new VillageProgram());
         programs.add(new LevelChangeProgram());
         programs.add(new SecurityProgram());
+        programs.add(new EditProgram());
     }
     
     public static void add(Program p) { programs.add(p); }

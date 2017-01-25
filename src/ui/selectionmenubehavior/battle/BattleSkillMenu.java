@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import rpgbattle.BattleManager;
 import rpgbattle.PlayerSkills;
 import rpgbattle.fighter.Fighter;
+import rpgsystem.DefaultTarget;
 import rpgsystem.Skill;
 import rpgsystem.SkillModifier;
 import ui.BattleUIManager;
@@ -51,8 +52,9 @@ public class BattleSkillMenu implements SelectionMenuBehavior {
         else {
             if (BattleManager.getPlayer().canUseSkill(handler, skills.get(index))) {
                 currentSkill = skills.get(index);
-                boolean isMultiTarget = (PlayerSkills.getLinkedModifier(currentSkill) == SkillModifier.MULTI_TARGET);
-                handler.openMenu(new EnemySelectionMenu(handler, this::skillCallback, isMultiTarget));
+                boolean isMultiTarget = (PlayerSkills.getLinkedModifier(currentSkill) == SkillModifier.MULTI_TARGET) || currentSkill.defaultTarget == DefaultTarget.ALL_ENEMIES;
+                boolean isEnemyTarget = currentSkill.defaultTarget == DefaultTarget.ENEMY || currentSkill.defaultTarget == DefaultTarget.ALL_ENEMIES;
+                handler.openMenu(new EnemySelectionMenu(handler, this::skillCallback, isMultiTarget, isEnemyTarget, !isEnemyTarget));
             }
         }
     }

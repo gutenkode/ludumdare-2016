@@ -1,5 +1,8 @@
 package terminal;
 
+import terminal.file.TerminalFile;
+import terminal.file.TextFile;
+
 import java.util.ArrayList;
 
 /**
@@ -8,12 +11,13 @@ import java.util.ArrayList;
  */
 public class CurrentFiles {
     
-    private static ArrayList<String> files;
+    private static ArrayList<TerminalFile> files;
     
     static {
         files = new ArrayList<>();
+        files.add(new TextFile("asdf", "Hello, world!\nLine two."));
     }
     
-    public static void add(String p) { files.add(p); }
-    public static ArrayList<String> getList() { return files; }
+    public static void add(TerminalFile f) { files.add(f); }
+    public static ArrayList<TerminalFile> getList() { return files; }
 }

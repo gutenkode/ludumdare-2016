@@ -113,6 +113,11 @@ public class MapListMenu implements SelectionMenuBehavior {
 
     @Override
     public void onHighlight(int index) {
+        if (index == options.length-1)
+            EditorUI.setMapPreview(null);
+        else {
+            EditorUI.setMapPreview(MapLoader.getMap(options[index]));
+        }
     }
 
     @Override
@@ -121,6 +126,7 @@ public class MapListMenu implements SelectionMenuBehavior {
 
     @Override
     public void onClose() {
+        EditorUI.setMapPreview(null);
         handler.closeMenu();
     }
 

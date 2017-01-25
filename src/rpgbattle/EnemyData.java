@@ -26,6 +26,12 @@ public class EnemyData {
     public static String getBattleSprite(String enemyName) {
         return json.getJSONObject(enemyName).getJSONObject("battle").getString("sprite");
     }
+    public static String getBattleBackground(String enemyName) {
+        return json.getJSONObject(enemyName).getJSONObject("battle").getString("background");
+    }
+    public static int getMaxNumEnemies(String enemyName) {
+        return json.getJSONObject(enemyName).getJSONObject("battle").getInt("maxEnemies");
+    }
     /**
      * The message to display at the star of a battle when encountering this enemy.
      * @param enemyName
