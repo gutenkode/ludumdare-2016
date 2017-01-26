@@ -31,7 +31,7 @@ public enum SkillModifier implements Pickupable{
     @Override
     public String pickupName() { return name+" modifier"; };
     @Override
-    public String overworldSprite() { return "skill_mod"; }; // TODO change this
+    public String overworldSprite() { return "skill_mod"; };
     @Override
     public void pickup() {
         PlayerSkills.addAvailableModifier(this);
