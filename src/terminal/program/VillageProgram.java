@@ -62,7 +62,7 @@ public class VillageProgram implements Program {
             session.addLine("Your MANA and MAX MANA increased by 5!");
         }
         else if (s.toLowerCase().equals("grenade")){
-            BattleManager.getPlayer().stats.attack += 2;
+            BattleManager.getPlayer().stats.changeBaseAtk(2);
             session.addLine("Thank you for the grenade!");
             session.addLine("Your punches will now pack an explosive power!");
             session.addLine("Your ATTACK increased by 2!");

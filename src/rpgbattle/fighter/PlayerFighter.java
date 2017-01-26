@@ -24,18 +24,14 @@ public class PlayerFighter extends Fighter {
     private boolean turnUsed;
     
     public PlayerFighter() {
-        stats.health = stats.maxHealth = 100;
-        stats.stamina = stats.maxStamina = 80;
-        stats.mana = stats.maxMana = 80;
-        
-        stats.attack = 20;
-        stats.defense = 10;
-        stats.magic = 10;
-        stats.evasion = 0.2;
-        stats.critrate = 0.05;
 
-        stats.elementMultiplier = new double[Element.values().length];
-        Arrays.fill(stats.elementMultiplier, 1);
+        double[] emult = new double[Element.values().length];
+        Arrays.fill(emult, 1);
+        stats = new FighterStats(this,
+                100,80,80,
+                20,10,10,
+                0.2,0.05,
+                emult);
     }
     
     @Override
@@ -48,11 +44,11 @@ public class PlayerFighter extends Fighter {
         // stamina regen
         if (statEffects.contains(StatEffect.FATIGUE)) {
             addToast(ToastType.STAMINA.color+"FATIGUE");
-            addToast(ToastType.STAMINA.color+"-"+(stats.attack/2));
-            drainStamina(stats.attack/2);
+            addToast(ToastType.STAMINA.color+"-"+(stats.attack()/2));
+            drainStamina(stats.attack()/2);
         } else if (stats.stamina != stats.maxStamina) {
             addToast(ToastType.STAMINA.color+"REGEN");
-            restoreStamina(stats.attack/3);
+            restoreStamina(stats.attack()/3);
         }
     }
     @Override
@@ -169,12 +165,12 @@ public class PlayerFighter extends Fighter {
     
     public boolean useAttack(MenuHandler handler, Fighter... targets) {
         BattleUIManager.logMessage("You attack!");
-        targets[0].damage(Element.PHYS, stats.attack, getAttackPower(), 100, false);
+        targets[0].damage(Element.PHYS, stats.attack(), getAttackPower(), 100, false);
         
         lastStamina = stats.stamina;
-        stats.stamina -= stats.attack/2;
+        stats.stamina -= stats.attack()/2;
         stats.stamina = Math.max(0, stats.stamina);
-        addToast(ToastType.STAMINA, "-"+stats.attack);
+        addToast(ToastType.STAMINA, "-"+stats.attack());
         
         turnUsed = true;
         return true;
@@ -200,7 +196,7 @@ public class PlayerFighter extends Fighter {
         stats.mana -= skill.cost();
         addToast(ToastType.MANA, "-"+skill.cost());
         /*
-        if (PlayerSkills.getLinkedModifier(skill) == SkillModifier.MULTI_TARGET) {
+        if (PlayerSkills.getLinkedModifier(skill) == SkillModifier.MOD_MULTI_TARGET) {
             Fighter[] targets = new Fighter[BattleManager.getEnemies().size()];
             for (int i = 0; i < targets.length; i++)
                 targets[i] = BattleManager.getEnemies().get(i);
@@ -221,7 +217,7 @@ public class PlayerFighter extends Fighter {
             skill.useBattle(handler,  stats.magic, target);
         }*/
         for (Fighter f : targets)
-            skill.useBattle(handler,  stats.magic, f);
+            skill.useBattle(handler,  stats.magic(), f);
 
         turnUsed = true;
         return turnUsed;

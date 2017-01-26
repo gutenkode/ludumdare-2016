@@ -26,8 +26,8 @@ public abstract class EnemyBehavior {
      */
     public void useAttack() {
         int power = (int)(Math.random()*5)+7;
-        boolean crit = Math.random() < fighter.stats.critrate;
-        BattleManager.getPlayer().damage(Element.PHYS, fighter.stats.attack, power, 100, crit);
+        boolean crit = Math.random() < fighter.stats.critrate();
+        BattleManager.getPlayer().damage(Element.PHYS, fighter.stats.attack(), power, 100, crit);
     }
 
     /**
@@ -36,8 +36,8 @@ public abstract class EnemyBehavior {
      */
     public void useAttack(double attackMult) {
         int power = 10;
-        boolean crit = Math.random() < fighter.stats.critrate;
-        BattleManager.getPlayer().damage(Element.PHYS, (int)(fighter.stats.attack*attackMult), power, 100, crit);
+        boolean crit = Math.random() < fighter.stats.critrate();
+        BattleManager.getPlayer().damage(Element.PHYS, (int)(fighter.stats.attack()*attackMult), power, 100, crit);
     }
     
     /**

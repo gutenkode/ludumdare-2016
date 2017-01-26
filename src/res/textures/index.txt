@@ -68,13 +68,22 @@ item/keycard3			item_keycard3
 item/keycard4			item_keycard4
 
 skill/fire			skill_fire
+skill/bolt			skill_bolt
+skill/dark			skill_dark
+skill/heal			skill_heal
+skill/ice			skill_ice
+skill/poison			skill_poison
+skill/defup			skill_defup
+skill/mod			skill_mod
 
 talk/boss			talk_boss
 talk/none			talk_none
 
 status/poison			status_poison
 status/fatigue			status_fatigue
+status/defup			status_defup
 
 anim/ice			anim_ice
 anim/fire			anim_fire
 anim/elec_2			anim_elec
+anim/status			anim_status

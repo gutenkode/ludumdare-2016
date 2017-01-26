@@ -43,4 +43,5 @@ SolidPlatform,4,3,10
 SolidPlatform,5,3,10
 SolidPlatform,6,3,10
 ItemPickup,7,2,MANA_HYPO
+ItemPickup,7,4,SKILL_RUIN
 </entitydata>

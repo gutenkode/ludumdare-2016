@@ -46,7 +46,7 @@ public class EvilDoorBehavior extends EnemyBehavior {
     void performAct() {
         switch (action) {
             case 0:
-                BattleManager.getPlayer().inflictStatus(StatEffect.FATIGUE);
+                BattleManager.getPlayer().inflictStatus(StatEffect.FATIGUE, 80);
                 break;
             case 1:
                 useAttack(); //Yes, I am aware that there is no break there. There shouldn't be one.

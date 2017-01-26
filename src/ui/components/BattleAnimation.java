@@ -12,7 +12,8 @@ public class BattleAnimation {
     public enum Type {
         ICE("anim_ice", 5,7, .5f),
         FIRE("anim_fire", 5,4, .5f),
-        ELEC("anim_elec", 5,6, .5f);
+        ELEC("anim_elec", 5,6, .5f),
+        STATUS("anim_status", 5,5, .35f);
 
         public final String SPRITE_NAME;
         public final int WIDTH, HEIGHT;

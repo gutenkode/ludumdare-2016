@@ -21,12 +21,13 @@ public class EnemySelectionMenu implements SelectionMenuBehavior {
     private String title = "TARGET";
     private ArrayList<String> options;
     private ArrayList<Fighter> fighters;
-    private boolean multiTarget;
+    private boolean multiTarget, inclEnemies;
 
     public EnemySelectionMenu(MenuHandler h, Consumer<Fighter[]> cb, boolean mt, boolean inclEnemies, boolean inclPlayer) {
         handler = h;
         callback = cb;
         multiTarget = mt;
+        this.inclEnemies = inclEnemies;
 
         if (multiTarget) {
             options = new ArrayList<String>();
@@ -64,9 +65,12 @@ public class EnemySelectionMenu implements SelectionMenuBehavior {
     @Override
     public void onAction(int index) {
         Fighter[] f;
-        if (multiTarget)
-            f = BattleManager.getEnemies().toArray(new Fighter[0]);
-        else {
+        if (multiTarget) {
+            if (inclEnemies) // this skill targets all Fighters, but can be all players or all enemies
+                f = BattleManager.getEnemies().toArray(new Fighter[0]);
+            else
+                f = new Fighter[] {BattleManager.getPlayer()};
+        } else {
             f = new Fighter[1];
             f[0] = fighters.get(index);
         }

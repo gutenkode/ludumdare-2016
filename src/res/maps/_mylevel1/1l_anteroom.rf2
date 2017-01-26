@@ -35,4 +35,5 @@ b......
 </linkdesc>
 <entitydata>
 KeyDoor,1,3,2,3
+ItemPickup,3,3,MOD_POWER_BOOST
 </entitydata>

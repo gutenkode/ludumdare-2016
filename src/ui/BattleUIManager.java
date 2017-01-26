@@ -2,6 +2,8 @@ package ui;
 
 import java.util.ArrayList;
 import java.util.Stack;
+
+import entities.Player;
 import mote4.util.matrix.ModelMatrix;
 import mote4.util.matrix.Transform;
 import mote4.util.shader.ShaderMap;
@@ -83,18 +85,11 @@ public class BattleUIManager implements MenuHandler {
             s.render(model);
             s.renderAnimations(model);
         }
-        /*
-        for (EnemyFighter f : BattleManager.getEnemies()) {
-            model.push();
-            EnemySprite.render(model, f);
-            model.pop();
-            model.translate(96*2, 0);
-        }
-        */
-    // PlayerStatBar sets own shaders
-        // PlayerStatBar
+        // PlayerStatBar sets own shaders
         PlayerStatBar.render(RootScene.width()/2, RootScene.height()-42-Const.UI_SCALE/2, trans);
-        
+        ShaderMap.use("spritesheet_nolight");
+        PlayerStatBar.renderAnimations(RootScene.width()/2, RootScene.height()-10-Const.UI_SCALE/2, model);
+
     ShaderMap.use("texture_color"); // uses the color attribute, for colored text
     trans.makeCurrent();
         // enemy toasts

@@ -5,6 +5,7 @@ import org.json.*;
 import rpgbattle.enemyBehavior.*;
 import rpgbattle.fighter.EnemyFighter;
 import rpgbattle.fighter.Fighter;
+import rpgbattle.fighter.FighterStats;
 import rpgsystem.Element;
 
 import java.util.IllegalFormatException;
@@ -60,25 +61,36 @@ public class EnemyData {
         }
         return result;
     }
-    
-    public static void populateStats(String enemyName, Fighter.FighterStats stats) {
+
+    /**
+     * Populate and return a FighterStats object with the stats of this enemy.
+     * @param enemyName
+     * @return
+     */
+    public static FighterStats populateStats(String enemyName,Fighter f) {
         JSONObject enemyJson = json.getJSONObject(enemyName);
+        int h = enemyJson.getJSONObject("battle").getJSONObject("stats").getInt("health");
+        int atk = enemyJson.getJSONObject("battle").getJSONObject("stats").getInt("attack");
+        int def = enemyJson.getJSONObject("battle").getJSONObject("stats").getInt("defense");
+        int mag = enemyJson.getJSONObject("battle").getJSONObject("stats").getInt("magic");
+        double ev = enemyJson.getJSONObject("battle").getJSONObject("stats").getDouble("evasion");
+        double crit = enemyJson.getJSONObject("battle").getJSONObject("stats").getDouble("critrate");
         
-        stats.health = stats.maxHealth = enemyJson.getJSONObject("battle").getJSONObject("stats").getInt("health");
-        stats.attack = enemyJson.getJSONObject("battle").getJSONObject("stats").getInt("attack");
-        stats.defense = enemyJson.getJSONObject("battle").getJSONObject("stats").getInt("defense");
-        stats.magic = enemyJson.getJSONObject("battle").getJSONObject("stats").getInt("magic");
-        stats.evasion = enemyJson.getJSONObject("battle").getJSONObject("stats").getInt("evasion");
-        stats.critrate = enemyJson.getJSONObject("battle").getJSONObject("stats").getInt("critrate");
-        
-        stats.elementMultiplier = new double[Element.values().length];
+        double[] emult = new double[Element.values().length];
         JSONArray arr = enemyJson.getJSONObject("battle").getJSONArray("elementMult");
         if (arr.length() != Element.values().length)
             throw new IllegalStateException("Incorrect number of element multipliers in enemy definition.");
         for (int i = 0; i < Element.values().length; i++)
         {
-            stats.elementMultiplier[i] = arr.getDouble(i);
+            emult[i] = arr.getDouble(i);
         }
+
+        FighterStats stats = new FighterStats(f,
+                h,0,0,
+                atk,def,mag,
+                ev,crit,
+                emult);
+        return stats;
     }
     
     public static float[][] getPatrol(String enemyName, float x, float y) {

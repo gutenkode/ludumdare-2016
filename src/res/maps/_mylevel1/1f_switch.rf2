@@ -64,4 +64,5 @@ TogglePlatform,10,7,0,0,3,false
 Enemy,6,9,NOISE
 Water,-1
 KeyDoor,6,1,0,0
+ItemPickup,11,10,MOD_ACCURACY
 </entitydata>

@@ -37,6 +37,7 @@ a.............
 <entitydata>
 ToggleButton,4,2,0
 ItemPickup,4,4,POTION
+ItemPickup,11,4,MOD_DAMAGE_BOOST
 TogglePlatform,5,3,0,0,0,false
 TogglePlatform,6,3,0,0,1,false
 TogglePlatform,7,3,0,0,2,false

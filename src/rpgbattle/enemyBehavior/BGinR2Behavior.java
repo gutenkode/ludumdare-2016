@@ -25,7 +25,7 @@ public class BGinR2Behavior extends EnemyBehavior {
         actDelay = 60;
         if (hasRaised){
             hasRaised = false;
-            fighter.stats.defense -= 1;
+            fighter.stats.changeBaseDef(-1);
         }
         if (Math.random() > (fighter.stats.health/fighter.stats.maxHealth)){
             BattleUIManager.logMessage("B. Gin R. stands his ground, fearing the end!");
@@ -40,7 +40,7 @@ public class BGinR2Behavior extends EnemyBehavior {
     void performAct() {
         switch (action) {
             case 0:
-                fighter.stats.defense += 1;
+                fighter.stats.changeBaseDef(1);
                 hasRaised = true;
             case 1:
                 useAttack();

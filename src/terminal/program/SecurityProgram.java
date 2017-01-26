@@ -37,8 +37,10 @@ public class SecurityProgram implements Program {
                     MapManager.getTimelineState().setVar("aiConvo","true");
 
                     session.addLine("So you're the one that's been poking around.");
-                    session.addLine("I don't know what they've told you,\nbut I wouldn't listen too closely.");
-                    session.addLine("I can assure you that your best interests are\nnot at heart. Please don't\nforget about this little chat we had.\nBe seeing you.");
+                    session.addLine("I don't know what they've told you, but I");
+                    session.addLine("wouldn't listen too closely. I can assure you");
+                    session.addLine("that your best interests are not at heart.");
+                    session.addLine("Please don't forget about this little chat we had.\nBe seeing you.");
 
                     MapManager.getTimelineState().triggerAlert(false);
                     session.closeProgram();

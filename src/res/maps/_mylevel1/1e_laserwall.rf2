@@ -48,7 +48,8 @@ height=11
 Enemy,3,1,SLIME
 Elevator,1,7,1,true
 Elevator,3,9,1,true
-ItemPickup,3,2,KEYCARD1
+ItemPickup,3,3,KEYCARD1
+ItemPickup,4,1,SKILL_FIRE
 LaserGrid,2,5,3
 ScriptTrigger,2,8,1,2,alertTrigger
 ScriptTrigger,2,6,2,1,laser

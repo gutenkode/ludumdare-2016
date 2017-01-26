@@ -30,7 +30,7 @@ public class EnemyFighter extends Fighter {
         encounterString =  EnemyData.getEncounterString(enemyName);
         deathString = EnemyData.getDeathString(enemyName);
         frameDelay = EnemyData.getFrameDelay(enemyName);
-        EnemyData.populateStats(enemyName, stats);
+        stats = EnemyData.populateStats(enemyName,this);
         
         currentFrame = (int)(Math.random()*frameDelay.length);
         currentFrameDelay = (int)(Math.random()*frameDelay[currentFrame]);
@@ -73,7 +73,7 @@ public class EnemyFighter extends Fighter {
     @Override
     public void cutHealth(Element e, double percent, int accuracy) {
         if (calculateHit(accuracy)) {
-            double elementMultVal = stats.elementMultiplier[e.index];
+            double elementMultVal = stats.elementMultiplier(e.index);
             if (elementMultVal > 1)
                 addToast("WEAK");
             else if (elementMultVal < 1)

@@ -9,6 +9,7 @@ import mote4.util.vertex.mesh.Mesh;
 import static org.lwjgl.opengl.GL11.*;
 import rpgsystem.Inventory;
 import rpgsystem.Item;
+import rpgsystem.Pickupable;
 import ui.IngameUIManager;
 
 /**
@@ -20,7 +21,7 @@ public class ItemPickup extends Entity {
     private static Mesh mesh;
     private boolean collected = false;
     private float cycle = 0, addSpeed = 0;
-    private Item item;
+    private Pickupable item;
     
     static {
         mesh = StaticMeshBuilder.constructVAO(GL_TRIANGLES, 
@@ -54,7 +55,7 @@ public class ItemPickup extends Entity {
                                       0,-1,0, 0,-1,0, 0,-1,0, 0,-1,0, 0,-1,0, 0,-1,0});
     }
     
-    public ItemPickup(int x, int y, Item i) {
+    public ItemPickup(int x, int y, Pickupable i) {
         posX = x+.5f;
         posY = y+.5f;
         hitboxW = .35f;
@@ -64,6 +65,7 @@ public class ItemPickup extends Entity {
 
     @Override
     public void onRoomInit() {
+        cycle = (posX+posY)*.5f;
         tileHeight = MapManager.getTileHeight((int)posX, (int)posY);
     }
     
@@ -74,7 +76,7 @@ public class ItemPickup extends Entity {
             if (addSpeed > 1)
                 MapManager.removeEntity(this);
         }
-        cycle += .05f+addSpeed*.35;
+        cycle += .05f;//+addSpeed*.35;
     }
     
     @Override
@@ -86,7 +88,7 @@ public class ItemPickup extends Entity {
         model.rotate(cycle, 0, 0, 1);
         model.makeCurrent();
         Uniform.varFloat("spriteInfo", 1,1,0);
-        TextureMap.bindUnfiltered(item.spriteName);
+        TextureMap.bindUnfiltered(item.overworldSprite());
         glEnable(GL_CULL_FACE);
         mesh.render();
         glDisable(GL_CULL_FACE);
@@ -96,8 +98,8 @@ public class ItemPickup extends Entity {
     public void playerPointIn() {
         if (!collected) {
             collected = true;
-            Inventory.addItem(item);
-            IngameUIManager.logMessage("Obtained a " + item.name + ".");
+            item.pickup();//Inventory.addItem(item);
+            IngameUIManager.logMessage("Obtained a " + item.pickupName() + ".");
         }
     }
 

@@ -11,7 +11,7 @@ import mote4.util.vertex.mesh.Mesh;
 import nullset.Const;
 import org.lwjgl.opengl.GL11;
 import rpgbattle.BattleManager;
-import rpgbattle.fighter.Fighter.FighterStats;
+import rpgbattle.fighter.FighterStats;
 import rpgsystem.StatEffect;
 import ui.MenuMeshCreator;
 
@@ -38,10 +38,10 @@ public class PlayerStatBar {
         healthRender = staminaRender = manaRender = 0;
         
         borderMesh = MenuMeshCreator.create(50, 0, BORDER_W, BORDER_H, Const.UI_SCALE);
-        
-        statusIconMesh = StaticMeshBuilder.constructVAO(GL11.GL_TRIANGLE_FAN, 
-                2, new float[] {0,0, 0,9, 9,9, 9,0}, 
-                2, new float[] {0,0, 0,1, 1,1, 1,0}, 
+
+        statusIconMesh = StaticMeshBuilder.constructVAO(GL11.GL_TRIANGLE_FAN,
+                2, new float[] {0,0, 0,9, 9,9, 9,0},
+                2, new float[] {0,0, 0,1, 1,1, 1,0},
                 0, null, null);
         
         float barLength = 40;
@@ -192,7 +192,7 @@ public class PlayerStatBar {
         for (Mesh m : textMesh)
             m.render();
         
-    // RENDER STATUS EFFECTS
+    // RENDER STATUS EFFECT ICONS
         
         model.translate(79, -13);
         model.makeCurrent();
@@ -200,7 +200,7 @@ public class PlayerStatBar {
             TextureMap.bindUnfiltered(s.spriteName);
             statusIconMesh.render();
             
-            model.translate(0, 10);
+            model.translate(0, 10); // TODO after four stat boxes this will overlap the outer box, shift to the left
             model.makeCurrent();
         }
     }
@@ -213,5 +213,13 @@ public class PlayerStatBar {
         barMesh.render();
         model.pop();
         model.makeCurrent();
+    }
+
+    public static void renderAnimations(float posX, float posY, ModelMatrix model) {
+        model.setIdentity();
+        model.translate(posX, posY);
+        model.makeCurrent();
+
+        BattleManager.getPlayer().updateAnim();
     }
 }

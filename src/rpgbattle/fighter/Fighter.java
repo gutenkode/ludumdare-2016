@@ -22,7 +22,7 @@ public abstract class Fighter {
     
     public ArrayList<StatEffect> statEffects = new ArrayList<>();
     private ArrayList<BattleAnimation> battleAnimations = new ArrayList<>();
-    public FighterStats stats = new FighterStats();
+    public FighterStats stats;
     
     float[] flash = new float[] {0,0,0};
     double shake, shakeVel;
@@ -48,12 +48,12 @@ public abstract class Fighter {
     /**
      * Runs an accuracy check for an attack against this Fighter.
      * Returns true the % of time the attack should hit.
-     * @param accuracy
+     * @param accuracy Accuracy as an int from 0-100.
      * @return 
      */
     final boolean calculateHit(int accuracy) {
         double rand = Math.random();
-        return (rand < accuracy*.01-stats.evasion);
+        return (rand < accuracy*.01-stats.evasion());
         // if random value is less than attack's accuracy minus evasion
     }
     /**
@@ -77,14 +77,14 @@ public abstract class Fighter {
          */
 
         // elemental strength/weakness
-        double elementMultVal = stats.elementMultiplier[element.index];
+        double elementMultVal = stats.elementMultiplier(element.index);
 
         int dmg;
         if (crit) {// criticals have 1.5 power and use /1.5 the defense stat
-            dmg = (int)(1.5*strength/(stats.defense/1.5));
+            dmg = (int)(1.5*strength/(stats.defense()/1.5));
             addToast("CRITICAL");
         } else
-            dmg = strength/stats.defense;
+            dmg = strength/stats.defense();
 
         // multiplier for attack elemental type
         dmg *= elementMultVal;
@@ -111,36 +111,47 @@ public abstract class Fighter {
      * Inflicts damage from poison.
      */
     public void poisonDamage() {
-        if (poisonDelay <= 0) {
-            poisonDelay = 60*4;
-            lastHealth = stats.health;
-            int dmg = stats.maxHealth/20;
-            stats.health -= dmg;
-            stats.health = Math.max(0, stats.health);
-            addToast(ToastType.POISON, "-"+dmg);
-        } else
-            poisonDelay--;
+        if (stats.health > 0)
+            if (poisonDelay <= 0) {
+                poisonDelay = 60*4;
+                lastHealth = stats.health;
+                int dmg = stats.maxHealth/20;
+                stats.health -= dmg;
+                stats.health = Math.max(1, stats.health);
+                addToast(ToastType.POISON, "-"+dmg);
+            } else
+                poisonDelay--;
     }
     
     public boolean isDead() { return stats.health <= 0; }
     
-    public void inflictStatus(StatEffect e) {
-        switch (e) {
-            case POISON:
-                BattleUIManager.logMessage("You are now poisoned!"); // this dialogue is not versatile enough
-                addToast(ToastType.POISON, e.name.toUpperCase());
-                break;
-            case FATIGUE:
-                BattleUIManager.logMessage("You are now fatigued!");
-                addToast(ToastType.STAMINA, e.name.toUpperCase());
-                break;
-            default:
-                BattleUIManager.logMessage("You are now ["+e.name()+"]!");
-                addToast(e.name.toUpperCase());
-                break;
+    public void inflictStatus(StatEffect e, int accuracy) {
+        if (calculateHit(accuracy)) {
+            switch (e) {
+                case POISON:
+                    BattleUIManager.logMessage("You are now poisoned!"); // TODO this dialogue is not versatile enough
+                    addToast(ToastType.POISON, e.name.toUpperCase());
+                    break;
+                case FATIGUE:
+                    BattleUIManager.logMessage("You are now fatigued!");
+                    addToast(ToastType.STAMINA, e.name.toUpperCase());
+                    break;
+                case DEF_UP:
+                    BattleUIManager.logMessage("Your defense increased!");
+                    addToast("+DEFENSE");
+                    break;
+                default:
+                    BattleUIManager.logMessage("You are now [" + e.name() + "]!");
+                    addToast(e.name.toUpperCase());
+                    break;
+            }
+            this.addAnim(new BattleAnimation(BattleAnimation.Type.STATUS));
+            if (!statEffects.contains(e)) {
+                statEffects.add(e);
+            }
+        } else {
+            addToast("MISS");
         }
-        if (!statEffects.contains(e))
-            statEffects.add(e);
     }
     public boolean hasStatus(StatEffect e) {
         return statEffects.contains(e);
@@ -200,15 +211,6 @@ public abstract class Fighter {
         shakeVel *= .9;
 
         return (int)shake;
-    }
-
-    public class FighterStats {
-        public int health, maxHealth,
-                   stamina, maxStamina,
-                   mana, maxMana;
-        public int attack, defense, magic;
-        public double evasion, critrate;
-        public double[] elementMultiplier;
     }
     
     // text "toasts" for displaying damage/restore amounts

@@ -42,4 +42,8 @@ StaticObject,1,1,Ceiling
 Elevator,5,5,2,true
 Enemy,3,3,SLIME
 Water,-2
+ItemPickup,2,1,SKILL_BOLT
+ItemPickup,3,1,SKILL_ICE
+ItemPickup,4,1,MOD_MULTI_TARGET
+ItemPickup,3,3,SKILL_CURE
 </entitydata>

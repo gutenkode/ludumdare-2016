@@ -8,7 +8,7 @@
     "Look for a command console or something!\nYou might be able to shut down the alert."
   ],
   "walkwayRoomEnter": [
-    "There's an elevator to a higher level in a room farther ahead.",
+    "There's an elevator to a higher level\nin a room farther ahead.",
     "Once you're there I'll explain where you are."
   ],
   "terminalRoomExit": [

@@ -57,7 +57,7 @@ b.....a
 <entitydata>
 ScriptTrigger,4,5,1,3,intro
 Elevator,4,8,8,true
-ItemPickup,1,7,POTION
+ItemPickup,1,7,MOD_EFFICIENCY
 KeyDoor,5,6,0,1
 KeyDoor,1,6,0,3
 SolidPlatform,5,6,0

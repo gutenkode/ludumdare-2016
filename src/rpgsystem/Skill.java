@@ -1,10 +1,9 @@
 package rpgsystem;
 
-import java.util.ArrayList;
 import rpgbattle.BattleManager;
 import rpgbattle.PlayerSkills;
 import rpgbattle.fighter.Fighter;
-import rpgbattle.fighter.Fighter.FighterStats;
+import rpgbattle.fighter.FighterStats;
 import ui.BattleUIManager;
 import ui.MenuHandler;
 import ui.components.BattleAnimation;
@@ -15,27 +14,35 @@ import static rpgsystem.DefaultTarget.*;
  * Special attack that can be used in battle.
  * @author Peter
  */
-public enum Skill {
-    FIRE("Fireball",
+public enum Skill implements Pickupable {
+    SKILL_FIRE("Fireball",
         "Reliable medium strength skill.", "skill_fire",
         ENEMY, BattleAnimation.Type.FIRE,
         30,     100,    5),
-    BOLT("Thunderbolt",
-        "High power, low accuracy.", "skill_fire",
+    SKILL_BOLT("Thunderbolt",
+        "High power, low accuracy.", "skill_bolt",
         ENEMY, BattleAnimation.Type.ELEC,
         35,     80,     7),
-    ICE("Ice",
-        "Weak, but high chance to crit.", "skill_fire",
+    SKILL_ICE("Ice",
+        "Weak, but high chance to crit.", "skill_ice",
         ENEMY, BattleAnimation.Type.ICE,
         25,     100,    7),
-    RUIN("Ruin",
-        "Does damage based on\ntarget's remaining HP.", "skill_fire",
+    SKILL_RUIN("Ruin",
+        "Does damage based on\ntarget's remaining HP.", "skill_dark",
         ENEMY, BattleAnimation.Type.FIRE,
         50,     100,    6),
-    CURE("Cure",
-        "Restores HP.", "skill_fire",
-        PLAYER, BattleAnimation.Type.FIRE,
-        50,     0,      10);
+    SKILL_CURE("Cure",
+        "Restores HP.", "skill_heal",
+        PLAYER, BattleAnimation.Type.STATUS,
+        50,     0,      10),
+    SKILL_DEF_UP("Defense",
+        "Temporarily boosts defense.", "skill_defup",
+        PLAYER, BattleAnimation.Type.STATUS,
+        50,     0,      5),
+    SKILL_POISON("Toxic",
+        "Poison an enemy.", "skill_poison",
+        ENEMY, BattleAnimation.Type.STATUS,
+        0,     75,      5);
 
     public final String name,
                         desc, spriteName;
@@ -88,9 +95,9 @@ public enum Skill {
         if (m == null)
             return basePower;
         switch (m) {
-            case DAMAGE_BOOST:
+            case MOD_DAMAGE_BOOST:
                 return (int)(basePower * 1.5);
-            case POWER_BOOST:
+            case MOD_POWER_BOOST:
                 return (int)(basePower * 2);
             default: 
                 return basePower;
@@ -101,9 +108,9 @@ public enum Skill {
         if (m == null)
             return baseAccuracy;
         switch (m) {
-            case MULTI_TARGET:
+            case MOD_MULTI_TARGET:
                 return (int)(baseAccuracy*.75);
-            case ACCURACY:
+            case MOD_ACCURACY:
                 return Math.min(baseAccuracy * 2, 100);
             default: 
                 return baseAccuracy;
@@ -114,11 +121,11 @@ public enum Skill {
         if (m == null)
             return baseCost;
         switch (m) {
-            case EFFICIENCY:
+            case MOD_EFFICIENCY:
                 return baseCost/2;
-            case POWER_BOOST:
+            case MOD_POWER_BOOST:
                 return baseCost*2;
-            case MULTI_TARGET:
+            case MOD_MULTI_TARGET:
                 return (int)(baseCost*1.5);
             default:
                 return baseCost;
@@ -127,7 +134,7 @@ public enum Skill {
     
     public void useIngame(MenuHandler handler) {
         switch (this) {
-            case CURE:
+            case SKILL_CURE:
                 FighterStats stats = BattleManager.getPlayer().stats;
                 if (stats.health == stats.maxHealth) {
                     handler.showDialogue("Your health is full!", spriteName);
@@ -147,21 +154,21 @@ public enum Skill {
     
     public void useBattle(MenuHandler handler, int magicStat, Fighter... targets) {
         switch (this) {
-            case FIRE:
+            case SKILL_FIRE:
                 BattleUIManager.logMessage("You cast Fireball!");
                 for (Fighter f : targets) {
                     f.damage(Element.FIRE, magicStat, power(), accuracy(), false);
                     f.addAnim(new BattleAnimation(animType));
                 }
                 break;
-            case BOLT:
+            case SKILL_BOLT:
                 BattleUIManager.logMessage("You cast Thunderbolt!");
                 for (Fighter f : targets) {
                     f.damage(Element.ELEC, magicStat, power(), accuracy(), false);
                     f.addAnim(new BattleAnimation(animType));
                 }
                 break;
-            case ICE:
+            case SKILL_ICE:
                 BattleUIManager.logMessage("You cast Ice!");
                 for (Fighter f : targets) {
                     boolean crit = Math.random() > .35;
@@ -169,22 +176,45 @@ public enum Skill {
                     f.addAnim(new BattleAnimation(animType));
                 }
                 break;
-            case RUIN:
+            case SKILL_RUIN:
                 BattleUIManager.logMessage("You cast Ruin!");
                 for (Fighter f : targets) {
                     f.cutHealth(Element.RUIN, power()/100.0, accuracy());
                     f.addAnim(new BattleAnimation(animType));
                 }
                 break;
-            case CURE:
+            case SKILL_CURE:
                 BattleUIManager.logMessage("You cast Cure!");
                 for (Fighter f : targets) {
                     f.restoreHealth(power());
                     f.addAnim(new BattleAnimation(animType));
                 }
                 break;
+            case SKILL_DEF_UP:
+                BattleUIManager.logMessage("You cast Defense Up!");
+                for (Fighter f : targets) {
+                    f.inflictStatus(StatEffect.DEF_UP,999);
+                    f.addAnim(new BattleAnimation(animType));
+                }
+                break;
+            case SKILL_POISON:
+                BattleUIManager.logMessage("You cast Toxic!");
+                for (Fighter f : targets) {
+                    f.inflictStatus(StatEffect.POISON, accuracy());
+                    f.addAnim(new BattleAnimation(animType));
+                }
+                break;
             default:
                 handler.showDialogue("You can't use this here.");
         }
+    }
+
+    @Override
+    public String pickupName() { return name+" skill"; };
+    @Override
+    public String overworldSprite() { return spriteName; };
+    @Override
+    public void pickup() {
+        PlayerSkills.addAvailableSkill(this);
     }
 }

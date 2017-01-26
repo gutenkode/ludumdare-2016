@@ -54,7 +54,7 @@ public class NoiseBehavior extends EnemyBehavior {
                 useAttack(2.0);
                 break;
             case 2:
-                BattleManager.getPlayer().inflictStatus(StatEffect.FATIGUE);
+                BattleManager.getPlayer().inflictStatus(StatEffect.FATIGUE, 80);
                 break;
         }
     }

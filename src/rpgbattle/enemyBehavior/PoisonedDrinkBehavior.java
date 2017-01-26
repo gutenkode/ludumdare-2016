@@ -41,8 +41,8 @@ public class PoisonedDrinkBehavior extends EnemyBehavior {
     void performAct() {
         switch (action) {
             case 0:
-                BattleManager.getPlayer().inflictStatus(StatEffect.POISON);
-                BattleManager.getPlayer().inflictStatus(StatEffect.FATIGUE);
+                BattleManager.getPlayer().inflictStatus(StatEffect.POISON, 80);
+                BattleManager.getPlayer().inflictStatus(StatEffect.FATIGUE, 80);
                 fighter.stats.health -= fighter.stats.maxHealth/4;
                 break;
             case 1:

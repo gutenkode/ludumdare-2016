@@ -10,6 +10,9 @@ import nullset.Const;
 import org.lwjgl.opengl.GL11;
 import rpgbattle.EnemyData;
 import rpgsystem.Item;
+import rpgsystem.Pickupable;
+import rpgsystem.Skill;
+import rpgsystem.SkillModifier;
 
 /**
  * Utility class for constructing Entities and Meshes for MapData objects.
@@ -44,13 +47,7 @@ public class MapDataUtility {
                     x = Integer.valueOf(tok.nextToken());
                     y = Integer.valueOf(tok.nextToken());
                     String itemName = tok.nextToken().trim();
-                    Item item = null;
-                    for (Item i2 : Item.values()) {
-                        if (i2.toString().equals(itemName))
-                            item = i2;
-                    }
-                    if (item == null)
-                        throw new IllegalArgumentException("Unable to find item '"+itemName+"' when constructing ItemPickup entity.");
+                    Pickupable item = findPickupable(itemName);
                     list.add(new ItemPickup(x,y,item));
                     break;
                 case "ScriptTrigger":
@@ -119,7 +116,33 @@ public class MapDataUtility {
         }
         return list;
     }
-    
+    private static Pickupable findPickupable(String itemName) {
+        Pickupable item = null;
+        // try and match an Item
+        for (Item i : Item.values()) {
+            if (i.toString().equals(itemName))
+                item = i;
+        }
+        // try and match a Skill
+        if (item == null) {
+            for (Skill i : Skill.values()) {
+                if (i.toString().equals(itemName))
+                    item = i;
+            }
+        }
+        // try and match a SkillModifier
+        if (item == null) {
+            for (SkillModifier i : SkillModifier.values()) {
+                if (i.toString().equals(itemName))
+                    item = i;
+            }
+        }
+        if (item == null)
+            throw new IllegalArgumentException("Unable to find item '"+itemName+"' when constructing ItemPickup entity.");
+        return item;
+
+    }
+
     private static MapData mapData; // stored when buildMesh is called
     public static Mesh buildMesh(MapData md) {
         mapData = md;

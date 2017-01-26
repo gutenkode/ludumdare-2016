@@ -26,11 +26,13 @@ public class PlayerSkills {
         appliedModifiers2 = new HashMap<>();
         
         // for now, the player has access to all skills and modifiers
-        availableSkills.addAll(Arrays.asList(Skill.values()));
-        availableModifiers.addAll(Arrays.asList(SkillModifier.values()));
+        //availableSkills.addAll(Arrays.asList(Skill.values()));
+        //availableModifiers.addAll(Arrays.asList(SkillModifier.values()));
+        availableSkills.add(Skill.SKILL_DEF_UP);
+        availableSkills.add(Skill.SKILL_POISON);
         
-        // equip skills by default
-        equippedSkills.addAll(Arrays.asList(Skill.values()));
+        // ...and equip all skills by default
+        equippedSkills.addAll(availableSkills);
     }
     
     public static int maxCapacity() { return maxCapacity; }
@@ -79,13 +81,21 @@ public class PlayerSkills {
     public static boolean isModifierApplied(SkillModifier m) { return appliedModifiers1.containsValue(m); }
     public static Skill getLinkedSkill(SkillModifier m) { return appliedModifiers2.get(m); }
     public static SkillModifier getLinkedModifier(Skill s) { return appliedModifiers1.get(s); }
-    
+
+    /**
+     * Add a new skill to the list of available ones, if not already present.
+     * @param s
+     */
     public static void addAvailableSkill(Skill s) {
-        if (availableSkills.contains(s))
+        if (!availableSkills.contains(s))
             availableSkills.add(s);
     }
+    /**
+     * Add a new modifier to the list of available ones, if not already present.
+     * @param m
+     */
     public static void addAvailableModifier(SkillModifier m) {
-        if (availableModifiers.contains(m))
+        if (!availableModifiers.contains(m))
             availableModifiers.add(m);
     }
 }

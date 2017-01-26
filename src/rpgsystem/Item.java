@@ -10,7 +10,7 @@ import ui.MenuHandler;
  *
  * @author Peter
  */
-public enum Item {
+public enum Item implements Pickupable {
     KEYCARD1("Lv1 Keycard",
         "A keycard with the text \"Level 1\" written\non it.",
         "item_keycard1", NO_TARGET, false),
@@ -140,6 +140,15 @@ public enum Item {
     public void discard() {
         if (canDiscard)
             Inventory.get().remove(this);
+    }
+
+    @Override
+    public String pickupName() { return name; };
+    @Override
+    public String overworldSprite() { return spriteName; };
+    @Override
+    public void pickup() {
+        Inventory.addItem(this);
     }
 }
 

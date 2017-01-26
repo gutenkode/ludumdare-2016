@@ -52,8 +52,13 @@ public class BattleSkillMenu implements SelectionMenuBehavior {
         else {
             if (BattleManager.getPlayer().canUseSkill(handler, skills.get(index))) {
                 currentSkill = skills.get(index);
-                boolean isMultiTarget = (PlayerSkills.getLinkedModifier(currentSkill) == SkillModifier.MULTI_TARGET) || currentSkill.defaultTarget == DefaultTarget.ALL_ENEMIES;
-                boolean isEnemyTarget = currentSkill.defaultTarget == DefaultTarget.ENEMY || currentSkill.defaultTarget == DefaultTarget.ALL_ENEMIES;
+                boolean isMultiTarget =
+                        (PlayerSkills.getLinkedModifier(currentSkill) == SkillModifier.MOD_MULTI_TARGET)
+                        || currentSkill.defaultTarget == DefaultTarget.ALL_ENEMIES
+                        || currentSkill.defaultTarget == DefaultTarget.ALL_PLAYERS;
+                boolean isEnemyTarget =
+                           currentSkill.defaultTarget == DefaultTarget.ENEMY
+                        || currentSkill.defaultTarget == DefaultTarget.ALL_ENEMIES;
                 handler.openMenu(new EnemySelectionMenu(handler, this::skillCallback, isMultiTarget, isEnemyTarget, !isEnemyTarget));
             }
         }
