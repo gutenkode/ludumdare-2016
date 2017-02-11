@@ -17,8 +17,8 @@ public class ScriptTrigger extends Entity {
     private final int x, y;
     
     public ScriptTrigger(int x, int y, int width, int height, String scriptName) {
-        hitboxW = width/2f -.01f; // -.01f is to get rid of any edge cases
-        hitboxH = height/2f -.01f;
+        hitboxW = width/2f +.01f; // +.01f is to get rid of any edge cases
+        hitboxH = height/2f +.01f;
         posX = x+hitboxW;
         posY = y+hitboxH;
         this.x = x; this.y = y;

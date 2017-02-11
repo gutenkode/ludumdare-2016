@@ -4,7 +4,7 @@ import entities.Entity;
 import entities.Player;
 import java.util.ArrayList;
 
-import entities.Water;
+import entities.RoomLink;
 import mote4.util.matrix.GenericMatrix;
 import mote4.util.matrix.Transform;
 import mote4.util.matrix.TransformationMatrix;
@@ -12,11 +12,10 @@ import mote4.util.shader.ShaderMap;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
 import nullset.Input;
-import static org.lwjgl.opengl.GL11.*;
 
+import nullset.RootLayer;
 import scenes.Editor;
 import scenes.Postprocess;
-import scenes.RootScene;
 
 /**
  * Manages rendering and updating maps and entities.
@@ -29,7 +28,7 @@ public class MapManager {
     private static int currentTimelineInd;
     // temporary list of entities that should be deleted, to avoid ConcurrentModificationExceptions
     private static ArrayList<Entity> deleteList = new ArrayList<>(); 
-    private static LinkData loadLinkData; // stored link data while a fadeout is performed
+    private static String newMapName; // stored while a fadeout is performed
 
     // data for entity lights in shaders
     private static float[] eLightPos, eLightColor;
@@ -73,7 +72,8 @@ public class MapManager {
 
     public static void update() {
         if (Input.currentLock() == Input.Lock.FADE)
-            return;
+            return; // don't update ANYTHING if the scene is fading
+        // jump between timelines
         if (Input.currentLock() == Input.Lock.PLAYER) {
             if (Input.isKeyNew(Input.Keys.TIMELINE_1))
                 jumpToTimeline(0);
@@ -84,12 +84,11 @@ public class MapManager {
         }
         
         player.update();
-        testRoomLinks();
         
         while (!deleteList.isEmpty()) {
             currentTimeline.getEntities().remove(deleteList.remove(0));
         }
-        
+        // update all entities, test if they player is inside their hitboxes or is using them
         for (Entity e : currentTimeline.getEntities()) {
             if (e.isInside(player.posX(), player.posY())) {
                 e.playerPointIn();
@@ -102,46 +101,60 @@ public class MapManager {
             e.update();
         }
     }
+
     /**
-     * Test if the player is on a room link tile, and load the new room if needed.
+     * Will load the specified room.  Currently somewhat broken;
+     * if the room does not have a room link to the current room,
+     * the game won't know where to put the player and will crash.
+     * @param roomName
      */
-    private static void testRoomLinks() {
-        for (LinkData ld : currentTimeline.getMapData().linkData)
-            if ((int)player.posX() == ld.x &&
-                (int)player.posY() == ld.y) {
-                Input.pushLock(Input.Lock.FADE);
-                loadLinkData = ld; // save the link data for after the room transition
-                Postprocess.fadeOut(MapManager::fadeCallback);
-                return;
-            }
-                
+    public static void loadRoom(String roomName) {
+        newMapName = roomName;
+        Postprocess.fadeOut(MapManager::fadeCallback);
+        Input.pushLock(Input.Lock.FADE);
     }
-    public static void fadeCallback() {
-        loadRoom(loadLinkData);
+    /**
+     * Called when a room fade is done, performs the actual load action.
+     */
+    private static void fadeCallback() {
+        String currentMapName = currentTimeline.getMapData().mapName; // the map we are about to unload
+        MapData newMapData = MapLoader.getMap(newMapName); // get the MapData for the new room
+        // newMapData will not be null; MapLoader will throw an error if no map is found
+        currentTimeline.setMapData(newMapData);
+        RoomLink newLink = currentTimeline.getRoomLink(currentMapName);
+
+        float[] loc;
+        if (newLink == null) {
+            System.err.println("Linked room does not have reciprocating link. From: "
+                    + currentMapName + " To: " + newMapName);
+            loc = new float[] {0.5f,0.5f};
+        } else
+            loc = newLink.getFrontTile();
+
+        player.moveTo(loc[0], loc[1]); // move the player to the new location
+        runOnRoomInit();
+        newMapName = null;
         Input.popLock();
     }
     /**
-     * Load the specified room.
-     * @param roomLink 
+     * Called whenever a room is loaded, initializes entities and lights.
      */
-    private static void loadRoom(LinkData roomLink) {
-        MapData newMapData = MapLoader.getMap(roomLink.mapName); // get the MapData for the new room
-        // newMapData will not be null; MapLoader will throw an error if no map is found
-        LinkData newLink = newMapData.getLinkPair(currentTimeline.getMapData().mapName); // get the LinkData the player has moved to
-        if (newLink == null)
-            throw new IllegalStateException("Linked room does not have reciprocating link. From: "+currentTimeline.getMapData().mapName +" To: "+roomLink.mapName);
-        int[] loc = newLink.getFrontTile();
-        player.moveTo(loc[0]+.5f, loc[1]+.5f); // move the player to the new location
-        currentTimeline.setMapData(newMapData);
-
-        runOnRoomInit();
+    private static void runOnRoomInit() {
+        for (Entity e : currentTimeline.getEntities())
+            e.onRoomInit();
+        player.onRoomInit();
+        refreshLighting();
     }
-    private static void runOnRoomInit() { // TODO add lighting refresh call - e.g. doors can toggle alert status
+
+    /**
+     * Update the light data sent to the shader, useful if
+     * an entity toggles its lighting state.
+     */
+    public static void refreshLighting() {
         int numLights = 0;
         eLightPos = new float[16*3];
         eLightColor = new float[16*3];
         for (Entity e : currentTimeline.getEntities()) {
-            e.onRoomInit();
             if (e.hasLight()) {
                 if (numLights >= eLightPos.length/3)
                     throw new IllegalStateException("Room has more entity lights than maximum.");
@@ -156,7 +169,6 @@ public class MapManager {
                 numLights++;
             }
         }
-        player.onRoomInit();
     }
 
     // rendering
@@ -271,7 +283,7 @@ public class MapManager {
     public static int getTileHeight(int x, int y) {
         // somewhat hackish solution to making entities load in the editor
         // the engine wasn't designed to be used withouth the MapManagerz
-        if (RootScene.currentState() == RootScene.State.EDITOR)
+        if (RootLayer.getState() == RootLayer.State.EDITOR)
             return Editor.getMapEditor().getMapData().heightData[x][y];
         return currentTimeline.getMapData().heightData[x][y];
     }

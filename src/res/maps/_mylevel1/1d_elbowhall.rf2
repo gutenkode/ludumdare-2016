@@ -20,20 +20,10 @@ height=7
 2 0 0 0 -7 -7 2
 -7 -7 -7 -7 -7 -7 -7
 </walkdata>
-<linkdata>
-.......
-.......
-......a
-.......
-b......
-.......
-.......
-</linkdata>
-<linkdesc>
-1c_hub,0
-1e_laserwall,2
-</linkdesc>
 <entitydata>
+RoomLink,6,2,1,1,0,1c_hub
+RoomLink,0,4,1,1,2,1e_laserwall
+
 Enemy,3,4,SLIME
 ScriptTrigger,3,2,3,1,enemyTutorial
 KeyDoor,5,2,0,1

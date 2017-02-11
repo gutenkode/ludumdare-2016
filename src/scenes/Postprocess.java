@@ -8,6 +8,8 @@ import mote4.util.shader.ShaderMap;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.mesh.MeshMap;
+import nullset.RootLayer;
+
 import static org.lwjgl.opengl.GL11.*;
 
 /**
@@ -60,7 +62,7 @@ public class Postprocess implements Scene {
         glDisable(GL_DEPTH_TEST);
 
         // render transition effect, if active
-        if (RootScene.currentState() == RootScene.State.BATTLE_INTRO) {
+        if (RootLayer.getState() == RootLayer.State.BATTLE_INTRO) {
             ShaderMap.use("quad");
             Uniform.varFloat("colorMult", colorMult,colorMult,colorMult);
             TextureMap.bindFiltered("fbo_transition1");

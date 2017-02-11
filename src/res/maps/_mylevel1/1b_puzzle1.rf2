@@ -20,21 +20,11 @@ height=7
 2 -2 -2 -2 0 -2 0 -2 -2 0 0 0 0 2
 2 -2 -6 -6 -6 -6 -6 -6 -6 -2 0 -2 -2 2
 </walkdata>
-<linkdata>
-...........b..
-..............
-..............
-a.............
-..............
-..............
-..........c...
-</linkdata>
-<linkdesc>
-1h_intro,2
-1c_hub,1
-1f_switch,3
-</linkdesc>
 <entitydata>
+RoomLink,0,3,1,1,2,1h_intro
+RoomLink,11,0,1,1,1,1c_hub
+RoomLink,10,6,1,1,3,1f_switch
+
 ToggleButton,4,2,0
 ItemPickup,4,4,POTION
 ItemPickup,11,4,MOD_DAMAGE_BOOST

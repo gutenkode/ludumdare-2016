@@ -9,6 +9,7 @@ import mote4.util.texture.TextureMap;
 import mote4.util.vertex.mesh.MeshMap;
 import nullset.Const;
 import nullset.Input;
+import nullset.RootLayer;
 import terminal.TerminalSession;
 import ui.EditorUIManager;
 
@@ -92,7 +93,7 @@ public class EditorUI implements Scene {
         // texture sheet
         ShaderMap.use("texture");
         trans.model.setIdentity();
-        trans.model.translate(RootScene.width()-128,128);
+        trans.model.translate(RootLayer.width()-128,128);
         trans.model.scale(128,128,1);
         trans.makeCurrent();
         TextureMap.bindUnfiltered("tileset_1");
@@ -105,7 +106,7 @@ public class EditorUI implements Scene {
         int x = (int)(pos[0] % Const.TILESHEET_X);
         int y = (int)(pos[0] / Const.TILESHEET_Y);
         trans.model.setIdentity();
-        trans.model.translate(RootScene.width()-256+16+32*x,16+32*y);
+        trans.model.translate(RootLayer.width()-256+16+32*x,16+32*y);
         trans.model.scale(128/8,128/8,1);
         trans.makeCurrent();
         MeshMap.render("quad");
@@ -113,7 +114,7 @@ public class EditorUI implements Scene {
         x = (int)(pos[1] % Const.TILESHEET_X);
         y = (int)(pos[1] / Const.TILESHEET_Y);
         trans.model.setIdentity();
-        trans.model.translate(RootScene.width()-256+16+32*x,16+32*y);
+        trans.model.translate(RootLayer.width()-256+16+32*x,16+32*y);
         trans.model.scale(128/8,128/8,1);
         trans.makeCurrent();
         Uniform.varFloat("colorMult",1,1,0,1);

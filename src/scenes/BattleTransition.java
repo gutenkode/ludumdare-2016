@@ -6,6 +6,8 @@ import mote4.util.matrix.ModelMatrix;
 import mote4.util.shader.ShaderMap;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.mesh.MeshMap;
+import nullset.RootLayer;
+
 import static org.lwjgl.opengl.GL11.*;
 
 /**
@@ -57,8 +59,7 @@ public class BattleTransition implements Scene {
         //model.rotate(.02f, 0, 0, 1);
         delay--;
         if (delay == 0)
-            Postprocess.fadeOut(RootScene::startBattle);
-            //RootScene.setState(RootScene.State.BATTLE);
+            Postprocess.fadeOut(RootLayer::startBattle);
     }
 
     @Override

@@ -109,6 +109,15 @@ public class MapDataUtility {
                     h = Integer.valueOf(tok.nextToken());
                     list.add(new Water(h));
                     break;
+                case "RoomLink":
+                    x = Integer.valueOf(tok.nextToken());
+                    y = Integer.valueOf(tok.nextToken());
+                    width = Integer.valueOf(tok.nextToken());
+                    height = Integer.valueOf(tok.nextToken());
+                    int rot = Integer.valueOf(tok.nextToken());
+                    String rn = tok.nextToken();
+                    list.add(new RoomLink(x,y,width,height,rot,rn));
+                    break;
                 default:
                     System.err.println("Unrecognized entity name while constructing entities: "+s);
                     break;

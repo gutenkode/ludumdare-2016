@@ -56,8 +56,8 @@ void main()
 	//float dofLength = length(lightPos.y-vertexPos.y);
 	DOFValue = vec4(1.0);//vec4(1.0-1.0/pow(dofLength,3.0),0,0,1);//vec4(fogDepth);
 
-    // bias is used to reduce weird artifacts in shadow
-    float bias = 0.005*tan(acos(max(dot(bumpNormal,L),0)));
+    // bias is used to reduce weird artifacts in shadow, "shadow acne"
+    float bias = 0.003*tan(acos(max(dot(bumpNormal,L),0)));
     bias = clamp(bias, 0, 0.01);
     float shadow = textureProj(shadowMap, shadowCoord+vec4(0,0,-bias,0));
 	shadow = shadow*.9+.1;

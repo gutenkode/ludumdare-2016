@@ -3,16 +3,15 @@ package ui;
 import java.util.ArrayList;
 import java.util.Stack;
 
-import entities.Player;
 import mote4.util.matrix.ModelMatrix;
 import mote4.util.matrix.Transform;
 import mote4.util.shader.ShaderMap;
 import mote4.util.texture.TextureMap;
 import nullset.Const;
 import nullset.Input;
+import nullset.RootLayer;
 import rpgbattle.BattleManager;
 import rpgbattle.fighter.EnemyFighter;
-import scenes.RootScene;
 import ui.components.DialogueMenu;
 import ui.components.EnemySprite;
 import ui.components.FlavorTextMenu;
@@ -86,9 +85,9 @@ public class BattleUIManager implements MenuHandler {
             s.renderAnimations(model);
         }
         // PlayerStatBar sets own shaders
-        PlayerStatBar.render(RootScene.width()/2, RootScene.height()-42-Const.UI_SCALE/2, trans);
+        PlayerStatBar.render(RootLayer.width()/2, RootLayer.height()-42-Const.UI_SCALE/2, trans);
         ShaderMap.use("spritesheet_nolight");
-        PlayerStatBar.renderAnimations(RootScene.width()/2, RootScene.height()-10-Const.UI_SCALE/2, model);
+        PlayerStatBar.renderAnimations(RootLayer.width()/2, RootLayer.height()-10-Const.UI_SCALE/2, model);
 
     ShaderMap.use("texture_color"); // uses the color attribute, for colored text
     trans.makeCurrent();
@@ -100,21 +99,21 @@ public class BattleUIManager implements MenuHandler {
         }
         // player toasts
         model.setIdentity();
-        model.translate(RootScene.width()/2, RootScene.height()-60);
+        model.translate(RootLayer.width()/2, RootLayer.height()-60);
         BattleManager.getPlayer().renderToast(model);
         
     ShaderMap.use("texture"); // all remaining UI elements use the texture shader
     trans.makeCurrent();
         // LogMenu
         model.setIdentity();
-        model.translate(RootScene.width()/2-DialogueMenu.BORDER_W/2-Const.UI_SCALE, 
+        model.translate(RootLayer.width()/2-DialogueMenu.BORDER_W/2-Const.UI_SCALE,
                         .5f*Const.UI_SCALE);
         model.makeCurrent();
         LogMenu.render(model);
         
         if (showDialogue) {
             model.setIdentity();
-            model.translate(RootScene.width()/2-DialogueMenu.BORDER_W/2-Const.UI_SCALE, 
+            model.translate(RootLayer.width()/2-DialogueMenu.BORDER_W/2-Const.UI_SCALE,
                             .5f*Const.UI_SCALE);
             model.makeCurrent();
             DialogueMenu.render();
@@ -122,8 +121,8 @@ public class BattleUIManager implements MenuHandler {
 
         if (showScriptChoice) {
             model.setIdentity();
-            model.translate(RootScene.width()/2-DialogueMenu.BORDER_W/2, 
-                            RootScene.height()-40-5*Const.UI_SCALE-ScriptChoiceMenu.height());
+            model.translate(RootLayer.width()/2-DialogueMenu.BORDER_W/2,
+                            RootLayer.height()-40-5*Const.UI_SCALE-ScriptChoiceMenu.height());
             model.makeCurrent();
             ScriptChoiceMenu.render(model);
         }
@@ -178,8 +177,8 @@ public class BattleUIManager implements MenuHandler {
     public static void refreshEnemies() {
         if (fighters != null) {
             enemySprites = new ArrayList<>();
-            int startX = RootScene.width()/2-(96*(BattleManager.getEnemies().size()-1));
-            int startY = RootScene.height()/2;
+            int startX = RootLayer.width()/2-(96*(BattleManager.getEnemies().size()-1));
+            int startY = RootLayer.height()/2;
             for (EnemyFighter f : fighters) {
                 enemySprites.add(new EnemySprite(startX, startY, f));
                 startX += 96*2;

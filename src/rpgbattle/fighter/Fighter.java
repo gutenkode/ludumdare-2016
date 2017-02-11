@@ -6,11 +6,10 @@ import mote4.util.shader.Uniform;
 import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.mesh.Mesh;
 import nullset.Const;
+import nullset.RootLayer;
 import rpgbattle.fighter.Fighter.Toast.ToastType;
 import rpgsystem.Element;
 import rpgsystem.StatEffect;
-import scenes.RootScene;
-import scenes.RootScene.State;
 import ui.BattleUIManager;
 import ui.components.BattleAnimation;
 
@@ -127,21 +126,18 @@ public abstract class Fighter {
     
     public void inflictStatus(StatEffect e, int accuracy) {
         if (calculateHit(accuracy)) {
+            BattleUIManager.logMessage(getStatusEffectString(e));
             switch (e) {
                 case POISON:
-                    BattleUIManager.logMessage("You are now poisoned!"); // TODO this dialogue is not versatile enough
                     addToast(ToastType.POISON, e.name.toUpperCase());
                     break;
                 case FATIGUE:
-                    BattleUIManager.logMessage("You are now fatigued!");
                     addToast(ToastType.STAMINA, e.name.toUpperCase());
                     break;
                 case DEF_UP:
-                    BattleUIManager.logMessage("Your defense increased!");
                     addToast("+DEFENSE");
                     break;
                 default:
-                    BattleUIManager.logMessage("You are now [" + e.name() + "]!");
                     addToast(e.name.toUpperCase());
                     break;
             }
@@ -153,6 +149,7 @@ public abstract class Fighter {
             addToast("MISS");
         }
     }
+    protected abstract String getStatusEffectString(StatEffect e);
     public boolean hasStatus(StatEffect e) {
         return statEffects.contains(e);
     }
@@ -228,7 +225,7 @@ public abstract class Fighter {
         addToast(type, String.valueOf(val));
     }
     void addToast(ToastType type, String text) {
-        if (RootScene.currentState() == State.BATTLE)
+        if (RootLayer.getState() == RootLayer.State.BATTLE)
             // new toasts are delayed by the number of toasts in the queue ahead of them
             toast.add(new Toast(type.color+text, TOAST_DELAY*toast.size()));
     }

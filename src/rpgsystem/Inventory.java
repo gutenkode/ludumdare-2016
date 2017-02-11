@@ -12,7 +12,7 @@ public class Inventory {
     
     static {
         inventory = new ArrayList<>();
-        //inventory.add(Item.KEYCARD1);
+        //inventory.add(Item.KEYCARD4);
         inventory.add(Item.POTION);
         inventory.add(Item.ENERGY_DRINK);
         inventory.add(Item.MANA_HYPO);

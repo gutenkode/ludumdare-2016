@@ -18,17 +18,9 @@ height=6
 16 0 0 -1 0 2 2 10 16
 16 -1 -1 -1 -1 2 2 2 16
 </walkdata>
-<linkdata>
-..a......
-.........
-.........
-.........
-.........
-</linkdata>
-<linkdesc>
-1i_puzzle2,1
-</linkdesc>
 <entitydata>
+RoomLink,2,0,1,1,1,1i_puzzle2
+
 ToggleButton,2,3,1
 ToggleButton,4,4,0
 TogglePlatform,3,1,0,0,0,false

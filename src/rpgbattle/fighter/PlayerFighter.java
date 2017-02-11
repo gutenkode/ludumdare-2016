@@ -37,7 +37,7 @@ public class PlayerFighter extends Fighter {
     @Override
     public void initAct() {
         BattleUIManager.startPlayerTurn();
-        BattleUIManager.logMessage("It's your turn.");
+        //BattleUIManager.logMessage("It's your turn.");
         turnUsed = false;
         delay = 60;
         
@@ -230,16 +230,27 @@ public class PlayerFighter extends Fighter {
         return turnUsed;
     }
     public boolean useRun(MenuHandler handler) {
-        handler.showDialogue("You can't run from this fight!");
-        return false;
-        /*
-        BattleUIManager.logMessage("You try to run...");
-        BattleUIManager.logMessage("...but fail!");
+        BattleUIManager.logMessage("You escape safely!");
+        BattleManager.runFromBattle();
         turnUsed = true;
-        return turnUsed;*/
+        return turnUsed;
     }
     
     public boolean canUseSkill(Skill s) {
         return s.cost() <= stats.mana;
+    }
+
+    @Override
+    protected String getStatusEffectString(StatEffect e) {
+        switch (e) {
+            case POISON:
+                return "You are now poisoned!";
+            case FATIGUE:
+                return "You are now fatigued!";
+            case DEF_UP:
+                return "Your defense increased!";
+            default:
+                return "You are now [" + e.name() + "]!";
+        }
     }
 }

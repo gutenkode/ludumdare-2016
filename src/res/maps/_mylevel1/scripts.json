@@ -1,4 +1,15 @@
 {
+  "tutorial1": [
+    "$SPRITE talk_tutorial",
+    "You just picked up some skills.\nSkills can be used during battle.",
+    "You must equip skills and modifiers before using them.\nOpen the menu with X,\nthen go to Skills > Equip\nand Skills > Modifiers."
+  ],
+  "tutorial2": [
+    "$SPRITE talk_tutorial",
+    "To use terminals, stand in front of them\nand press Z.",
+    "To exit a terminal, press the Escape key.\nAny open program will stay open if you leave.",
+    "As this game is unfinished, here's some advice:\nThe security password is 'asdf'.\nUse it in 'secr.exe'."
+  ],
   "alertTrigger": [
     "$SECRALRT $FLAG",
     "$RESET",

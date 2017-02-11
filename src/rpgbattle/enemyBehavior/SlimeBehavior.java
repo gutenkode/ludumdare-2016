@@ -28,7 +28,7 @@ public class SlimeBehavior extends EnemyBehavior {
         if (!fighter.hasStatus(StatEffect.DEF_UP)
             && Math.random() > .8)
         {
-            BattleUIManager.logMessage("The Slime boosts its defense.");
+            BattleUIManager.logMessage("The Slime uses Harden!");
             action = 1;
         } 
         else if (!BattleManager.getPlayer().hasStatus(StatEffect.POISON)

@@ -21,7 +21,6 @@ public class MapLoader {
     // intermediate variables used during map loading
     private static int mapWidth, mapHeight;
     private static String fileName;
-    private static HashMap<Character,int[]> roomLinkLocations; 
     
     /**
      * Load the specified map file into the game.
@@ -32,11 +31,10 @@ public class MapLoader {
             System.err.println("Attempted to load already loaded map file '"+fileName+"'.");
             return; // don't load the same room more than once
         }
-        //System.out.println("Loading map '"+fileName+"'...");
+        System.out.println("Loading map '"+fileName+"'...");
         
         MapLoader.fileName = fileName;
         mapWidth = mapHeight = -1;
-        roomLinkLocations = null;
         
         BufferedReader bf = FileIO.getBufferedReader("/res/maps/"+levelPath+"/"+fileName+FILE_EXTENSION);
         ArrayList<String> file = new ArrayList<>();
@@ -65,22 +63,13 @@ public class MapLoader {
         start = file.indexOf("<walkdata>");
         end = file.indexOf("</walkdata>");
         int[][] heightData = loadHeight(start, end, file);
-
-        // load room link locations
-        start = file.indexOf("<linkdata>");
-        end = file.indexOf("</linkdata>");
-        loadLinkPosition(start, end, file);
-        // load room link data
-        start = file.indexOf("<linkdesc>");
-        end = file.indexOf("</linkdesc>");
-        ArrayList<LinkData> linkData = loadLinkDesc(start, end, file);
         
         // load entity data
         start = file.indexOf("<entitydata>");
         end = file.indexOf("</entitydata>");
         ArrayList<String> entities = loadEntities(start, end, file);
         
-        loadedMaps.put(fileName, new MapData(fileName, tileData, heightData, linkData, entities));
+        loadedMaps.put(fileName, new MapData(fileName, tileData, heightData, entities));
     }
     
     /**
@@ -177,56 +166,6 @@ public class MapLoader {
         return data;
     }
     /**
-     * Stores the (x,y) position of each room link.
-     * Creates the roomLinkLocations hashmap, used while reading link data.
-     * @param s Start index.
-     * @param e End index.
-     * @param str File to read.
-     */
-    private static void loadLinkPosition(int s, int e, ArrayList<String> str) {
-        roomLinkLocations = new HashMap<>();
-        for (int i = s+1; i < e; i++) {
-            for (int j = 0; j < mapWidth; j++) {
-                char indexChar = str.get(i).charAt(j);
-                if ((int)indexChar >= 97 && (int)indexChar < 122)
-                    roomLinkLocations.put(indexChar, new int[] {j,i-s-1});
-            }
-        }
-    }
-    /**
-     * Creates full room link information in combination with the data from
-     * loadLinkPosition.
-     * @param s Start index.
-     * @param e End index.
-     * @param str File to read.
-     * @return 
-     */
-    private static ArrayList<LinkData> loadLinkDesc(int s, int e, ArrayList<String> str) {
-        ArrayList<LinkData> data = new ArrayList<>();//LinkData[] data = new LinkData[e-s-1];
-        for (int i = s+1; i < e; i++) {
-            StringTokenizer tok = new StringTokenizer(str.get(i),",");
-            // characters starting from 'a'
-            // it is assumed values in the linkdesc section are in order
-            // starting with 'a'
-            char id = (char)(i-s-1+97);
-            int[] pos = roomLinkLocations.get(id); // read position data created in loadLinkPosition
-            data.add(new LinkData(
-                id,
-                tok.nextToken(), // room name
-                pos[0],
-                pos[1],
-                Integer.parseInt(tok.nextToken()))); // direction of the link
-        }
-        // make sure there isn't more then one link to the same room
-        // this is undefined behavoir in the engine
-        for (LinkData ld1 : data)
-            for (LinkData ld2 : data)
-                if (ld1 != ld2)
-                    if (ld1.mapName.equals(ld2.mapName))
-                        throw new IllegalStateException("Invalid map file: '"+fileName+"' has more than one link to '"+ld1.mapName+"'.");
-        return data;
-    }
-    /**
      * Creates a list of Entity "blueprints" for each MapData object.
      * This is simply the entity constructor represented by a String.
      * Actual Entity construction is handled in MapData, as multiple sets
@@ -296,35 +235,6 @@ public class MapLoader {
             out.write("</walkdata>");
             out.newLine();
 
-            // write link data
-            out.write("<linkdata>");
-            out.newLine();
-            char[][] links = new char[md.height][md.width];
-            for (char[] c : links)
-                Arrays.fill(c, '.');
-            for (LinkData ld : md.linkData)
-                links[ld.y][ld.x] = ld.id;
-            for (int i = 0; i < md.height; i++) {
-                outString = "";
-                for (int j = 0; j < md.width; j++) {
-                    outString += links[i][j];
-                }
-                out.write(outString);
-                out.newLine();
-            }
-            out.write("</linkdata>");
-            out.newLine();
-
-            // write link desc data
-            out.write("<linkdesc>");
-            out.newLine();
-            for (LinkData ld : md.linkData) {
-                out.write(ld.mapName+","+ld.direction);
-                out.newLine();
-            }
-            out.write("</linkdesc>");
-            out.newLine();
-
             out.write("<entitydata>");
             out.newLine();
             for (String s : md.entities) {
@@ -351,9 +261,8 @@ public class MapLoader {
                 tileData[i][j][2] = 0;
             }
         int[][] heightData = new int[x][y];
-        ArrayList<LinkData> linkData = new ArrayList<>();
         ArrayList<String> entities = new ArrayList<>();
-        loadedMaps.put(fileName, new MapData(fileName, tileData, heightData, linkData, entities));
+        loadedMaps.put(fileName, new MapData(fileName, tileData, heightData, entities));
     }
 
     public static boolean deleteMapFile(String mapName) {

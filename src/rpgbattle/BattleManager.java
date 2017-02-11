@@ -1,14 +1,13 @@
 package rpgbattle;
 
+import nullset.RootLayer;
 import rpgbattle.fighter.Fighter;
 import java.util.ArrayList;
 import rpgbattle.fighter.EnemyFighter;
 import rpgbattle.fighter.PlayerFighter;
-import rpgsystem.Element;
 import rpgsystem.StatEffect;
 import scenes.Battle;
 import scenes.Postprocess;
-import scenes.RootScene;
 import ui.BattleUIManager;
 
 /**
@@ -55,7 +54,7 @@ public class BattleManager {
         {
             exitBattleDelay--;
             if (exitBattleDelay == 0) {
-                Postprocess.fadeOut(RootScene::exitBattle);
+                Postprocess.fadeOut(RootLayer::exitBattle);
                 playerFighter.statEffects.clear(); // remove status effects after battle
             }
                 //RootScene.setState(RootScene.State.INGAME);
@@ -101,7 +100,12 @@ public class BattleManager {
             }
         }
     }
-    
+
+    public static void runFromBattle() {
+        exitBattle = true;
+        exitBattleDelay = 75;
+    }
+
     public static ArrayList<Fighter> getFighters() { return fighters; }
     public static ArrayList<EnemyFighter> getEnemies() { return enemies; }
     public static PlayerFighter getPlayer() { return playerFighter; }

@@ -6,6 +6,7 @@ import rpgbattle.EnemyData;
 import rpgbattle.enemyBehavior.EnemyBehavior;
 import rpgbattle.fighter.Fighter.Toast.ToastType;
 import rpgsystem.Element;
+import rpgsystem.StatEffect;
 
 /**
  * Encapsulates the logic of an enemy in a battle.
@@ -131,5 +132,19 @@ public class EnemyFighter extends Fighter {
     
     public void runDeathAnimation(ModelMatrix model) {
         behavior.runDeathAnimation(model);
+    }
+
+    @Override
+    protected String getStatusEffectString(StatEffect e) {
+        switch (e) {
+            case POISON:
+                return "The "+displayName+" is poisoned!";
+            case FATIGUE:
+                return "The "+displayName+" is fatigued!";
+            case DEF_UP:
+                return "The "+displayName+"'s defense increased!";
+            default:
+                return "The "+displayName+" is now [" + e.name() + "]!";
+        }
     }
 }

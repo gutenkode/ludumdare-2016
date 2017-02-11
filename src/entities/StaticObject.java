@@ -6,11 +6,15 @@ import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.mesh.MeshMap;
 
+import java.util.Random;
+
 /**
  *
  * @author Peter
  */
 public class StaticObject extends Entity {
+
+    private static Random rand = new Random();
     
     private enum Type {
         BARREL,
@@ -23,6 +27,7 @@ public class StaticObject extends Entity {
     
     private final Type TYPE;
     private final boolean solid;
+    private boolean b1;
     
     public StaticObject(float x, float y, String model, float val) {
         val0 = val;
@@ -51,6 +56,8 @@ public class StaticObject extends Entity {
             case "Fluorescent":
                 TYPE = Type.FLUORESCENT;
                 solid = false;
+                b1 = true;
+                val1 = 60;
                 break;
             case "Ceiling":
                 TYPE = Type.CEILING;
@@ -68,6 +75,21 @@ public class StaticObject extends Entity {
 
     @Override
     public void update() {
+        switch (TYPE) {
+            case FLUORESCENT:
+                val1--;
+                if (val1 <= 0) {
+                    b1 = !b1;
+                    if (b1)
+                        val1 = rand.nextInt(200);
+                    else
+                        val1 = rand.nextInt(9)+3;
+                    MapManager.refreshLighting();
+                }
+                break;
+            default:
+                break;
+        }
     }
     
     @Override
@@ -99,8 +121,10 @@ public class StaticObject extends Entity {
                 break;
             case FLUORESCENT:
                 Uniform.varFloat("spriteInfo", 2,1,0);
-                Uniform.varFloat("spriteInfoEmissive", 2,1,1);
-                Uniform.varFloat("emissiveMult", 3);
+                if (b1) {
+                    Uniform.varFloat("spriteInfoEmissive", 2, 1, 1);
+                    Uniform.varFloat("emissiveMult", 3);
+                }
                 model.translate(posX, posY, tileHeight+1.75f);
                 model.scale(.25f,.75f,1);
                 model.rotate((float)Math.PI, 1, 0, 0);
@@ -140,7 +164,7 @@ public class StaticObject extends Entity {
     public String getName() { return "Static: "+TYPE.name(); }
 
     @Override
-    public boolean hasLight() { return TYPE == Type.FLUORESCENT; }
+    public boolean hasLight() { return TYPE == Type.FLUORESCENT && b1; }
     @Override
     public float[] lightPos() { return new float[] {posX,posY,tileHeight+1.75f}; }
     @Override

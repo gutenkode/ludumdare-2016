@@ -92,40 +92,6 @@ public class MapEditor {
             e.onRoomInit();
     }
 
-    public void addLink(int x, int y, String roomname) {
-        ArrayList<Character> ids = new ArrayList<>();
-        for (LinkData ld : mapData.linkData) {
-            if ((ld.x == x && ld.y == y) || roomname.equals(ld.mapName))
-                return; // there is already a LinkData here or it links to the same room
-            ids.add(ld.id);
-        }
-        // no LinkData was found
-        for (int i = 'a'; i <= 'z'; i++) {
-            if (!ids.contains(i)) {
-                mapData.linkData.add(new LinkData((char) i, roomname, x, y, 0));
-                return;
-            }
-        }
-        // this room links to too many other rooms, somehow...
-        throw new IllegalStateException("Too many room links!");
-    }
-    /**
-     * If there is a room link on this tile, edits its orientation.
-     * @param x
-     * @param y
-     * @param chg
-     */
-    public void editLinkDirection(int x, int y, int chg) {
-        for (LinkData ld : mapData.linkData) {
-            if (ld.x == x && ld.y == y) {
-                ld.direction += chg;
-                ld.direction %= 4;
-                return;
-            }
-        }
-        // no LinkData was found
-    }
-
     /**
      * Adds the specified entity to the map.
      * The entity descriptor string will be added to the map, but if it is not

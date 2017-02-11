@@ -22,7 +22,7 @@ public class KeyDoor extends Entity {
     private float rot, openVal = 0;
     private int keycardLevel, tileX, tileY;
     private int delay = 0, alertCycle = 0;
-    private boolean playerOn = false, flicker;
+    private boolean playerOn = false, flicker, renderAlert;
     
     static {
         mesh = StaticMeshBuilder.constructVAO(GL11.GL_TRIANGLE_FAN, 
@@ -78,6 +78,7 @@ public class KeyDoor extends Entity {
     @Override
     public void onRoomInit() {
         tileHeight = MapManager.getTileHeight((int)posX, (int)posY);
+        renderAlert = false;
     }
     
     @Override
@@ -176,6 +177,11 @@ public class KeyDoor extends Entity {
         model.pop();
 
         if (MapManager.getTimelineState().isAlertTriggered()) {
+            if (!renderAlert) {
+                renderAlert = true;
+                MapManager.refreshLighting();
+            }
+
             int offset = 10;
             if (flicker)
                 offset += 6;
@@ -197,6 +203,11 @@ public class KeyDoor extends Entity {
             mesh.render();
 
             Uniform.varFloat("emissiveMult", 0);
+        } else {
+            if (renderAlert) {
+                renderAlert = false;
+                MapManager.refreshLighting();
+            }
         }
 
         /*
@@ -225,9 +236,14 @@ public class KeyDoor extends Entity {
     public String getName() { return "Door"; }
 
     @Override
-    public boolean hasLight() { return keycardLevel > 0; }
+    public boolean hasLight() { return keycardLevel > 0 || renderAlert; }
     @Override
     public float[] lightPos() { return new float[] {tileX+.5f,tileY+.5f,tileHeight+1f}; }
     @Override
-    public float[] lightColor() { return new float[] {1.5f,0,0}; }
+    public float[] lightColor() {
+        if (renderAlert)
+            return new float[] {2,.5f,0};
+        else
+            return new float[] {.54f,.58f,1};
+    }
 }

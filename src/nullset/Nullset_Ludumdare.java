@@ -3,14 +3,12 @@ package nullset;
 import map.MapLevelManager;
 import mote4.scenegraph.Layer;
 import mote4.scenegraph.Window;
-import mote4.scenegraph.target.EmptyTarget;
 import mote4.util.shader.ShaderUtils;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.builder.StaticMeshBuilder;
 import mote4.util.vertex.mesh.MeshMap;
 import scenes.Postprocess;
-import scenes.RootScene;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -26,8 +24,9 @@ public class Nullset_Ludumdare {
             System.setProperty("java.awt.headless", "true"); // prevents ImageIO from hanging on OS X
         //Window.initFullscreen();
         //Window.initWindowed(1920/2, 1080/2);
+        Window.setWindowTitle("Nullset");
         Window.setVsync(false);
-        Window.initWindowedPercent(.75, 16/9.0);
+        Window.initWindowedPercent(.666, 16/9.0);
         
         Input.createCharCallback();
         Input.createKeyCallback();
@@ -50,11 +49,8 @@ public class Nullset_Ludumdare {
         //FBO ingame = new FBO(1280/2,720/2,true,false,null);
         //FBO ingame = new FBO(1920/3,1080/3,true,false,null);
         //ingame.addToTextureMap("fbo_scene");
-        Layer l = new Layer(new EmptyTarget());
-        l.addScene(new RootScene());
-        Window.addLayer(l);
-        
-        Window.addScene(new Postprocess());
+        Window.addLayer(new RootLayer());
+        Window.addScene(new Postprocess()); // Postprocess is on the default layer and renders to the screen
         Window.loop();
     }
     

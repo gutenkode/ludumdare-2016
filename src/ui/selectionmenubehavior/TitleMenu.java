@@ -1,7 +1,9 @@
 package ui.selectionmenubehavior;
 
 import mote4.scenegraph.Window;
-import scenes.RootScene;
+import nullset.Input;
+import nullset.RootLayer;
+import scenes.Postprocess;
 import ui.MenuHandler;
 
 /**
@@ -37,18 +39,24 @@ public class TitleMenu implements  SelectionMenuBehavior {
     public void onAction(int index) {
         switch (getElementName(index)) {
             case "New Game":
-                RootScene.setState(RootScene.State.INGAME);
+                Postprocess.fadeOut(this::newGameCallback);
+                Input.pushLock(Input.Lock.FADE);
                 break;
             case "Options":
                 handler.openMenu(new OptionsMenu(handler));
                 break;
             case "Editor":
-                RootScene.setState(RootScene.State.EDITOR);
+                RootLayer.setState(RootLayer.State.EDITOR);
                 break;
             case "Quit":
                 Window.destroy();
                 break;
         }
+    }
+
+    private void newGameCallback() {
+        RootLayer.setState(RootLayer.State.INGAME);
+        Input.popLock();
     }
 
     @Override

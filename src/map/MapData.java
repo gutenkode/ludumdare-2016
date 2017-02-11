@@ -19,7 +19,6 @@ public class MapData {
     public final String mapName;
     public final int[][][] tileData;
     public final int[][] heightData;
-    public final ArrayList<LinkData> linkData;
     public final ArrayList<String> entities;
     
     /**
@@ -31,31 +30,15 @@ public class MapData {
      *                  secondary texture coordinates.
      *                 Tile shape is a value (0,1,2,3): 0,1=draw ground, 2,3=no ground, 0,2=no wall, 1,3=draw wall
      * @param heightData 2D array defining the height of each tile, default is 0.
-     * @param linkData Array of LinkData objects for tiles that link to other rooms.
      * @param entities String array of all entities to be constructed.
      */
-    protected MapData(String mapName, int[][][] tileData, int[][] heightData, ArrayList<LinkData> linkData, ArrayList<String> entities) {
+    protected MapData(String mapName, int[][][] tileData, int[][] heightData, ArrayList<String> entities) {
         width = tileData.length;
         height = tileData[0].length;
         this.mapName = mapName;
         this.tileData = tileData;
         this.heightData = heightData;
-        this.linkData = linkData;
         this.entities = entities;
-    }
-    
-    /**
-     * Find and return the LinkData in this room that links to a specified room.
-     * Returns null if there is no matching LinkData.
-     * @param linkedRoomName
-     * @return 
-     */
-    public LinkData getLinkPair(String linkedRoomName) {
-        for (LinkData ld : linkData)
-            if (ld.mapName.equals(linkedRoomName))
-                return ld;
-        return null;
-        
     }
     
     public void render() {

@@ -8,7 +8,7 @@ import mote4.util.texture.TextureMap;
 import mote4.util.vertex.mesh.ScrollingText;
 import nullset.Const;
 import nullset.Input;
-import scenes.RootScene;
+import nullset.RootLayer;
 import ui.components.SelectionMenu;
 import ui.selectionmenubehavior.editor.RootEditorMenu;
 import ui.selectionmenubehavior.SelectionMenuBehavior;
@@ -45,7 +45,7 @@ public class EditorUIManager implements MenuHandler {
         if (logMessageTimeout > 0) {
             logMessageTimeout--;
             model.setIdentity();
-            model.translate(80, RootScene.height()-80);
+            model.translate(80, RootLayer.height()-80);
             model.makeCurrent();
             TextureMap.bindUnfiltered("font_1");
             Uniform.varFloat("colorMult",0,0,0,1);

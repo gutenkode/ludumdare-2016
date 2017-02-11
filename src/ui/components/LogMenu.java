@@ -51,7 +51,7 @@ public class LogMenu {
     }
     
     public static void render(ModelMatrix model) {
-        TextureMap.bindUnfiltered("ui_scalablemenu");
+        TextureMap.bindUnfiltered("ui_scalablemenu_blur");
         border.render();
         
         model.translate(0, offset);

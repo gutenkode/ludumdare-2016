@@ -42,7 +42,7 @@ public enum Skill implements Pickupable {
     SKILL_POISON("Toxic",
         "Poison an enemy.", "skill_poison",
         ENEMY, BattleAnimation.Type.STATUS,
-        0,     75,      5);
+        0,     80,      5);
 
     public final String name,
                         desc, spriteName;

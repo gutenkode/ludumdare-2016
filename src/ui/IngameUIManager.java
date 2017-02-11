@@ -1,6 +1,7 @@
 package ui;
 
 import entities.ScriptTrigger;
+import nullset.RootLayer;
 import ui.components.SpriteMenu;
 import ui.components.DialogueMenu;
 import ui.components.SelectionMenu;
@@ -13,7 +14,6 @@ import mote4.util.vertex.mesh.ScrollingText;
 import nullset.Const;
 import nullset.Input;
 import rpgbattle.BattleManager;
-import scenes.RootScene;
 import ui.components.FlavorTextMenu;
 import ui.components.PlayerStatBar;
 import ui.components.ScriptChoiceMenu;
@@ -93,7 +93,7 @@ public class IngameUIManager implements MenuHandler {
 
         // PlayerStatBar, sets own shaders
         if (statBarSlide < .95)
-            PlayerStatBar.render(54, RootScene.height()-42-Const.UI_SCALE/2+(int)(60*statBarSlide), trans);
+            PlayerStatBar.render(54, RootLayer.height()-42-Const.UI_SCALE/2+(int)(60*statBarSlide), trans);
 
         // initialize state for the rest of the UI
         ShaderMap.use("texture");
@@ -104,7 +104,7 @@ public class IngameUIManager implements MenuHandler {
         if (logMessageTimeout > 0) {
             logMessageTimeout--;
             // does not set model to identity as this is the first potentially rendered item
-            model.translate(80, RootScene.height()-80);
+            model.translate(80, RootLayer.height()-80);
             model.makeCurrent();
             TextureMap.bindUnfiltered("font_1");
             logMessage.render();
@@ -115,8 +115,8 @@ public class IngameUIManager implements MenuHandler {
             // the dialogue box will auto-align with the bottom of the screen
             model.translate(0, dialogueSlide*100);
             // and center in the X direction
-            model.translate(RootScene.width()/2-DialogueMenu.BORDER_W/2-Const.UI_SCALE,
-                    RootScene.height()-40-3*Const.UI_SCALE);
+            model.translate(RootLayer.width()/2-DialogueMenu.BORDER_W/2-Const.UI_SCALE,
+                    RootLayer.height()-40-3*Const.UI_SCALE);
             model.makeCurrent();
             DialogueMenu.render();
         }
@@ -127,8 +127,8 @@ public class IngameUIManager implements MenuHandler {
                 // sprite
                 // no smooth in/out animation, but not too noticeable next to dialogue bar
                 model.setIdentity();
-                model.translate(RootScene.width()/2+DialogueMenu.BORDER_W/2+Const.UI_SCALE, 
-                                RootScene.height()-40-3*Const.UI_SCALE);
+                model.translate(RootLayer.width()/2+DialogueMenu.BORDER_W/2+Const.UI_SCALE,
+                        RootLayer.height()-40-3*Const.UI_SCALE);
                 model.makeCurrent();
                 SpriteMenu.render(model);
 
@@ -136,8 +136,8 @@ public class IngameUIManager implements MenuHandler {
                 // !!!! needs a simple animation
                 if (showScriptChoice) {
                     model.setIdentity();
-                    model.translate(RootScene.width()/2-DialogueMenu.BORDER_W/2-Const.UI_SCALE, 
-                                    RootScene.height()-40-5*Const.UI_SCALE-ScriptChoiceMenu.height());
+                    model.translate(RootLayer.width()/2-DialogueMenu.BORDER_W/2-Const.UI_SCALE,
+                            RootLayer.height()-40-5*Const.UI_SCALE-ScriptChoiceMenu.height());
                     model.makeCurrent();
                     ScriptChoiceMenu.render(model);
                 }

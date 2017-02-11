@@ -11,5 +11,6 @@ public class Const {
     // width of one tile out of a scale of 1 on the tilesheet
     public static final float TILE_SIZE_X = 1f/TILESHEET_X,
                               TILE_SIZE_Y = 1f/TILESHEET_Y;
-    public static final int UI_SCALE = 16;
+    public static final int UI_SCALE = 16,
+                            WINDOW_HEIGHT = 1080/3;
 }

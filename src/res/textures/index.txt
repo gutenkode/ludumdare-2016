@@ -1,9 +1,10 @@
-tileset/foundation		tileset_1
-tileset/foundation_NRM		tileset_1_NRM
+tileset/foundation3		tileset_1
+tileset/foundation3_NRM 		tileset_1_NRM
 tileset/shade			tileset_shade
 
 ui/title			ui_title
 ui/scalablemenu			ui_scalablemenu
+ui/scalablemenu_blur		ui_scalablemenu_blur
 ui/arrow_cursor			ui_cursor
 ui/square_cursor		ui_square_cursor
 ui/statbars			ui_statbars
@@ -78,6 +79,7 @@ skill/mod			skill_mod
 
 talk/boss			talk_boss
 talk/none			talk_none
+talk/tutorial			talk_tutorial
 
 status/poison			status_poison
 status/fatigue			status_fatigue

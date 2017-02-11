@@ -7,10 +7,10 @@ import mote4.util.texture.TextureMap;
 import mote4.util.vector.Vector2f;
 import mote4.util.vertex.builder.StaticMeshBuilder;
 import mote4.util.vertex.mesh.Mesh;
+import nullset.RootLayer;
 import org.lwjgl.opengl.GL11;
 import rpgbattle.BattleManager;
 import rpgbattle.EnemyData;
-import scenes.RootScene;
 
 import java.util.Arrays;
 
@@ -135,7 +135,7 @@ public class Enemy extends Entity {
             BattleManager.initEnemies(enemies); // list multiple enemies here
 
             // RootScene -> go to battle
-            RootScene.transitionToBattle();
+            RootLayer.transitionToBattle();
 
             // MapManager -> delete this entity
             MapManager.removeEntity(this);

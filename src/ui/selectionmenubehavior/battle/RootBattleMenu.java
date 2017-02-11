@@ -45,8 +45,6 @@ public class RootBattleMenu implements SelectionMenuBehavior {
         switch (getElementName(index)) {
             case "Attack":
                 handler.openMenu(new EnemySelectionMenu(handler, this::attackCallback, false,true,false));
-                //if (BattleManager.getPlayer().useAttack(handler))
-                //    BattleUIManager.endPlayerTurn();
                 break;
             case "Guard":
                 break;
@@ -62,7 +60,7 @@ public class RootBattleMenu implements SelectionMenuBehavior {
                 break;
         }
     }
-    public void attackCallback(Fighter... f) {
+    private void attackCallback(Fighter... f) {
         if (BattleManager.getPlayer().useAttack(handler, f))
             BattleUIManager.endPlayerTurn();
     }
@@ -84,7 +82,7 @@ public class RootBattleMenu implements SelectionMenuBehavior {
                 handler.showFlavorText(false, "Use an item.");
                 break;
             case "Run":
-                handler.showFlavorText(false, "Try to escape.");
+                handler.showFlavorText(false, "Success chance: 100%");
                 break;
             default:
                 handler.closeFlavorText();

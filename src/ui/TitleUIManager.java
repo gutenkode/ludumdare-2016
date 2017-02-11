@@ -5,7 +5,8 @@ import mote4.util.matrix.Transform;
 import mote4.util.shader.ShaderMap;
 import mote4.util.texture.TextureMap;
 import nullset.Const;
-import scenes.RootScene;
+import nullset.Input;
+import nullset.RootLayer;
 import ui.components.SelectionMenu;
 import ui.selectionmenubehavior.SelectionMenuBehavior;
 import ui.selectionmenubehavior.TitleMenu;
@@ -28,7 +29,8 @@ public class TitleUIManager implements MenuHandler {
     }
 
     public static void update() {
-        selectionMenus.peek().update();
+        if (Input.currentLock() != Input.Lock.FADE)
+            selectionMenus.peek().update();
     }
     public static void render(Transform trans) {
         ModelMatrix model = trans.model;
@@ -38,7 +40,7 @@ public class TitleUIManager implements MenuHandler {
         TextureMap.bindUnfiltered("font_1");
 
         model.setIdentity();
-        model.translate(RootScene.width()/2-50, RootScene.height()/2,0);
+        model.translate(RootLayer.width()/2-50, RootLayer.height()/2,0);
         for (SelectionMenu sm : selectionMenus) {
             model.translate(Const.UI_SCALE/2, Const.UI_SCALE/2);
             model.makeCurrent();
