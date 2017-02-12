@@ -1,20 +1,22 @@
-package terminal.program;
+package terminal.filesystem.program;
 
 import map.MapLoader;
 import scenes.Editor;
 import terminal.TerminalSession;
+import terminal.filesystem.Directory;
 
 import java.util.StringTokenizer;
 
 /**
  * Created by Peter on 1/24/17.
  */
-public class EditProgram implements Program {
+public class EditProgram extends Program {
 
     private TerminalSession session;
 
-    @Override
-    public String name() { return "edit"; };
+    public EditProgram(Directory p) {
+        super("edit", p);
+    }
 
     @Override
     public void init(TerminalSession s) {

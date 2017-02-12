@@ -61,16 +61,20 @@ public class BattleManager {
         }
         else if (currentFighter.act())
         {
+            // poison damage happens at the end of a turn
+            if (currentFighter.statEffects.contains(StatEffect.POISON))
+                currentFighter.poisonDamage();
+
             int ind = fighters.indexOf(currentFighter);
             ind++;
             ind %= fighters.size();
             currentFighter = fighters.get(ind);
             currentFighter.initAct();
         }
-        
+        /*
         for (Fighter f : fighters)
             if (f.statEffects.contains(StatEffect.POISON))
-                f.poisonDamage();
+                f.poisonDamage();*/
     }
     
     /**

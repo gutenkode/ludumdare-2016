@@ -1,19 +1,21 @@
-package terminal.program;
+package terminal.filesystem.program;
 
 import map.MapLevelManager;
 import scenes.TerminalScene;
 import terminal.TerminalSession;
+import terminal.filesystem.Directory;
 
 /**
  *
  * @author Peter
  */
-public class LevelChangeProgram implements Program {
+public class LevelChangeProgram extends Program {
 
     private TerminalSession session;
-    
-    @Override
-    public String name() { return "level"; };
+
+    public LevelChangeProgram(Directory p) {
+        super("level", p);
+    }
 
     @Override
     public void init(TerminalSession s) {

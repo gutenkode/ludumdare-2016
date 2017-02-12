@@ -28,8 +28,7 @@ public abstract class Fighter {
     protected int lastHealth, lastStamina, lastMana;
     
     private int doubleFlashDelay = -1; // used to trigger the second flash from actionStartFlash()
-    private float flashDecay, // the rate at which a flash color will fade
-                  poisonDelay; // delay for taking poison damage
+    private float flashDecay; // the rate at which a flash color will fade
     
     /**
      * Called once at the beginning of a Fighter's turn.
@@ -110,16 +109,17 @@ public abstract class Fighter {
      * Inflicts damage from poison.
      */
     public void poisonDamage() {
-        if (stats.health > 0)
-            if (poisonDelay <= 0) {
-                poisonDelay = 60*4;
+        if (stats.health > 1) {
+            //if (poisonDelay <= 0) {
+            //    poisonDelay = 60*4;
                 lastHealth = stats.health;
-                int dmg = stats.maxHealth/20;
+                int dmg = stats.maxHealth / 10;
                 stats.health -= dmg;
                 stats.health = Math.max(1, stats.health);
-                addToast(ToastType.POISON, "-"+dmg);
-            } else
-                poisonDelay--;
+                addToast(ToastType.POISON, "POISON -" + (lastHealth - stats.health)); // if health was capped at 1hp, actual damage might be different from dmg
+            //} else
+            //    poisonDelay--;
+        }
     }
     
     public boolean isDead() { return stats.health <= 0; }

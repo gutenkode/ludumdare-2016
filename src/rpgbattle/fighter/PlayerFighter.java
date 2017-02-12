@@ -43,11 +43,10 @@ public class PlayerFighter extends Fighter {
         
         // stamina regen
         if (statEffects.contains(StatEffect.FATIGUE)) {
-            addToast(ToastType.STAMINA.color+"FATIGUE");
-            addToast(ToastType.STAMINA.color+"-"+(stats.attack()/2));
+            addToast(ToastType.STAMINA.color+"FATIGUE -"+(stats.attack()/2));
             drainStamina(stats.attack()/2);
         } else if (stats.stamina != stats.maxStamina) {
-            addToast(ToastType.STAMINA.color+"REGEN");
+            //addToast(ToastType.STAMINA.color+"REGEN");
             restoreStamina(stats.attack()/3);
         }
     }
@@ -115,7 +114,7 @@ public class PlayerFighter extends Fighter {
         int delta = stats.stamina;
         stats.stamina += amount;
         stats.stamina = Math.min(stats.stamina, stats.maxStamina);
-        addToast(ToastType.STAMINA, stats.stamina-delta);
+        addToast(ToastType.STAMINA, "+"+(stats.stamina-delta));
         lastStamina = stats.stamina;
         return true;
     }
@@ -127,7 +126,7 @@ public class PlayerFighter extends Fighter {
         int delta = stats.mana;
         stats.mana += amount;
         stats.mana = Math.min(stats.mana, stats.maxMana);
-        addToast(ToastType.MANA, stats.mana-delta);
+        addToast(ToastType.MANA, "+"+(stats.mana-delta));
         lastMana = stats.mana;
         return true;
     }

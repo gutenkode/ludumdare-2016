@@ -35,7 +35,7 @@ public class RoomLink extends Entity {
      * Used for determining where to place the player after linking.
      * @return
      */
-    public float[] getFrontTile() { // TODO test this!!
+    public float[] getFrontTile() {
         switch (direction) {
             case 0:
                 return new float[] {posX-hitboxW/2-.3f, posY};

@@ -1,18 +1,20 @@
-package terminal.program;
+package terminal.filesystem.program;
 
 import map.MapManager;
 import terminal.TerminalSession;
+import terminal.filesystem.Directory;
 
 /**
  *
  * @author Peter
  */
-public class SecurityProgram implements Program {
+public class SecurityProgram extends Program {
 
     private TerminalSession session;
 
-    @Override
-    public String name() { return "secr"; }
+    public SecurityProgram(Directory p) {
+        super("secr", p);
+    }
 
     @Override
     public void init(TerminalSession s) {

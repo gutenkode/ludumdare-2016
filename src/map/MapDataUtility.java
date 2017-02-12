@@ -211,7 +211,7 @@ public class MapDataUtility {
             );
             addTex(texAttrib, i,j, 0,0);
             addNormal(normAttrib, 0,0,1);
-            addShade(shadeAttrib, i,j, true);
+            addShade(shadeAttrib, i,j, 0);
         }
         
         // wall tile only drawn for shapes 1,3
@@ -234,12 +234,15 @@ public class MapDataUtility {
                             i,j,h2-(1+k),
                             i+1,j,h2-(1+k)
                     );
-                    if ((k & 1) == 0)
+                    if (k == 0)
                         addTex(texAttrib, i,j, 0,2);
                     else
                         addTex(texAttrib, i,j, 1,2);
+                    if (k == diff-1)
+                        addShade(shadeAttrib, i,j, 2);
+                    else
+                        addShade(shadeAttrib, i,j, -1);
                     addNormal(normAttrib, 0,1,0);
-                    addShade(shadeAttrib, i,j, false);
                 }
             }
         }
@@ -259,12 +262,15 @@ public class MapDataUtility {
                             i+1,j,h2-(1+k),
                             i+1,j+1,h2-(1+k)
                     );
-                    if ((k & 1) == 0)
+                    if (k == 0)
                         addTex(texAttrib, i,j, 0,2);
                     else
                         addTex(texAttrib, i,j, 1,2);
+                    if (k == diff-1)
+                        addShade(shadeAttrib, i,j, 3);
+                    else
+                        addShade(shadeAttrib, i,j, -1);
                     addNormal(normAttrib, -1,0,0);
-                    addShade(shadeAttrib, i,j, false);
                 }
             }
         }
@@ -283,12 +289,15 @@ public class MapDataUtility {
                             i,j+1,h2-(1+k),
                             i,j,h2-(1+k)
                     );
-                    if ((k & 1) == 0)
+                    if (k == 0)
                         addTex(texAttrib, i,j, 0,2);
                     else
                         addTex(texAttrib, i,j, 1,2);
+                    if (k == diff-1)
+                        addShade(shadeAttrib, i,j, 1);
+                    else
+                        addShade(shadeAttrib, i,j, -1);
                     addNormal(normAttrib, 1,0,0);
-                    addShade(shadeAttrib, i,j, false);
                 }
             }
         }
@@ -323,82 +332,141 @@ public class MapDataUtility {
      * Similar to addTex, but only a tile index is required.
      * Adds the "shade" texture, making the edges of platforms a darker color.
      * Any edge near a ledge or the edge of the map will have shade added to it.
-     * @param attrib
+     * @param attrib The Attribute to add to.
+     * @param x X coordinate of the tile.
+     * @param x X coordinate of the tile.
+     * @param type The type of tile shade is being applied to.
+     *             0: Floor tile
+     *             1,2,3: Left,front,right wall tile
+     *             Anything else: Use no shade (index 0)
      */
-    private static void addShade(Attribute attrib, int x, int y, boolean floor) {
+    private static void addShade(Attribute attrib, int x, int y, int type) {
         int ind = 0;
         
-        if (floor)
+        switch (type)
         {
-            int h = mapData.heightData[x][y];
+            case 0:
+                // this is a floor tile; determine the correct shade
+                // pattern based on surrounding tile heights
+                int h = mapData.heightData[x][y];
 
-            boolean l = false;
-            if (x > 0)
-                l = mapData.heightData[x-1][y] == h;
-            boolean r = false;
-            if (x < mapData.heightData.length-1)
-                r = mapData.heightData[x+1][y] == h;
-            boolean u = false;
-            if (y > 0)
-                u = mapData.heightData[x][y-1] == h;
-            boolean d = false;
-            if (y < mapData.heightData[0].length-1)
-                d = mapData.heightData[x][y+1] == h;
-        
-            // all sides
-            if (!l && !r && !u && !d)
-                ind = 11;
-            // single side
-            else if (!l && r && u && d)
-                ind = 3;
-            else if (l && !r && u && d)
-                ind = 2;
-            else if (l && r && !u && d)
-                ind = 1;
-            else if (l && r && u && !d)
-                ind = 4;
-            // L sides
-            else if (!l && r && !u && d)
-                ind = 7;
-            else if (!l && r && u && !d)
-                ind = 6;
-            else if (l && !r && !u && d)
-                ind = 8;
-            else if (l && !r && u && !d)
-                ind = 5;
-            // parallel sides
-            else if (!l && !r && u && d)
-                ind = 9;
-            else if (l && r && !u && !d)
-                ind = 10;
-            // three sides
-            else if (!l && !r && !u && d)
-                ind = 14;
-            else if (!l && !r && u && !d)
-                ind = 15;
-            else if (!l && r && !u && !d)
-                ind = 12;
-            else if (l && !r && !u && !d)
-                ind = 13;
-            else
-            {
-                ind = 0;
-                /*
-                boolean ul = mapData.heightData[x-1][y-1] == h;
-                boolean ur = mapData.heightData[x+1][y-1] == h;
-                boolean dl = mapData.heightData[x-1][y+1] == h;
-                boolean dr = mapData.heightData[x+1][y+1] == h;
-                
-                // single corners
-                if (!ul && ur && dl && dr)
+                boolean l = false;
+                if (x > 0)
+                    l = mapData.heightData[x-1][y] == h;
+                boolean r = false;
+                if (x < mapData.heightData.length-1)
+                    r = mapData.heightData[x+1][y] == h;
+                boolean u = false;
+                if (y > 0)
+                    u = mapData.heightData[x][y-1] == h;
+                boolean d = false;
+                if (y < mapData.heightData[0].length-1)
+                    d = mapData.heightData[x][y+1] == h;
+
+                // all sides
+                if (!l && !r && !u && !d)
                     ind = 11;
-                */
-            }
+                // single side
+                else if (!l && r && u && d)
+                    ind = 3;
+                else if (l && !r && u && d)
+                    ind = 2;
+                else if (l && r && !u && d)
+                    ind = 1;
+                else if (l && r && u && !d)
+                    ind = 4;
+                // L sides
+                else if (!l && r && !u && d)
+                    ind = 7;
+                else if (!l && r && u && !d)
+                    ind = 6;
+                else if (l && !r && !u && d)
+                    ind = 8;
+                else if (l && !r && u && !d)
+                    ind = 5;
+                // parallel sides
+                else if (!l && !r && u && d)
+                    ind = 9;
+                else if (l && r && !u && !d)
+                    ind = 10;
+                // three sides
+                else if (!l && !r && !u && d)
+                    ind = 14;
+                else if (!l && !r && u && !d)
+                    ind = 15;
+                else if (!l && r && !u && !d)
+                    ind = 12;
+                else if (l && !r && !u && !d)
+                    ind = 13;
+                else
+                {
+                    ind = 0;
+                    /*
+                    boolean ul = mapData.heightData[x-1][y-1] == h;
+                    boolean ur = mapData.heightData[x+1][y-1] == h;
+                    boolean dl = mapData.heightData[x-1][y+1] == h;
+                    boolean dr = mapData.heightData[x+1][y+1] == h;
+
+                    // single corners
+                    if (!ul && ur && dl && dr)
+                        ind = 11;
+                    */
+                }
+                break;
+            // wall tiles
+            case 1: // left
+            case 2: // back
+            case 3: // right
+                ind = 17;
+                boolean leftLower = false, rightLower = false;
+                switch (type) {
+                    case 1: // left
+                        if (y < mapData.heightData[0].length-1) {
+                            leftLower = mapData.heightData[x][y + 1] < mapData.heightData[x][y]; // if the tile to the left is lower than the current tile
+                            leftLower = leftLower && mapData.heightData[x - 1][y + 1] > mapData.heightData[x][y]; // if there is no wall directly to the left, still draw the full edge regardless
+                        }
+                        if (y > 0) {
+                            rightLower = mapData.heightData[x][y - 1] < mapData.heightData[x][y];
+                            rightLower = rightLower && mapData.heightData[x - 1][y - 1] > mapData.heightData[x][y];
+                        }
+                        break;
+                    case 2: // back
+                        if (x > 0) {
+                            leftLower = mapData.heightData[x - 1][y] < mapData.heightData[x][y];
+                            leftLower = leftLower && mapData.heightData[x - 1][y - 1] > mapData.heightData[x][y];
+                        }
+                        if (x < mapData.heightData.length-1) {
+                            rightLower = mapData.heightData[x + 1][y] < mapData.heightData[x][y];
+                            rightLower = rightLower && mapData.heightData[x + 1][y - 1] > mapData.heightData[x][y];
+                        }
+                        break;
+                    case 3: // right
+                        if (y > 0) {
+                            leftLower = mapData.heightData[x][y - 1] < mapData.heightData[x][y];
+                            leftLower = leftLower && mapData.heightData[x + 1][y - 1] > mapData.heightData[x][y];
+                        }
+                        if (y < mapData.heightData[0].length-1) {
+                            rightLower = mapData.heightData[x][y + 1] < mapData.heightData[x][y];
+                            leftLower = leftLower && mapData.heightData[x + 1][y + 1] > mapData.heightData[x][y];
+                        }
+                        break;
+                }
+                if (leftLower && rightLower) {}
+                else if (leftLower && !rightLower) {
+                    ind--;
+                } else if (!leftLower && rightLower) {
+                    ind++;
+                }
+                break;
+            default:
+                // apply no shade
+                break;
         }
-        
+
+        // calculate texture coordinates based on the value of 'ind'
         float indX = (int)(ind%Const.TILESHEET_X )*Const.TILE_SIZE_X;
         float indY = (int)(ind/Const.TILESHEET_X )*Const.TILE_SIZE_Y;
-
+        // and add it to the Attribute
         attrib.add(
             indX, indY,
             indX, indY+Const.TILE_SIZE_Y,

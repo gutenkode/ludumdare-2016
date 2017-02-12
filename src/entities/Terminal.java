@@ -9,6 +9,7 @@ import mote4.util.vertex.builder.StaticMeshBuilder;
 import org.lwjgl.opengl.GL11;
 import scenes.TerminalScene;
 import terminal.TerminalSession;
+import terminal.filesystem.DefaultFilesystem;
 
 /**
  *
@@ -63,7 +64,7 @@ public class Terminal extends Entity {
     @Override
     public void playerUse() {
         if (session == null)
-            session = new TerminalSession();
+            session = new TerminalSession(DefaultFilesystem.getDefaultFilesystem());
         TerminalScene.openTerminal(session);
     }
 

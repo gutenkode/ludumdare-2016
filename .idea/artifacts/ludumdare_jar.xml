@@ -1,5 +1,5 @@
 <component name="ArtifactManager">
-  <artifact type="jar" build-on-make="true" name="ludumdare:jar">
+  <artifact type="jar" name="ludumdare:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/ludumdare_jar</output-path>
     <root id="archive" name="ludumdare.jar">
       <element id="module-output" name="ludumdare" />

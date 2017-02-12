@@ -9,8 +9,10 @@ import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.mesh.Mesh;
 import mote4.util.vertex.mesh.ScrollingText;
 import nullset.Const;
-import terminal.program.DefaultProgram;
-import terminal.program.Program;
+import terminal.filesystem.Directory;
+import terminal.filesystem.Node;
+import terminal.filesystem.program.DefaultProgram;
+import terminal.filesystem.program.Program;
 
 /**
  * A "login session" for a terminal, created when the player uses a terminal entity.
@@ -28,8 +30,9 @@ public class TerminalSession {
     private Mesh writeLine;
     
     private Program rootProgram, activeProgram;
+    private Directory currentDirectory;
     
-    public TerminalSession() {
+    public TerminalSession(Directory d) {
         writtenLines = new ArrayList<>();
         inverted = new ArrayList<>();
         bufferedLines = new LinkedList<>();
@@ -39,6 +42,7 @@ public class TerminalSession {
         
         rootProgram = new DefaultProgram();
         rootProgram.init(this);
+        currentDirectory = d;
     }
     
     /**
@@ -123,6 +127,27 @@ public class TerminalSession {
     public void closeProgram() {
         activeProgram.close();
         activeProgram = null;
+    }
+
+    public Directory getCurrentDirectory() { return currentDirectory; }
+    public boolean changeDirectory(String s) {
+        for (Node n : currentDirectory.contents())
+            if (n.name().equals(s))
+                if (n instanceof Directory) {
+                    currentDirectory = (Directory)n;
+                    return true;
+                } else {
+                    return false;
+                }
+        return false;
+    }
+    public boolean moveToParentDirectory() {
+        Directory d = currentDirectory.parent();
+        if (d != null) {
+            currentDirectory = d;
+            return true;
+        }
+        return false;
     }
     
     public void render(ModelMatrix model) {

@@ -59,11 +59,20 @@ public class RootLayer extends Layer {
                 sceneFbo.makeCurrent();
                 transition.render(delta);
                 break;
-            default:
+            case TITLE:
+            case BATTLE:
                 sceneFbo.makeCurrent();
                 current[0].render(delta);
                 uiFbo.makeCurrent();
                 current[1].render(delta);
+                break;
+            case INGAME:
+            case EDITOR:
+                sceneFbo.makeCurrent();
+                current[0].render(delta);
+                uiFbo.makeCurrent();
+                current[1].render(delta);
+                current[2].render(delta);
                 break;
         }
     }

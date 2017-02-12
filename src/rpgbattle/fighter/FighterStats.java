@@ -36,7 +36,7 @@ public class FighterStats {
 
     public int attack() { return attack; }
     public int defense() {
-        if (fighter.hasStatus(StatEffect.DEF_UP))
+        if (fighter.hasStatus(StatEffect.DEF_UP)) // TODO check for skill modifiers
             return (int)(defense*1.5);
         return defense;
     }

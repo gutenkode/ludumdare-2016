@@ -11,6 +11,7 @@ import nullset.Const;
 import nullset.Input;
 import nullset.RootLayer;
 import terminal.TerminalSession;
+import terminal.filesystem.DefaultFilesystem;
 import ui.EditorUIManager;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -41,7 +42,7 @@ public class EditorUI implements Scene {
             if (Input.isKeyNew(Input.Keys.ESC))
             {
                 if (session == null)
-                    session = new TerminalSession();
+                    session = new TerminalSession(DefaultFilesystem.getDefaultFilesystem());
                 TerminalScene.openTerminal(session);
             }
             else {

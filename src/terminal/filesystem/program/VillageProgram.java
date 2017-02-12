@@ -1,23 +1,25 @@
-package terminal.program;
+package terminal.filesystem.program;
 import java.util.ArrayList;
 import map.MapLevelManager;
 import terminal.TerminalSession;
 import rpgsystem.Item;
 import rpgsystem.Inventory;
 import rpgbattle.BattleManager;
+import terminal.filesystem.Directory;
 
 /**
  *
  * @author Peter and Chance
  */
-public class VillageProgram implements Program {
+public class VillageProgram extends Program {
 
     private TerminalSession session;
     private boolean checkHowMany;
     private String it;
 
-    @Override
-    public String name() { return "villag"; }
+    public VillageProgram(Directory p) {
+        super("villag", p);
+    }
     
     
     @Override
