@@ -20,7 +20,7 @@ void main()
 	// shade texture component
     FragColor.rgb *= texture(tex_shade, shadeCoord).rgb;
 
-	DOFValue = vec4(1.0);
+	DOFValue = vec4(0,0,0,0);
 
 	FragColor = colorMult * (colorAdd + FragColor);
 }

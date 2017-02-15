@@ -24,7 +24,6 @@ public class Postprocess implements Scene {
 
     private static final int NUM_BLOOM_FBOS = 6;
     private Random random;
-    private static boolean finalPassShaderInitialized = false;
     private static int width, height;
     private static float dofCoef, dofCoefTarget;
     private static FBO combineScene, ditherScene, uiUpscaleScene,
@@ -40,11 +39,15 @@ public class Postprocess implements Scene {
 
     @Override
     public void update(double delta) {
+        // update fade-to-black effect
+        // call the specified callback when the fade is complete
+        // then unfade
         if (fadeToBlack) {
             colorMult *= 0.8;
             if (colorMult < 0.01) {
                 fadeToBlack = false;
                 callbackFunction.run();
+                System.gc(); // attempt to garbage collect after every fade operation
             }
         } else {
             if (colorMult < 1)
@@ -108,27 +111,17 @@ public class Postprocess implements Scene {
         
     // create a bloom texture from the combined scene
         createBloomTexture("fbo_combine");
-        
+
     // render final mix shader to screen
         framebuffer.makeCurrent();
         ShaderMap.use("quad_final");
-        
-        Uniform.varFloat("dofCoef", dofCoef);
+
         //Uniform.varFloat("bloomCoef", .5f);
-        Uniform.varFloat("colorMult", colorMult,colorMult,colorMult);
+        Uniform.varFloat("colorMult", colorMult,colorMult,colorMult); // for fading in/out
         Uniform.varFloat("rand", random.nextFloat(), random.nextFloat()); // random position for static
         
-        // TODO make this one-time initialization, must coordinate with sampler indices in MapManager
+        // other shader values are set once when resizeBuffers is called
         TextureMap.bindFiltered("fbo_dither"); // upscaled/dithered scene, binds to "tex_scene"
-        //Uniform.samplerAndTextureFiltered("tex_scene", 1, "fbo_dither");
-        Uniform.samplerAndTextureFiltered("tex_ui", 1, "fbo_ui_upscale"); // upscaled UI
-        Uniform.samplerAndTextureFiltered("tex_bloom", 2, "fbo_hdr"); // bloom scene
-        Uniform.samplerAndTextureFiltered("tex_dof", 3, "fbo_dof2"); // scene blur
-        Uniform.samplerAndTextureFiltered("tex_dofvalue", 4, "fbo_dofvalue"); // scene blur mix data
-        Uniform.samplerAndTextureFiltered("tex_noise", 5, "post_noise"); // postprocess
-        Uniform.samplerAndTextureFiltered("tex_vignette", 6, "post_vignette"); // postprocess
-        //Uniform.samplerAndTextureFiltered("tex_scanlines", 7, "post_scanlines");
-
         MeshMap.render("quad");
     }
     
@@ -297,13 +290,18 @@ public class Postprocess implements Scene {
         ShaderMap.use("quad_final");
         Uniform.varFloat("aspectRatio", (float)width/height);
         
-        if (!finalPassShaderInitialized)
-            initFinalPassShader();
+        initFinalPassShader();
     }
     private static void initFinalPassShader() {
-        finalPassShaderInitialized = true;
-        
-        // set uniforms here
+        ShaderMap.use("quad_final");
+        //Uniform.samplerAndTextureFiltered("tex_scene", -1, "fbo_dither");
+        Uniform.samplerAndTextureFiltered("tex_ui", 4, "fbo_ui_upscale"); // upscaled UI
+        Uniform.samplerAndTextureFiltered("tex_bloom", 5, "fbo_hdr"); // bloom scene
+        Uniform.samplerAndTextureFiltered("tex_dof", 6, "fbo_dof2"); // scene blur
+        Uniform.samplerAndTextureUnfiltered("tex_dofvalue", 7, "fbo_dofvalue"); // scene blur mix data
+        Uniform.samplerAndTextureFiltered("tex_noise", 8, "post_noise"); // postprocess
+        Uniform.samplerAndTextureFiltered("tex_vignette", 9, "post_vignette"); // postprocess
+        //Uniform.samplerAndTextureFiltered("tex_scanlines", -1, "post_scanlines");
     }
 
     @Override
@@ -312,9 +310,13 @@ public class Postprocess implements Scene {
     
     /**
      * Global weight to the depth-of-field interpolation.
-     * @param val -1 forces full blur, 1 forces no blur, 0 is default.
+     * @param val 1 forces full blur, -1 forces no blur, 0 is default.
      */
-    public static void setDOFCoef(float val) { dofCoefTarget = val; }
+    public static void setDOFCoef(float val) {
+        ShaderMap.use("quad_final");
+        dofCoefTarget = val;
+        Uniform.varFloat("dofCoef", dofCoef);
+    }
     public static void fadeOut(Runnable function) {
         // I really hope I know what I'm doing...
         fadeToBlack = true;

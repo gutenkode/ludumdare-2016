@@ -1,6 +1,7 @@
 package nullset;
 
 import map.MapLevelManager;
+import map.MapManager;
 import mote4.scenegraph.Layer;
 import mote4.scenegraph.Window;
 import mote4.util.shader.ShaderUtils;
@@ -25,7 +26,7 @@ public class Nullset_Ludumdare {
         //Window.initFullscreen();
         //Window.initWindowed(1920/2, 1080/2);
         Window.setWindowTitle("Nullset");
-        Window.setVsync(false);
+        Window.setVsync(true);
         Window.initWindowedPercent(.666, 16/9.0);
         
         Input.createCharCallback();
@@ -55,42 +56,13 @@ public class Nullset_Ludumdare {
     }
     
     private static void loadResources() {
-        ShaderUtils.addProgram("ingame_map.vert", "ingame_map.frag", "ingame_map");
-        ShaderUtils.addProgram("ingame_nolight.vert", "ingame_nolight.frag", "ingame_nolight");
-        //ShaderUtils.addProgram("ingame_object.vert", "ingame_object.frag", "ingame_object");
-        ShaderUtils.addProgram("texture.vert", "texture.frag", "texture");
-        ShaderUtils.addProgram("texture_color.vert", "texture_color.frag", "texture_color");
-        ShaderUtils.addProgram("color.vert", "color.frag", "color");
-        ShaderUtils.addProgram("titlebg.vert", "titlebg.frag", "titlebg");
-        ShaderUtils.addProgram("quad_dither.vert", "quad_dither.frag", "quad_dither");
-        ShaderUtils.addProgram("spritesheet_nolight.vert", "spritesheet_nolight.frag", "spritesheet_nolight");
-        ShaderUtils.addProgram("spritesheet_light.vert", "spritesheet_light.frag", "spritesheet_light");
-        ShaderUtils.addProgram("battle_bg.vert", "battle_bg.frag", "battle_bg");
-        /*
-        String vertSource = ShaderUtils.loadSource("shadowCubeMap.vert");
-        String geomSource = ShaderUtils.loadSource("shadowCubeMap.geom");
-        String fragSource = ShaderUtils.loadSource("shadowCubeMap.frag");
-        int vert = ShaderUtils.compileShaderFromSource(vertSource, ShaderUtils.VERTEX);
-        int geom = ShaderUtils.compileShaderFromSource(geomSource, ShaderUtils.GEOMETRY);
-        int frag = ShaderUtils.compileShaderFromSource(fragSource, ShaderUtils.FRAGMENT);
-        int prog = ShaderUtils.addProgram(new int[] {vert, geom, frag}, "shadowCubeMap");
-        */
-        ShaderUtils.addProgram("shadowMap.vert", "shadowMap.frag", "shadowMap");
-        ShaderUtils.addProgram("shadowMap_tex.vert", "shadowMap_tex.frag", "shadowMap_tex");
-        
-        ShaderUtils.addProgram("quad.vert", "quad.frag", "quad");
-        ShaderUtils.addProgram("quad_transition.vert", "quad_transition.frag", "quad_transition");
-        ShaderUtils.addProgram("quad.vert", "quad_vertBlur.frag", "quad_vertBlur");
-        ShaderUtils.addProgram("quad.vert", "quad_horizBlur.frag", "quad_horizBlur");
-        ShaderUtils.addProgram("quad.vert", "quad_dofBlur.frag", "quad_dofBlur");
-        ShaderUtils.addProgram("quad.vert", "quad_hdr.frag", "quad_hdr");
-        ShaderUtils.addProgram("quad.vert", "quad_final.frag", "quad_final");
-        
+        TextureMap.loadIndex("index.txt");
+        ShaderUtils.loadIndex("index.txt");
+
         FontUtils.loadMetric("font/misterpixel/misterpixel_metric","font_1");
         FontUtils.loadMetric("font/6px/6px_metric","6px");
         FontUtils.loadMetric("font/terminal/terminal_metric","terminal");
         FontUtils.useMetric("font_1");
-        TextureMap.loadIndex("index.txt");
                 
         MeshMap.add(StaticMeshBuilder.loadQuadMesh(), "quad");
         MeshMap.add(StaticMeshBuilder.constructVAOFromOBJ("cube", false), "cube");

@@ -3,6 +3,7 @@ tileset/foundation3_NRM 		tileset_1_NRM
 tileset/shade			tileset_shade
 
 ui/title			ui_title
+ui/titlebg			ui_titlebg
 ui/scalablemenu			ui_scalablemenu
 ui/scalablemenu_blur		ui_scalablemenu_blur
 ui/arrow_cursor			ui_cursor
@@ -52,6 +53,7 @@ object/crate			obj_crate
 object/barrel			obj_barrel
 object/fluorescent		obj_fluorescent
 object/ceiling			obj_ceiling
+object/chain			obj_chain
 
 color/test			color_test
 

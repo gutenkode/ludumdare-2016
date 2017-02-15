@@ -1,18 +1,13 @@
 package scenes;
 
-import map.MapLevelManager;
 import map.MapManager;
 import mote4.scenegraph.Scene;
-import mote4.scenegraph.target.DepthTexture;
+import mote4.scenegraph.target.DepthBuffer;
 import mote4.scenegraph.target.Target;
-import mote4.util.shader.Uniform;
-import mote4.util.matrix.CubeMapMatrix;
 import mote4.util.matrix.GenericMatrix;
 import mote4.util.matrix.Transform;
-import mote4.util.shader.ShaderMap;
-import org.lwjgl.opengl.GL11;
+
 import static org.lwjgl.opengl.GL11.*;
-import rpgbattle.BattleManager;
 
 /**
  * Renders the 3D overworld scene.
@@ -20,36 +15,33 @@ import rpgbattle.BattleManager;
  */
 public class Ingame implements Scene {
     
-    private static final DepthTexture depthTexture;
+    private static final DepthBuffer depthTexture;
 
-    private static boolean firstPerson = false;
+    public static final boolean firstPerson = false;
     
     static {
-        depthTexture = new DepthTexture(1024,1024);
+        depthTexture = new DepthBuffer(1024,1024);
         depthTexture.addToTextureMap("fbo_depth");
+        MapManager.initShaders();
     }
     
     private Transform trans;
-    private final GenericMatrix shadowProj;
-    private int playerRestoreStaminaDelay;
+    private final GenericMatrix shadowProj; // defines the shadow camera, combines projection with view and model transforms
     private float[] flashlightDir = new float[2];
     
     public Ingame() {
         trans = new Transform();
         shadowProj = new GenericMatrix("depthProj");
+        shadowProj.setPerspective(1, 1, .1f, 10, 140); // FOV is in degrees
+        shadowProj.scale(-1, 1, 1);
+        shadowProj.rotate(-(float)Math.PI/2, 1, 0, 0); // face forward, not down
+        shadowProj.push();
     }
 
     @Override
     public void update(double delta) {
         // update entities
         MapManager.update();
-        
-        // restore stamina
-        if (playerRestoreStaminaDelay <= 0) {
-            playerRestoreStaminaDelay = 5;
-            BattleManager.getPlayer().restoreStamina(1);
-        } else
-            playerRestoreStaminaDelay--;
 
         if (firstPerson) {
             double[] r = MapManager.getPlayer().cameraRot();
@@ -73,7 +65,7 @@ public class Ingame implements Scene {
             // normal camera view
             trans.view.setIdentity();
             trans.view.translate(0, 0, -5); // pull camera back
-            trans.view.rotate(-(float) Math.PI / 4, 1, 0, 0); // angle down, otherwise view is top-down
+            trans.view.rotate(-(float) Math.PI / 3.5f, 1, 0, 0); // angle down, otherwise view is top-down
 
             // dynamic angle changing based on the players location in the current map
             int[] mapSize = MapManager.currentMapSize();
@@ -87,19 +79,14 @@ public class Ingame implements Scene {
             trans.view.scale(1, -1, 1);
         }
         // shadow map camera view
-        shadowProj.setIdentity();
-        
-        //shadowProj.setOrthographic(left, top, right, bottom, near, far);
-        //shadowProj.setOrthographic(-1, -1, 1, 1, 0, 10);
-        //shadowProj.rotate(-(float)Math.PI/2+.3f, 1, 0, 0); // face forward, not down
-        
-        shadowProj.setPerspective(1, 1, .1f, 10, 140); // FOV is in degrees
-        shadowProj.scale(-1, 1, 1);
-        shadowProj.rotate(-(float)Math.PI/2, 1, 0, 0); // face forward, not down
-
+        shadowProj.pop();
+        shadowProj.push();
         //shadowProj.translate(.5f,0,-.25f); // offset for first person view
         shadowProj.rotate(flashlightDir[0], 0, 0, 1); // rotate to match flashlight
-        shadowProj.translate(-MapManager.getPlayer().posX(), -MapManager.getPlayer().posY(), -MapManager.getPlayer().elevatorHeight()-1.1f);
+        // translate to player position
+        shadowProj.translate(-MapManager.getPlayer().posX(),
+                             -MapManager.getPlayer().posY(),
+                             -MapManager.getPlayer().elevatorHeight()-1.1f);
         
     }
 
@@ -112,7 +99,7 @@ public class Ingame implements Scene {
         depthTexture.makeCurrent();
         glClearColor(1, 1, 1, 1); // for depth buffer values
         glClear(GL_DEPTH_BUFFER_BIT);
-        MapManager.renderForShadow(trans.model, shadowProj);
+        MapManager.renderForShadow(shadowProj);
         
     // normal scene, using contents of depth texture for shadow rendering
         t.makeCurrent();

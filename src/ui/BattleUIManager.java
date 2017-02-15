@@ -102,7 +102,7 @@ public class BattleUIManager implements MenuHandler {
         model.translate(RootLayer.width()/2, RootLayer.height()-60);
         BattleManager.getPlayer().renderToast(model);
         
-    ShaderMap.use("texture"); // all remaining UI elements use the texture shader
+    ShaderMap.use("texture"); // log menu is not blurred
     trans.makeCurrent();
         // LogMenu
         model.setIdentity();
@@ -110,6 +110,9 @@ public class BattleUIManager implements MenuHandler {
                         .5f*Const.UI_SCALE);
         model.makeCurrent();
         LogMenu.render(model);
+
+    ShaderMap.use("texture_uiblur"); // all remaining UI elements use the texture shader with blurring
+    trans.makeCurrent();
         
         if (showDialogue) {
             model.setIdentity();

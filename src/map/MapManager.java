@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import entities.RoomLink;
 import mote4.util.matrix.GenericMatrix;
+import mote4.util.matrix.ModelMatrix;
 import mote4.util.matrix.Transform;
 import mote4.util.matrix.TransformationMatrix;
 import mote4.util.shader.ShaderMap;
@@ -29,9 +30,9 @@ public class MapManager {
     // temporary list of entities that should be deleted, to avoid ConcurrentModificationExceptions
     private static ArrayList<Entity> deleteList = new ArrayList<>(); 
     private static String newMapName; // stored while a fadeout is performed
-
     // data for entity lights in shaders
     private static float[] eLightPos, eLightColor;
+    private static ModelMatrix shadowModel = new ModelMatrix(); // used when rendering shadows
 
     // initialization and timelines
 
@@ -66,6 +67,18 @@ public class MapManager {
         player = currentTimeline.getPlayer();
         //player.onRoomInit();
         runOnRoomInit();
+    }
+    public static void initShaders() {
+        // initialize uniform values once
+        ShaderMap.use("ingame_map");
+        Uniform.varFloat("ambient", 0,0,0);
+        Uniform.samplerAndTextureFiltered("shadowMap", 1, "fbo_depth");
+        Uniform.samplerAndTextureUnfiltered("tex_shade", 2, "tileset_shade");
+        Uniform.samplerAndTextureUnfiltered("tex_bump", 3, "tileset_1_NRM");
+
+        ShaderMap.use("spritesheet_light");
+        Uniform.varFloat("ambient", 0,0,0);
+        Uniform.samplerAndTextureFiltered("shadowMap", 1, "fbo_depth");
     }
 
     // update and room load process methods
@@ -169,6 +182,13 @@ public class MapManager {
                 numLights++;
             }
         }
+        // send the data to shaders
+        ShaderMap.use("ingame_map");
+        Uniform.arrayFloat("eLightPos",3, eLightPos);
+        Uniform.arrayFloat("eLightColor",3, eLightColor);
+        ShaderMap.use("spritesheet_light");
+        Uniform.arrayFloat("eLightPos",3, eLightPos);
+        Uniform.arrayFloat("eLightColor",3, eLightColor);
     }
 
     // rendering
@@ -176,8 +196,10 @@ public class MapManager {
     /**
      * Renders static map mesh, entity sprites, and static object meshes using
      * lighting shaders and textures.
-     * @param trans
-     * @param shadowProj
+     * @param trans Transform for the scene, includes camera information.
+     *              It is passed in since it must be bound to multiple shaders.
+     * @param shadowProj Bound as "depthProj" in the shader, the projection used for the shadow view.
+     * @param flashlightDir Flashlight angle, in spherical coordinates.
      */
     public static void render(Transform trans, GenericMatrix shadowProj, float[] flashlightDir) {
         float[] lightVector = new float[3];
@@ -187,19 +209,12 @@ public class MapManager {
         
     // render static map mesh
         ShaderMap.use("ingame_map");
+        TextureMap.bindUnfiltered("tileset_1");
         shadowProj.makeCurrent();
-        Uniform.arrayFloat("eLightPos",3, eLightPos);
-        Uniform.arrayFloat("eLightColor",3, eLightColor);
-        Uniform.varFloat("ambient", 0,0,0);
         Uniform.varFloat("flashlightAngle", lightVector);
         Uniform.varFloat("lightPos", player.posX(),
                                                     player.posY()+player.hitboxH(),
                                                     player.elevatorHeight()+1f);
-        Uniform.samplerAndTextureFiltered("shadowMap", 1, "fbo_depth");
-        
-        TextureMap.bindUnfiltered("tileset_1");
-        Uniform.samplerAndTextureUnfiltered("tex_shade", 2, "tileset_shade");
-        Uniform.samplerAndTextureUnfiltered("tex_bump", 3, "tileset_1_NRM");
         trans.model.setIdentity();
         trans.makeCurrent();
         currentTimeline.getMapData().render();
@@ -207,15 +222,10 @@ public class MapManager {
     // render entity tilesheets
         ShaderMap.use("spritesheet_light");
         shadowProj.makeCurrent();
-        Uniform.arrayFloat("eLightPos",3, eLightPos);
-        Uniform.arrayFloat("eLightColor",3, eLightColor);
-        Uniform.varFloat("ambient", 0,0,0);
         Uniform.varFloat("flashlightAngle", lightVector);
         Uniform.varFloat("lightPos", player.posX(),
                                                     player.posY()+player.hitboxH(),
                                                     player.elevatorHeight()+1f);
-        Uniform.samplerAndTextureFiltered("shadowMap", 1, "fbo_depth");
-        
         trans.makeCurrent();
         player.render(trans.model);
         for (Entity e : currentTimeline.getEntities()) {
@@ -242,11 +252,10 @@ public class MapManager {
     /**
      * Renders meshes with only data needed for constructing the depth texture
      * for shadow mapping.
-     * @param shadowModel
-     * @param shadowProj
+     * @param shadowProj Projection for the shadow camera.
      */
-    public static void renderForShadow(TransformationMatrix shadowModel, GenericMatrix shadowProj) {
-        ShaderMap.use("shadowMap");
+    public static void renderForShadow(GenericMatrix shadowProj) {
+        ShaderMap.use("shadowMap"); // we don't care about textures when rendering the static mesh shadows
         shadowProj.makeCurrent();
         
         // render static map mesh
@@ -254,17 +263,16 @@ public class MapManager {
         shadowModel.makeCurrent();
         currentTimeline.getMapData().render();
         
-        ShaderMap.use("shadowMap_tex");
+        ShaderMap.use("shadowMap_tex"); // entity textures may have transparent parts, so texture data must be checked
         shadowProj.makeCurrent();
         
-        // render entity tilesheets
+        // render entity tilesheets, the player is not rendered
         for (Entity e : currentTimeline.getEntities()) {
             // add a check for whether this entity should render shadows
-            shadowModel.setIdentity();
-            shadowModel.makeCurrent();
+            shadowModel.setIdentity(); // entities don't reset the model matrix
+            //shadowModel.makeCurrent();
             e.render(shadowModel);
         }
-        
     }
 
     // state management methods

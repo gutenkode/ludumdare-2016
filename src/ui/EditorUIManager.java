@@ -38,7 +38,7 @@ public class EditorUIManager implements MenuHandler {
     public static void render(Transform trans) {
         ModelMatrix model = trans.model;
 
-        ShaderMap.use("texture");
+        ShaderMap.use("texture_uiblur");
         trans.makeCurrent();
         TextureMap.bindUnfiltered("font_1");
 

@@ -34,7 +34,6 @@ void main()
 	vertexPos = vec3(modelMatrix * VertexIn);
 	normalMatrix = mat3(NormalIn1,NormalIn2,NormalIn3);
 
-	// the position of this vertex in the same space as the shadow map
 	// an offset matrix is used to convert from range -1:1 to 0:1 for texture lookups
 	mat4 biasMatrix = mat4(
 		0.5, 0.0, 0.0, 0.0,
@@ -42,5 +41,6 @@ void main()
 		0.0, 0.0, 0.5, 0.0,
 		0.5, 0.5, 0.5, 1.0
 	);
+	// the position of this vertex in the same space as the shadow map
 	shadowCoord = biasMatrix * depthProj * modelMatrix * VertexIn;
 }

@@ -29,7 +29,7 @@ public class TitleUI implements Scene {
     @Override
     public void render(double delta) {
         glDisable(GL_DEPTH_TEST);
-        glClear(GL_COLOR_BUFFER_BIT);
+        //glClear(GL_COLOR_BUFFER_BIT);
 
         ShaderMap.use("texture");
         quadTrans.makeCurrent();

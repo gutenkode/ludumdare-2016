@@ -31,6 +31,8 @@ StaticObject,5,1,Crate
 StaticObject,4,3,Barrel
 StaticObject,5,1.5,Fluorescent
 StaticObject,1,1,Ceiling
+StaticObject,2,2,Chain,02
+StaticObject,4,2,Chain,12
 Elevator,5,5,2,true
 Enemy,3,3,SLIME
 Water,-2

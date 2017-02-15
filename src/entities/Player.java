@@ -10,6 +10,7 @@ import mote4.util.vertex.mesh.Mesh;
 import nullset.Input;
 import org.lwjgl.opengl.GL11;
 import rpgbattle.BattleManager;
+import scenes.Ingame;
 
 /**
  *
@@ -19,6 +20,7 @@ public class Player extends Entity {
     
     private static Mesh mesh;
 
+    private int restoreStaminaDelay;
     private static int[][] dirMat = new int[][] {{5,4,3},
                                                  {6,0,2},
                                                  {7,0,1}};
@@ -129,8 +131,11 @@ public class Player extends Entity {
                 accel = walkSpeed;
         }
 
-        float[] chg = topDownMovement(accel);
-        //float[] chg = firstPersonMovement(accel);
+        float[] chg;
+        if (Ingame.firstPerson)
+            chg = firstPersonMovement(accel);
+        else
+            chg = topDownMovement(accel);
         
         if (running && (chg[0] != 0 || chg[1] != 0)) {
             if (drainStaminaDelay <= 0) {
@@ -157,6 +162,13 @@ public class Player extends Entity {
         
         velX *= .75f;
         velY *= .75f;
+
+        // restore stamina
+        if (restoreStaminaDelay <= 0) {
+            restoreStaminaDelay = 5;
+            BattleManager.getPlayer().restoreStamina(1);
+        } else
+            restoreStaminaDelay--;
     }
     private float[] topDownMovement(float accel) {
         float chgX = 0;

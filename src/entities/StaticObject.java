@@ -8,6 +8,8 @@ import mote4.util.vertex.mesh.MeshMap;
 
 import java.util.Random;
 
+import static org.lwjgl.opengl.GL11.*;
+
 /**
  *
  * @author Peter
@@ -20,10 +22,11 @@ public class StaticObject extends Entity {
         BARREL,
         CRATE,
         FLUORESCENT,
-        CEILING;
+        CEILING,
+        CHAIN;
     }
     
-    private float val0, val1;
+    private float floatHeight, val0, val1;
     
     private final Type TYPE;
     private final boolean solid;
@@ -63,6 +66,24 @@ public class StaticObject extends Entity {
                 TYPE = Type.CEILING;
                 solid = false;
                 break;
+            case "Chain":
+                TYPE = Type.CHAIN;
+                solid = true;
+                posX = x;
+                posY = y;
+                val1 = (int)val%10;
+                val1 /= 2;
+                val0 = (int)val/10;
+                if (val0 == 0) {
+                    hitboxW = val1;
+                    posX += val1;
+                    hitboxH = 0;
+                } else {
+                    hitboxH = val1;
+                    posY += val1;
+                    hitboxW = 0;
+                }
+                break;
             default:
                 throw new IllegalArgumentException("Unrecognized StaticObject type: "+model);
         }
@@ -70,7 +91,27 @@ public class StaticObject extends Entity {
 
     @Override
     public void onRoomInit() {
-        tileHeight = MapManager.getTileHeight((int)posX, (int)posY);
+        floatHeight = MapManager.getTileHeight((int)posX, (int)posY);
+        switch (TYPE) {
+            case BARREL:
+                floatHeight += val0;
+                break;
+            case CRATE:
+                floatHeight += val0+.4f;
+                break;
+            case CEILING:
+                floatHeight = 2.2f;
+                break;
+            case FLUORESCENT:
+                floatHeight += 1.75f;
+                break;
+            case CHAIN:
+                floatHeight = 0;
+                break;
+            default:
+                break;
+        }
+        tileHeight = (int)floatHeight;
     }
 
     @Override
@@ -102,7 +143,7 @@ public class StaticObject extends Entity {
         switch (TYPE) {
             case BARREL:
                 Uniform.varFloat("spriteInfo", 1,1,0);
-                model.translate(posX, posY, tileHeight+val0);
+                model.translate(posX, posY, floatHeight);
                 model.rotate((float)Math.PI/2, 1, 0, 0);
                 model.scale(.65f, .7f, .65f);
                 model.rotate(val1, 0, 1, 0);
@@ -112,7 +153,7 @@ public class StaticObject extends Entity {
                 break;
             case CRATE:
                 Uniform.varFloat("spriteInfo", 1,1,0);
-                model.translate(posX, posY, tileHeight+val0+.4f);
+                model.translate(posX, posY, floatHeight);
                 model.scale(.4f,.4f,.4f);
                 model.rotate(val1, 0, 0, 1);
                 model.makeCurrent();
@@ -125,7 +166,7 @@ public class StaticObject extends Entity {
                     Uniform.varFloat("spriteInfoEmissive", 2, 1, 1);
                     Uniform.varFloat("emissiveMult", 3);
                 }
-                model.translate(posX, posY, tileHeight+1.75f);
+                model.translate(posX, posY, floatHeight);
                 model.scale(.25f,.75f,1);
                 model.rotate((float)Math.PI, 1, 0, 0);
                 model.makeCurrent();
@@ -135,7 +176,7 @@ public class StaticObject extends Entity {
                 break;
             case CEILING:
                 //model.scale(1,1,1);
-                model.translate(posX, posY, 2.2f);
+                model.translate(posX, posY, floatHeight);
                 //model.rotate((float)Math.PI, 1, 0, 0);
                 //model.makeCurrent();
                 TextureMap.bindUnfiltered("obj_ceiling");
@@ -157,6 +198,24 @@ public class StaticObject extends Entity {
                     model.translate(-4*2, 2);
                 }
                 break;
+            case CHAIN:
+                Uniform.varFloat("spriteInfo", 1/(val1*2),.5f,0);
+                model.translate(posX, posY, floatHeight+1);
+                model.rotate((float)Math.PI/2, 1, 0, 0);
+                model.rotate(((float)Math.PI/2)*val0, 0, 1, 0);
+                model.scale(val1, -1,1);
+                model.makeCurrent();
+                TextureMap.bindUnfiltered("obj_chain");
+                glEnable(GL_CULL_FACE);
+                {
+                    glCullFace(GL_BACK);
+                    MeshMap.render("quad");
+                    model.rotate((float) Math.PI, 0, 1, 0);
+                    model.makeCurrent();
+                    MeshMap.render("quad");
+                }
+                glDisable(GL_CULL_FACE);
+                break;
         }
     }
 
@@ -166,7 +225,7 @@ public class StaticObject extends Entity {
     @Override
     public boolean hasLight() { return TYPE == Type.FLUORESCENT && b1; }
     @Override
-    public float[] lightPos() { return new float[] {posX,posY,tileHeight+1.75f}; }
+    public float[] lightPos() { return new float[] {posX,posY,floatHeight}; }
     @Override
     public float[] lightColor() { return new float[] {4,4,4}; }
 }

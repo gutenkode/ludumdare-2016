@@ -46,7 +46,8 @@ public class TitleMenu implements  SelectionMenuBehavior {
                 handler.openMenu(new OptionsMenu(handler));
                 break;
             case "Editor":
-                RootLayer.setState(RootLayer.State.EDITOR);
+                Postprocess.fadeOut(this::editorCallback);
+                Input.pushLock(Input.Lock.FADE);
                 break;
             case "Quit":
                 Window.destroy();
@@ -56,6 +57,10 @@ public class TitleMenu implements  SelectionMenuBehavior {
 
     private void newGameCallback() {
         RootLayer.setState(RootLayer.State.INGAME);
+        Input.popLock();
+    }
+    private void editorCallback() {
+        RootLayer.setState(RootLayer.State.EDITOR);
         Input.popLock();
     }
 

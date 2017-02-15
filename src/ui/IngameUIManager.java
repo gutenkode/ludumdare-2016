@@ -96,7 +96,7 @@ public class IngameUIManager implements MenuHandler {
             PlayerStatBar.render(54, RootLayer.height()-42-Const.UI_SCALE/2+(int)(60*statBarSlide), trans);
 
         // initialize state for the rest of the UI
-        ShaderMap.use("texture");
+        ShaderMap.use("texture_uiblur");
         trans.view.setIdentity();
         trans.model.setIdentity();
         trans.makeCurrent();

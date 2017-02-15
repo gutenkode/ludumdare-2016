@@ -24,6 +24,9 @@ height=7
 RoomLink,6,2,1,1,0,1c_hub
 RoomLink,0,4,1,1,2,1e_laserwall
 
+StaticObject,4,4,Chain,02
+StaticObject,4,4,Chain,12
+StaticObject,1,6,Chain,03
 Enemy,3,4,SLIME
 ScriptTrigger,3,2,3,1,enemyTutorial
 KeyDoor,5,2,0,1

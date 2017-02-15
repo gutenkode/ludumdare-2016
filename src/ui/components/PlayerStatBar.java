@@ -114,7 +114,7 @@ public class PlayerStatBar {
         
     // RENDER BORDER BOX
         
-        ShaderMap.use("texture");
+        ShaderMap.use("texture_uiblur");
         trans.makeCurrent();
         
         Uniform.varFloat("colorAdd", BattleManager.getPlayer().updateFlash());

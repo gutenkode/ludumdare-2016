@@ -27,13 +27,11 @@ public class BattleUI implements Scene {
 
     @Override
     public void render(double delta) {
-        glClear(GL_COLOR_BUFFER_BIT);
+        //glClear(GL_COLOR_BUFFER_BIT);
         glDisable(GL_DEPTH_TEST);
-        
-        ShaderMap.use("texture");
+
         trans.model.setIdentity();
         trans.makeCurrent();
-        
         BattleUIManager.render(trans);
     }
     

@@ -134,7 +134,7 @@ public class TerminalScene implements Scene {
      */
     public static void openTerminal(TerminalSession s) {
         if (!terminalOpen) {
-            Postprocess.setDOFCoef(-1);
+            Postprocess.setDOFCoef(1);
             session = s;
             Input.pushLock(Input.Lock.TERMINAL);
             Input.recordTyped(true);

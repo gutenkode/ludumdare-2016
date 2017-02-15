@@ -2,11 +2,11 @@ package nullset;
 
 import mote4.scenegraph.Layer;
 import mote4.scenegraph.Scene;
-import mote4.scenegraph.target.FBO;
 import mote4.scenegraph.target.MultiColorFBO;
 import mote4.util.texture.TextureMap;
-import rpgbattle.BattleManager;
 import scenes.*;
+
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Created by Peter on 2/10/17.
@@ -25,8 +25,7 @@ public class RootLayer extends Layer {
     private static Scene[] current, title, ingame, battle, editor;
     private static Scene transition;
 
-    private MultiColorFBO sceneFbo;
-    private FBO uiFbo;
+    private MultiColorFBO sceneFbo, uiFbo;
 
     static {
         title = new Scene[] {new Title(), new TitleUI()};
@@ -54,6 +53,9 @@ public class RootLayer extends Layer {
     }
     @Override
     public void render(double delta) {
+        uiFbo.makeCurrent(0); // clear the UI buffer now to avoid problems with clearing the FBO buffer
+        glClear(GL_COLOR_BUFFER_BIT);
+
         switch (state) {
             case BATTLE_INTRO:
                 sceneFbo.makeCurrent();
@@ -94,9 +96,11 @@ public class RootLayer extends Layer {
         sceneFbo.addToTextureMap("fbo_dofvalue",1);
         if (uiFbo != null)
             uiFbo.destroy();
-        uiFbo = new FBO(renderWidth,renderHeight,false,false,null);
+        int[] buffers = new int[] {-1, sceneFbo.getColorBufferID(1)};
+        uiFbo = new MultiColorFBO(renderWidth,renderHeight,false,false,buffers);
+        //uiFbo = new FBO(renderWidth,renderHeight,false,false,null);
         TextureMap.delete("fbo_ui");
-        uiFbo.addToTextureMap("fbo_ui");
+        uiFbo.addToTextureMap("fbo_ui",0);
 
         Postprocess.resizeBuffers(renderWidth, renderHeight);
 

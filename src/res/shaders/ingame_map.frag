@@ -11,13 +11,14 @@ layout(location = 0) out vec4 FragColor;
 layout(location = 1) out vec4 DOFValue;
 
 uniform vec3 lightPos;
-uniform vec3 ambient = vec3(.1f);
+uniform vec3 ambient = vec3(0.0);
 uniform float flashlightAmbient = .2;
 
 uniform sampler2D tex_diffuse;
 uniform sampler2D tex_shade;
 uniform sampler2D tex_bump;
 uniform sampler2DShadow shadowMap; // shadow depth texture
+uniform samplerCubeShadow shadowCubeMap;
 
 uniform vec4 colorMult = vec4(1.0);
 uniform vec4 colorAdd = vec4(0.0);
@@ -54,7 +55,7 @@ void main()
 
 	// depth of field interpolation value
 	//float dofLength = length(lightPos.y-vertexPos.y);
-	DOFValue = vec4(1.0);//vec4(1.0-1.0/pow(dofLength,3.0),0,0,1);//vec4(fogDepth);
+	DOFValue = vec4(0,0,0,1);//vec4(1.0-1.0/pow(dofLength,3.0),0,0,1);//vec4(fogDepth);
 
     // bias is used to reduce weird artifacts in shadow, "shadow acne"
     float bias = 0.003*tan(acos(max(dot(bumpNormal,L),0)));

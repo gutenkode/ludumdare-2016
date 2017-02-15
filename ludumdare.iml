@@ -9,5 +9,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="json" level="application" />
     <orderEntry type="library" exported="" name="mote4" level="application" />
+    <orderEntry type="library" exported="" name="lwjgl" level="application" />
   </component>
 </module>

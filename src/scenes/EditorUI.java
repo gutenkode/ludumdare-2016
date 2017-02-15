@@ -57,9 +57,9 @@ public class EditorUI implements Scene {
     @Override
     public void render(double delta) {
         glDisable(GL_DEPTH_TEST);
-        glClear(GL_COLOR_BUFFER_BIT);
+        //glClear(GL_COLOR_BUFFER_BIT);
 
-        renderTilesetPreview();
+        //renderTilesetPreview();
         renderMapPreview();
 
         if (Input.currentLock() != Input.Lock.TERMINAL)

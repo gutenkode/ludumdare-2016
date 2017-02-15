@@ -31,10 +31,10 @@ void main()
 	float dofvalue = texture(tex_dofvalue, texCoord).r + dofCoef;
 	//dofvalue *=2;
 	dofvalue = clamp(dofvalue, 0,1);
-	dofvalue = min(dofvalue, 1-ceil(ui.a)); // if there is UI here, use the full blurred texture
+	//dofvalue = min(dofvalue, 1-ceil(ui.a)); // if there is UI here, use the full blurred texture
 	//FragColor = v1*(texCoord.y) + v2*(1-texCoord.y);
 	//dofvalue = 0.0; // 0 = blur, 1 = solid
-	FragColor = mix(v2, v1, dofvalue);
+	FragColor = mix(v1, v2, dofvalue);
 
 	//FragColor = texture(tex_dof, texCoord);
 
@@ -42,7 +42,7 @@ void main()
 	FragColor = ui*(ui.a) + FragColor*(1-ui.a);
 
 	// bloom
-	FragColor += /*texture(tex_scanlines, texCoord) */ texture(tex_bloom, texCoord) * .7 * bloomCoef;
+	FragColor += /*texture(tex_scanlines, texCoord) */ texture(tex_bloom, texCoord) * bloomCoef;
 
 	// noise and vignette
 	vec2 noiseCoord = (texCoord + rand) * vec2(aspectRatio,1);
@@ -51,9 +51,9 @@ void main()
 	//FragColor *= texture(tex_scanlines, texCoord*vec2(1,128));
 
 	FragColor.rgb *= colorMult; // used for fading in/out
-	//FragColor.a = 1;
+	//FragColor = vec4(vec3(dofvalue),1);
 
 	// gamma correction, 2.2 is normal
-    float gamma = 2.0;
+    //float gamma = 2.0;
     //FragColor.rgb = pow(FragColor.rgb, vec3(1.0/gamma));
 }

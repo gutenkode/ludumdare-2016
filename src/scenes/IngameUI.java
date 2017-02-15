@@ -30,7 +30,7 @@ public class IngameUI implements Scene {
 
     @Override
     public void render(double delta) {
-        glClear(GL_COLOR_BUFFER_BIT);
+        //glClear(GL_COLOR_BUFFER_BIT);
         glDisable(GL_DEPTH_TEST);
         
         IngameUIManager.render(trans);
