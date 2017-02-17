@@ -3,9 +3,14 @@ package scenes;
 import map.MapManager;
 import mote4.scenegraph.Scene;
 import mote4.scenegraph.target.DepthBuffer;
+import mote4.scenegraph.target.DepthCubeBuffer;
 import mote4.scenegraph.target.Target;
+import mote4.util.matrix.CubeMapMatrix;
 import mote4.util.matrix.GenericMatrix;
 import mote4.util.matrix.Transform;
+import mote4.util.matrix.ViewMatrix;
+import mote4.util.shader.ShaderMap;
+import mote4.util.shader.Uniform;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -15,27 +20,33 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class Ingame implements Scene {
     
-    private static final DepthBuffer depthTexture;
+    private static final DepthCubeBuffer depthTexture;
 
     public static final boolean firstPerson = false;
     
     static {
-        depthTexture = new DepthBuffer(1024,1024);
+        depthTexture = new DepthCubeBuffer(1024);
         depthTexture.addToTextureMap("fbo_depth");
         MapManager.initShaders();
     }
     
     private Transform trans;
-    private final GenericMatrix shadowProj; // defines the shadow camera, combines projection with view and model transforms
+    private final ViewMatrix shadowView;
+    private final CubeMapMatrix shadowProj; // defines the shadow camera, combines projection with view and model transforms
     private float[] flashlightDir = new float[2];
-    
+
     public Ingame() {
         trans = new Transform();
-        shadowProj = new GenericMatrix("depthProj");
-        shadowProj.setPerspective(1, 1, .1f, 10, 140); // FOV is in degrees
-        shadowProj.scale(-1, 1, 1);
-        shadowProj.rotate(-(float)Math.PI/2, 1, 0, 0); // face forward, not down
-        shadowProj.push();
+        shadowView = new ViewMatrix();
+        float shadowNearPlane = .1f;
+        float shadowFarPlane = 10;
+        shadowProj = new CubeMapMatrix("depthProj",shadowNearPlane,shadowFarPlane);
+        ShaderMap.use("ingame_map");
+        Uniform.varFloat("shadowNearPlane",shadowNearPlane);
+        Uniform.varFloat("shadowFarPlane",shadowFarPlane);
+        ShaderMap.use("spritesheet_light");
+        Uniform.varFloat("shadowNearPlane",shadowNearPlane);
+        Uniform.varFloat("shadowFarPlane",shadowFarPlane);
     }
 
     @Override
@@ -79,6 +90,7 @@ public class Ingame implements Scene {
             trans.view.scale(1, -1, 1);
         }
         // shadow map camera view
+        /*
         shadowProj.pop();
         shadowProj.push();
         //shadowProj.translate(.5f,0,-.25f); // offset for first person view
@@ -87,7 +99,11 @@ public class Ingame implements Scene {
         shadowProj.translate(-MapManager.getPlayer().posX(),
                              -MapManager.getPlayer().posY(),
                              -MapManager.getPlayer().elevatorHeight()-1.1f);
-        
+        */
+        shadowView.setIdentity();
+        shadowView.translate(-MapManager.getPlayer().posX(),
+                -MapManager.getPlayer().posY()-MapManager.getPlayer().hitboxH(),
+                -MapManager.getPlayer().elevatorHeight()-1f);
     }
 
     @Override
@@ -97,9 +113,9 @@ public class Ingame implements Scene {
     
     // render depth data from camera perspective
         depthTexture.makeCurrent();
-        glClearColor(1, 1, 1, 1); // for depth buffer values
+        //glClearColor(1,1,1,1); // for depth buffer values
         glClear(GL_DEPTH_BUFFER_BIT);
-        MapManager.renderForShadow(shadowProj);
+        MapManager.renderForShadow(shadowProj, shadowView);
         
     // normal scene, using contents of depth texture for shadow rendering
         t.makeCurrent();

@@ -4,25 +4,38 @@
 in vec2 texCoord, texCoordEmissive;
 in vec3 vertexPos;
 in vec3 normal;
-in vec4 shadowCoord;
 
 layout(location = 0) out vec4 FragColor;
 layout(location = 1) out vec4 DOFValue;
 
 uniform vec3 lightPos;
 uniform vec3 ambient = vec3(0.0);
-uniform float flashlightAmbient = .2;
+uniform float flashlightAmbient = 0.3,
+			  shadowNearPlane = 0.0,
+			  shadowFarPlane = 0.0;
 
 uniform float emissiveMult = 0.0;
 uniform vec4 colorMult = vec4(1.0);
 uniform vec4 colorAdd = vec4(0.0);
 
 uniform sampler2D texture1;
-uniform sampler2DShadow shadowMap; // shadow depth texture
+uniform samplerCubeShadow shadowCubeMap;
 uniform vec3 flashlightAngle = vec3(1,0,0);
 
-uniform vec3[10] eLightPos;
-uniform vec3[10] eLightColor;
+uniform vec3[16] eLightPos;
+uniform vec3[16] eLightColor;
+
+float shadowCalculation(vec3 Vec)
+{
+    vec3 AbsVec = abs(Vec);
+    float LocalZcomp = max(AbsVec.x, max(AbsVec.y, AbsVec.z));
+
+    float f = shadowFarPlane;
+    float n = shadowNearPlane;
+
+    float NormZComp = (f+n) / (f-n) - (2*f*n)/(f-n)/LocalZcomp;
+    return (NormZComp + 1.0) * 0.5;
+}
 
 void main()
 {
@@ -37,7 +50,7 @@ void main()
     float diffuseCoef = dot(normal,L) +0.25;
 
     // flashlight cone
-    diffuseCoef *= pow(clamp(dot(L,flashlightAngle), 0,1),2)*2;
+    float coneDiffuseCoef = diffuseCoef * pow(clamp(dot(L,flashlightAngle), 0,1),2)*2;
 
     // distance from this fragment to the light source
     float lengthVal = length(lightPos-vertexPos);
@@ -49,14 +62,20 @@ void main()
 	float dofLength = length(lightPos.y-vertexPos.y);
 	DOFValue = vec4(0,0,0,1);//vec4(1.0-1.0/pow(dofLength,3.0),0,0,1);
 
-    // bias is used to reduce weird artifacts in shadow
-    float bias = 0.005*tan(acos(max(dot(normal,L),0)));
+	// shadow rendering!
+    // bias is used to reduce weird artifacts in shadow, "shadow acne"
+    float bias = 0.003*tan(acos(max(dot(normal,L),0)));
     bias = clamp(bias, 0, 0.01);
-    float shadow = textureProj(shadowMap, shadowCoord+vec4(0,0,-bias,0));
-		shadow = shadow*.9+.1;
+	vec3 lightVec = vertexPos - lightPos;
+	float LightDepth = shadowCalculation(lightVec*vec3(-1,1,1));
+	float shadow = texture(shadowCubeMap,vec4(L*vec3(-1,1,1),LightDepth-bias));
+	shadow = shadow*.9+.1;
 
     // apply lighting to fragment, cannot be brighter than the diffuse texture
-    vec3 light = max(ambient, vec3(clamp(lightDistCoef*flashlightAmbient+lightDistCoef*diffuseCoef*shadow, 0.0, 1.0)));
+    vec3 light = max(ambient, vec3(clamp(
+		lightDistCoef*diffuseCoef*flashlightAmbient*shadow+
+		lightDistCoef*coneDiffuseCoef*shadow,
+		0.0, 1.0)));
 
 	// entity lights
 	for (int i = 0; i < 10; i++)
@@ -64,7 +83,7 @@ void main()
 		vec3 l1 = normalize(eLightPos[i] - vertexPos);
 		float l2 = length(eLightPos[i]-vertexPos);
 		lightDistCoef = 1.0 / (1.0 + 0.01*l2 + 1.8*l2*l2);
-		vec3 thisLight = dot(normal,l1)*eLightColor[i]*lightDistCoef;
+		vec3 thisLight = dot(normal,l1)*eLightColor[i]*lightDistCoef*clamp(shadow,.5,1);
 	    light = max(light,thisLight);
 	}
 
@@ -73,7 +92,6 @@ void main()
 
 	// emissive texture ignores lighting, does not affect alpha
     FragColor.rgb += texture(texture1, texCoordEmissive).rgb * emissiveMult;
-
     // final global color adjustement, colorMult takes precedence over colorAdd
 	FragColor = colorMult * (colorAdd + FragColor);
 }

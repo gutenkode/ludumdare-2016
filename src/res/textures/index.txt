@@ -1,5 +1,5 @@
 tileset/foundation3		tileset_1
-tileset/foundation3_NRM 		tileset_1_NRM
+tileset/foundation3_NRM 	tileset_1_NRM
 tileset/shade			tileset_shade
 
 ui/title			ui_title
@@ -12,7 +12,7 @@ ui/statbars			ui_statbars
 
 ui/battlebg/red			ui_bg_red
 ui/battlebg/grayscale		ui_bg_grayscale
-ui/battlebg/circle		ui_bg_circle
+#ui/battlebg/circle		ui_bg_circle
 ui/battlefloor/tile1		ui_floor_tile1
 
 font/misterpixel/misterpixel	font_1
@@ -49,45 +49,46 @@ entity/env/water		entity_water
 entity/env/terminal		entity_terminal
 entity/env/solidPlatform	entity_solidPlatform
 
-object/crate			obj_crate
-object/barrel			obj_barrel
-object/fluorescent		obj_fluorescent
-object/ceiling			obj_ceiling
-object/chain			obj_chain
+object/crate		obj_crate
+object/barrel		obj_barrel
+object/fluorescent	obj_fluorescent
+object/ceiling		obj_ceiling
+object/chain		obj_chain
 
-color/test			color_test
+#color/test		color_test
+#color/white		color_white
 
-post/noise			post_noise
-post/vignette			post_vignette
-post/scanlines			post_scanlines
+post/noise		post_noise
+post/vignette		post_vignette
+post/scanlines		post_scanlines
 
-item/drink			item_drink
-item/grenade			item_grenade
-item/hypo			item_hypo
-item/potion			item_potion
-item/keycard1			item_keycard1
-item/keycard2			item_keycard2
-item/keycard3			item_keycard3
-item/keycard4			item_keycard4
+item/drink		item_drink
+item/grenade		item_grenade
+item/hypo		item_hypo
+item/potion		item_potion
+item/keycard1		item_keycard1
+item/keycard2		item_keycard2
+item/keycard3		item_keycard3
+item/keycard4		item_keycard4
 
-skill/fire			skill_fire
-skill/bolt			skill_bolt
-skill/dark			skill_dark
-skill/heal			skill_heal
-skill/ice			skill_ice
-skill/poison			skill_poison
-skill/defup			skill_defup
-skill/mod			skill_mod
+skill/fire		skill_fire
+skill/bolt		skill_bolt
+skill/dark		skill_dark
+skill/heal		skill_heal
+skill/ice		skill_ice
+skill/poison		skill_poison
+skill/defup		skill_defup
+skill/mod		skill_mod
 
-talk/boss			talk_boss
-talk/none			talk_none
-talk/tutorial			talk_tutorial
+talk/boss		talk_boss
+talk/none		talk_none
+talk/tutorial		talk_tutorial
 
-status/poison			status_poison
-status/fatigue			status_fatigue
-status/defup			status_defup
+status/poison		status_poison
+status/fatigue		status_fatigue
+status/defup		status_defup
 
-anim/ice			anim_ice
-anim/fire			anim_fire
-anim/elec_2			anim_elec
-anim/status			anim_status
+anim/ice		anim_ice
+anim/fire		anim_fire
+anim/elec_2		anim_elec
+anim/status		anim_status

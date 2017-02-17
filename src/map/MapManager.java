@@ -5,10 +5,7 @@ import entities.Player;
 import java.util.ArrayList;
 
 import entities.RoomLink;
-import mote4.util.matrix.GenericMatrix;
-import mote4.util.matrix.ModelMatrix;
-import mote4.util.matrix.Transform;
-import mote4.util.matrix.TransformationMatrix;
+import mote4.util.matrix.*;
 import mote4.util.shader.ShaderMap;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
@@ -72,13 +69,13 @@ public class MapManager {
         // initialize uniform values once
         ShaderMap.use("ingame_map");
         Uniform.varFloat("ambient", 0,0,0);
-        Uniform.samplerAndTextureFiltered("shadowMap", 1, "fbo_depth");
+        Uniform.samplerAndTextureFiltered("shadowCubeMap", 1, "fbo_depth");
         Uniform.samplerAndTextureUnfiltered("tex_shade", 2, "tileset_shade");
         Uniform.samplerAndTextureUnfiltered("tex_bump", 3, "tileset_1_NRM");
 
         ShaderMap.use("spritesheet_light");
         Uniform.varFloat("ambient", 0,0,0);
-        Uniform.samplerAndTextureFiltered("shadowMap", 1, "fbo_depth");
+        Uniform.samplerAndTextureFiltered("shadowCubeMap", 1, "fbo_depth");
     }
 
     // update and room load process methods
@@ -201,7 +198,7 @@ public class MapManager {
      * @param shadowProj Bound as "depthProj" in the shader, the projection used for the shadow view.
      * @param flashlightDir Flashlight angle, in spherical coordinates.
      */
-    public static void render(Transform trans, GenericMatrix shadowProj, float[] flashlightDir) {
+    public static void render(Transform trans, CubeMapMatrix shadowProj, float[] flashlightDir) {
         float[] lightVector = new float[3];
         lightVector[0] = -(float)Math.sin(flashlightDir[0]);
         lightVector[1] = -(float)Math.cos(flashlightDir[0]);
@@ -210,7 +207,7 @@ public class MapManager {
     // render static map mesh
         ShaderMap.use("ingame_map");
         TextureMap.bindUnfiltered("tileset_1");
-        shadowProj.makeCurrent();
+        //shadowProj.makeCurrent();
         Uniform.varFloat("flashlightAngle", lightVector);
         Uniform.varFloat("lightPos", player.posX(),
                                                     player.posY()+player.hitboxH(),
@@ -221,7 +218,7 @@ public class MapManager {
         
     // render entity tilesheets
         ShaderMap.use("spritesheet_light");
-        shadowProj.makeCurrent();
+        //shadowProj.makeCurrent();
         Uniform.varFloat("flashlightAngle", lightVector);
         Uniform.varFloat("lightPos", player.posX(),
                                                     player.posY()+player.hitboxH(),
@@ -254,18 +251,21 @@ public class MapManager {
      * for shadow mapping.
      * @param shadowProj Projection for the shadow camera.
      */
-    public static void renderForShadow(GenericMatrix shadowProj) {
-        ShaderMap.use("shadowMap"); // we don't care about textures when rendering the static mesh shadows
+    public static void renderForShadow(CubeMapMatrix shadowProj, ViewMatrix shadowView) {
+        ShaderMap.use("shadowCubeMap"); // we don't care about textures when rendering the static mesh shadows
         shadowProj.makeCurrent();
-        
+        shadowView.makeCurrent();
+        Uniform.varFloat("lightPos", player.posX(),
+                                                    player.posY()+player.hitboxH(),
+                                                    player.elevatorHeight()+1f);
         // render static map mesh
         shadowModel.setIdentity();
         shadowModel.makeCurrent();
         currentTimeline.getMapData().render();
         
-        ShaderMap.use("shadowMap_tex"); // entity textures may have transparent parts, so texture data must be checked
-        shadowProj.makeCurrent();
-        
+        //ShaderMap.use("shadowMap_tex"); // entity textures may have transparent parts, so texture data must be checked
+        //shadowProj.makeCurrent();
+
         // render entity tilesheets, the player is not rendered
         for (Entity e : currentTimeline.getEntities()) {
             // add a check for whether this entity should render shadows

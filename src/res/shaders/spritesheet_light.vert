@@ -9,13 +9,10 @@ out vec2 texCoord,
 	     texCoordEmissive;
 out vec3 vertexPos;
 out vec3 normal;
-out vec4 shadowCoord;
 
 uniform mat4 projectionMatrix; 	// defines the visible area on the screen
 uniform mat4 viewMatrix;	// represents camera transformations
 uniform mat4 modelMatrix;	// represents model transformations
-
-uniform mat4 depthProj = mat4(1.0);
 
 // contains information about the sprite being drawn:
 // number of tiles horizontally,
@@ -47,14 +44,4 @@ void main()
 
 	texCoord = getSpriteCoords(spriteInfo);
 	texCoordEmissive = getSpriteCoords(spriteInfoEmissive);
-
-	// the position of this vertex in the same space as the shadow map
-	// an offset matrix is used to convert from range -1:1 to 0:1 for texture lookups
-	mat4 biasMatrix = mat4(
-		0.5, 0.0, 0.0, 0.0,
-		0.0, 0.5, 0.0, 0.0,
-		0.0, 0.0, 0.5, 0.0,
-		0.5, 0.5, 0.5, 1.0
-	);
-	shadowCoord = biasMatrix * depthProj * modelMatrix * VertexIn;
 }

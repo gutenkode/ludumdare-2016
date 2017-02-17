@@ -14,13 +14,10 @@ layout(location = 5) in vec2 ShadeIn;
 /*noperspective*/ out vec2 shadeCoord;
 out vec3 vertexPos;
 out mat3 normalMatrix;
-out vec4 shadowCoord;
 
 uniform mat4 projectionMatrix = mat4(1.0);
 uniform mat4 viewMatrix  = mat4(1.0);
 uniform mat4 modelMatrix  = mat4(1.0);
-
-uniform mat4 depthProj = mat4(1.0);
 
 void main()
 {
@@ -33,14 +30,4 @@ void main()
 	// light location value is in model space, so vertexPos must be in model space
 	vertexPos = vec3(modelMatrix * VertexIn);
 	normalMatrix = mat3(NormalIn1,NormalIn2,NormalIn3);
-
-	// an offset matrix is used to convert from range -1:1 to 0:1 for texture lookups
-	mat4 biasMatrix = mat4(
-		0.5, 0.0, 0.0, 0.0,
-		0.0, 0.5, 0.0, 0.0,
-		0.0, 0.0, 0.5, 0.0,
-		0.5, 0.5, 0.5, 1.0
-	);
-	// the position of this vertex in the same space as the shadow map
-	shadowCoord = biasMatrix * depthProj * modelMatrix * VertexIn;
 }

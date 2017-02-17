@@ -6,6 +6,7 @@ import mote4.scenegraph.Layer;
 import mote4.scenegraph.Window;
 import mote4.util.shader.ShaderUtils;
 import mote4.util.texture.TextureMap;
+import mote4.util.texture.CubeMapTexture;
 import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.builder.StaticMeshBuilder;
 import mote4.util.vertex.mesh.MeshMap;
@@ -58,6 +59,8 @@ public class Nullset_Ludumdare {
     private static void loadResources() {
         TextureMap.loadIndex("index.txt");
         ShaderUtils.loadIndex("index.txt");
+
+        CubeMapTexture.load("object/chain", "cubemap");
 
         FontUtils.loadMetric("font/misterpixel/misterpixel_metric","font_1");
         FontUtils.loadMetric("font/6px/6px_metric","6px");

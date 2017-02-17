@@ -4,8 +4,11 @@ layout (triangles) in;
 layout (triangle_strip, max_vertices=18) out;
 
 uniform mat4 depthProj[6];
+uniform mat4 viewMatrix = mat4(1.0);
+uniform mat4 modelMatrix = mat4(1.0);
 
-out vec4 FragPos; // FragPos from GS (output per emitvertex)
+in vec2[3] texCoord_in;
+out vec2 texCoord_out;
 
 void main()
 {
@@ -14,10 +17,10 @@ void main()
         gl_Layer = face; // built-in variable that specifies to which face we render
         for (int i = 0; i < 3; i++) // for each triangle's vertices
         {
-            FragPos = gl_in[i].gl_Position;
-            gl_Position = depthProj[face] * FragPos;
+            gl_Position = depthProj[face] * viewMatrix * modelMatrix * gl_in[i].gl_Position;
+            texCoord_out = texCoord_in[i]; // just pass them through
             EmitVertex();
-        }    
+        }
         EndPrimitive();
     }
-} 
+}

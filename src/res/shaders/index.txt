@@ -1,0 +1,27 @@
+ingame_map.vert			ingame_map.frag			ingame_map
+ingame_nolight.vert		ingame_nolight.frag		ingame_nolight
+spritesheet_nolight.vert	spritesheet_nolight.frag	spritesheet_nolight
+spritesheet_light.vert		spritesheet_light.frag		spritesheet_light
+
+texture.vert		texture.frag		texture
+texture_color.vert	texture_color.frag	texture_color
+texture.vert		texture_uiblur.frag	texture_uiblur
+
+color.vert		color.frag		color
+
+titlebg.vert		titlebg.frag		titlebg
+battle_bg.vert		battle_bg.frag		battle_bg
+
+#shadowMap.vert		shadowMap.frag		shadowMap
+#shadowMap_tex.vert	shadowMap_tex.frag	shadowMap_tex
+shadowCubeMap.vert	shadowCubeMap.geom	shadowCubeMap.frag	shadowCubeMap
+
+quad.vert		quad.frag		quad
+quad_transition.vert	quad_transition.frag	quad_transition
+quad.vert		quad_dither.frag	quad_dither
+quad.vert		quad_vertBlur.frag	quad_vertBlur
+quad.vert		quad_horizBlur.frag	quad_horizBlur
+#quad.vert		quad_dofBlur.frag	quad_dofBlur
+quad.vert		quad_hdr.frag		quad_hdr
+quad.vert		quad_titlebg.frag	quad_titlebg
+quad.vert		quad_final.frag		quad_final
