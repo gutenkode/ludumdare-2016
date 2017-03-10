@@ -23,7 +23,8 @@ public class StaticObject extends Entity {
         CRATE,
         FLUORESCENT,
         CEILING,
-        CHAIN;
+        CHAIN,
+        PIPE;
     }
     
     private float floatHeight, val0, val1;
@@ -36,8 +37,7 @@ public class StaticObject extends Entity {
         val0 = val;
         posX = x+.5f;
         posY = y+.5f;
-        hitboxW = .3f;
-        hitboxH = .3f;
+        hitboxW = hitboxH = .3f;
         
         switch(model) {
             case "Barrel":
@@ -84,6 +84,12 @@ public class StaticObject extends Entity {
                     hitboxW = 0;
                 }
                 break;
+            case "Pipe":
+                TYPE = Type.PIPE;
+                solid = true;
+                val0 = val*(float)Math.PI/2;
+                hitboxW = hitboxH = .2f;
+                break;
             default:
                 throw new IllegalArgumentException("Unrecognized StaticObject type: "+model);
         }
@@ -108,6 +114,7 @@ public class StaticObject extends Entity {
             case CHAIN:
                 floatHeight = 0;
                 break;
+            case PIPE:
             default:
                 break;
         }
@@ -215,6 +222,16 @@ public class StaticObject extends Entity {
                     MeshMap.render("quad");
                 }
                 glDisable(GL_CULL_FACE);
+                break;
+            case PIPE:
+                Uniform.varFloat("spriteInfo", 1,1,0);
+                model.translate(posX, posY, floatHeight+1.3f);
+                //model.rotate((float)Math.PI/2, 1, 0, 0);
+                model.scale(.32f, .32f, .32f);
+                model.rotate((float)Math.PI+val0, 0, 0, 1);
+                model.makeCurrent();
+                TextureMap.bindUnfiltered("obj_pipe");
+                MeshMap.render("pipe");
                 break;
         }
     }

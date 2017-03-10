@@ -73,7 +73,7 @@ void main()
 
     // apply lighting to fragment, cannot be brighter than the diffuse texture
     vec3 light = max(ambient, vec3(clamp(
-		lightDistCoef*diffuseCoef*flashlightAmbient*shadow+
+		lightDistCoef*diffuseCoef*flashlightAmbient+
 		lightDistCoef*coneDiffuseCoef*shadow,
 		0.0, 1.0)));
 
@@ -86,8 +86,8 @@ void main()
 		vec3 thisLight = dot(normal,l1)*eLightColor[i]*lightDistCoef*clamp(shadow,.5,1);
 	    light = max(light,thisLight);
 	}
-
-	light = clamp(light,vec3(0),vec3(2));
+	// actually apply lighting
+	light = clamp(light,vec3(0),vec3(1));
 	FragColor.rgb *= light;
 
 	// emissive texture ignores lighting, does not affect alpha

@@ -3,6 +3,7 @@
 
 /*noperspective*/ in vec2 texCoord;
 /*noperspective*/ in vec2 shadeCoord;
+in vec3 vertexPos;
 
 layout(location = 0) out vec4 FragColor;
 layout(location = 1) out vec4 DOFValue;
@@ -20,7 +21,11 @@ void main()
 	// shade texture component
     FragColor.rgb *= texture(tex_shade, shadeCoord).rgb;
 
-	DOFValue = vec4(0,0,0,0);
+	// fade edges of the map
+	//FragColor.rgb = mix(vec3(.6f,0,0),FragColor.rgb,clamp(vertexPos.x,0,1));
+	//FragColor.rgb = mix(vec3(.6f,0,0),FragColor.rgb,clamp(vertexPos.y,0,1));
+
+	DOFValue = vec4(0,0,0,1);
 
 	FragColor = colorMult * (colorAdd + FragColor);
 }

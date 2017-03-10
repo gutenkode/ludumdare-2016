@@ -70,6 +70,7 @@ public class Nullset_Ludumdare {
         MeshMap.add(StaticMeshBuilder.loadQuadMesh(), "quad");
         MeshMap.add(StaticMeshBuilder.constructVAOFromOBJ("cube", false), "cube");
         MeshMap.add(StaticMeshBuilder.constructVAOFromOBJ("barrel", false), "barrel");
+        MeshMap.add(StaticMeshBuilder.constructVAOFromOBJ("pipe", false), "pipe");
         MeshMap.add(StaticMeshBuilder.constructVAOFromOBJ("hexahedron", false), "hexahedron");
     }
 }

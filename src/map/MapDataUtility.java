@@ -194,110 +194,184 @@ public class MapDataUtility {
      * @param j Tile Y value.
      */
     private static void addVertex(Attribute vertAttrib, Attribute texAttrib, Attribute[] normAttrib, Attribute shadeAttrib, int i, int j) {
-        int h = mapData.heightData[i][j];
-        
-        // ground tile is only drawn for shapes 0,1
-        if (testShapeVal(i,j,1)) {
-        //if (mapData.tileData[i][j][1] < 2) {
-            // ground tile
-            vertAttrib.add(
-                i,j,h,
-                i,j+1,h,
-                i+1,j,h,
+        int h = mapData.heightData[i][j]; // height of this tile
 
-                i+1,j,h,
-                i,j+1,h,
-                i+1,j+1,h
-            );
+        if (!testShapeVal(i,j,2)) { // TODO replace this with a better check, don't draw floor tiles here for diagonal walls
+            // test if ground tiles should be drawn
+            if (!testShapeVal(i, j, 1)) {
+                // ground tile
+                vertAttrib.add(
+                        i, j, h,
+                        i, j + 1, h,
+                        i + 1, j, h,
+
+                        i + 1, j, h,
+                        i, j + 1, h,
+                        i + 1, j + 1, h
+                );
+                addTex(texAttrib, i, j, 0, 0);
+                addNormal(normAttrib, 0, 0, 1);
+                addShade(shadeAttrib, i, j, 0);
+            }
+        }
+        
+        // test if wall tiles should be drawn
+        if (!testShapeVal(i,j,0))
+            return;
+
+        if (testShapeVal(i,j,2)) {
+            // this tile is a diagonal wall
+            // for now, just draw the one angle for test purposes
+            int h_back = mapData.heightData[i][j-1];
+            int h2 = Math.min(h_back,mapData.heightData[i+1][j]);
+            int h3 = Math.min(h_back,mapData.heightData[i-1][j]);
+            boolean flip = h2 < h3;
+            if (flip)
+                h2 = h3; // we're done with h3, rest of the code just references h2
+            int diff = h2 - h;
+            if (h2 > h) { // if the back side is higher than the front side
+                for (int k = 0; k < diff; k++) {
+                    if (flip) {
+                        vertAttrib.add(
+                                i, j+1, h2 - k,
+                                i, j+1, h2 - (1 + k),
+                                i + 1, j, h2 - k,
+
+                                i + 1, j, h2 - k,
+                                i, j+1, h2 - (1 + k),
+                                i + 1, j, h2 - (1 + k)
+                        );
+                    } else {
+                        vertAttrib.add(
+                                i, j, h2 - k,
+                                i, j, h2 - (1 + k),
+                                i + 1, j + 1, h2 - k,
+
+                                i + 1, j + 1, h2 - k,
+                                i, j, h2 - (1 + k),
+                                i + 1, j + 1, h2 - (1 + k)
+                        );
+                    }
+                    if (k == 0)
+                        addTex(texAttrib, i, j, 0, 2);
+                    else
+                        addTex(texAttrib, i, j, 1, 2);
+                    if (k == diff - 1)
+                        addShade(shadeAttrib, i, j, 4);
+                    else
+                        addShade(shadeAttrib, i, j, -1);
+                    addNormal(normAttrib, -.707f, .707f, 0);
+                }
+            }  else { // front side is higher; flip h and h2 for proper floor rendering
+                int temp = h;
+                h = h2;
+                h2 = temp;
+            }
+            // draw the cut upper floor tile
+            if (flip) {
+                vertAttrib.add(
+                        i, j, h2,
+                        i, j + 1, h2,
+                        i + 1, j, h2,
+
+                        i + 1, j, h,
+                        i, j + 1, h,
+                        i + 1, j + 1, h
+                );
+            } else {
+                vertAttrib.add(
+                        i+1, j, h2,
+                        i, j, h2,
+                        i+1, j+1, h2,
+
+                        i+1, j+1, h,
+                        i, j, h,
+                        i, j+1, h
+                );
+            }
             addTex(texAttrib, i,j, 0,0);
             addNormal(normAttrib, 0,0,1);
             addShade(shadeAttrib, i,j, 0);
-        }
-        
-        // wall tile only drawn for shapes 1,3
-        if (testShapeVal(i,j,0))
-        //if (mapData.tileData[i][j][1] == 0 || mapData.tileData[i][j][1] == 2)
-            return;
-        
-        // back wall
-        if (j > 0) { // don't try to draw back walls for back row
-            int h2 = mapData.heightData[i][j-1];
-            if (h2 > h) { // if the back tile is higher than this one
-                int diff = h2-h;
-                for (int k = 0; k < diff; k++) {
-                    vertAttrib.add(
-                            i,j,h2-k,
-                            i,j,h2-(1+k),
-                            i+1,j,h2-k,
+        } else {
+            // this tile is a normal wall
+            // back wall
+            if (j > 0) { // don't try to draw back walls for back row
+                int h2 = mapData.heightData[i][j - 1];
+                if (h2 > h) { // if the back tile is higher than this one
+                    int diff = h2 - h;
+                    for (int k = 0; k < diff; k++) {
+                        vertAttrib.add(
+                                i, j, h2 - k,
+                                i, j, h2 - (1 + k),
+                                i + 1, j, h2 - k,
 
-                            i+1,j,h2-k,
-                            i,j,h2-(1+k),
-                            i+1,j,h2-(1+k)
-                    );
-                    if (k == 0)
-                        addTex(texAttrib, i,j, 0,2);
-                    else
-                        addTex(texAttrib, i,j, 1,2);
-                    if (k == diff-1)
-                        addShade(shadeAttrib, i,j, 2);
-                    else
-                        addShade(shadeAttrib, i,j, -1);
-                    addNormal(normAttrib, 0,1,0);
+                                i + 1, j, h2 - k,
+                                i, j, h2 - (1 + k),
+                                i + 1, j, h2 - (1 + k)
+                        );
+                        if (k == 0)
+                            addTex(texAttrib, i, j, 0, 2);
+                        else
+                            addTex(texAttrib, i, j, 1, 2);
+                        if (k == diff - 1)
+                            addShade(shadeAttrib, i, j, 2);
+                        else
+                            addShade(shadeAttrib, i, j, -1);
+                        addNormal(normAttrib, 0, 1, 0);
+                    }
                 }
             }
-        }
-        
-        // right wall
-        if (i+1 < mapData.heightData.length) { // don't draw right walls for far right column
-            int h2 = mapData.heightData[i+1][j];
-            if (h2 > h) { // if the right tile is higher than this one
-                int diff = h2-h;
-                for (int k = 0; k < diff; k++) {
-                    vertAttrib.add(
-                            i+1,j,h2-k,
-                            i+1,j,h2-(1+k),
-                            i+1,j+1,h2-k,
+            // right wall
+            if (i + 1 < mapData.heightData.length) { // don't draw right walls for far right column
+                int h2 = mapData.heightData[i + 1][j];
+                if (h2 > h) { // if the right tile is higher than this one
+                    int diff = h2 - h;
+                    for (int k = 0; k < diff; k++) {
+                        vertAttrib.add(
+                                i + 1, j, h2 - k,
+                                i + 1, j, h2 - (1 + k),
+                                i + 1, j + 1, h2 - k,
 
-                            i+1,j+1,h2-k,
-                            i+1,j,h2-(1+k),
-                            i+1,j+1,h2-(1+k)
-                    );
-                    if (k == 0)
-                        addTex(texAttrib, i,j, 0,2);
-                    else
-                        addTex(texAttrib, i,j, 1,2);
-                    if (k == diff-1)
-                        addShade(shadeAttrib, i,j, 3);
-                    else
-                        addShade(shadeAttrib, i,j, -1);
-                    addNormal(normAttrib, -1,0,0);
+                                i + 1, j + 1, h2 - k,
+                                i + 1, j, h2 - (1 + k),
+                                i + 1, j + 1, h2 - (1 + k)
+                        );
+                        if (k == 0)
+                            addTex(texAttrib, i, j, 0, 2);
+                        else
+                            addTex(texAttrib, i, j, 1, 2);
+                        if (k == diff - 1)
+                            addShade(shadeAttrib, i, j, 3);
+                        else
+                            addShade(shadeAttrib, i, j, -1);
+                        addNormal(normAttrib, -1, 0, 0);
+                    }
                 }
             }
-        }
-        
-        // left wall
-        if (i > 0) { // don't draw left walls for far left column
-            int h2 = mapData.heightData[i-1][j];
-            if (h2 > h) { // if the left tile is higher than this one
-                int diff = h2-h;
-                for (int k = 0; k < diff; k++) {
-                    vertAttrib.add(
-                            i,j+1,h2-k,
-                            i,j+1,h2-(1+k),
-                            i,j,h2-k,
-                            i,j,h2-k,
-                            i,j+1,h2-(1+k),
-                            i,j,h2-(1+k)
-                    );
-                    if (k == 0)
-                        addTex(texAttrib, i,j, 0,2);
-                    else
-                        addTex(texAttrib, i,j, 1,2);
-                    if (k == diff-1)
-                        addShade(shadeAttrib, i,j, 1);
-                    else
-                        addShade(shadeAttrib, i,j, -1);
-                    addNormal(normAttrib, 1,0,0);
+            // left wall
+            if (i > 0) { // don't draw left walls for far left column
+                int h2 = mapData.heightData[i - 1][j];
+                if (h2 > h) { // if the left tile is higher than this one
+                    int diff = h2 - h;
+                    for (int k = 0; k < diff; k++) {
+                        vertAttrib.add(
+                                i, j + 1, h2 - k,
+                                i, j + 1, h2 - (1 + k),
+                                i, j, h2 - k,
+                                i, j, h2 - k,
+                                i, j + 1, h2 - (1 + k),
+                                i, j, h2 - (1 + k)
+                        );
+                        if (k == 0)
+                            addTex(texAttrib, i, j, 0, 2);
+                        else
+                            addTex(texAttrib, i, j, 1, 2);
+                        if (k == diff - 1)
+                            addShade(shadeAttrib, i, j, 1);
+                        else
+                            addShade(shadeAttrib, i, j, -1);
+                        addNormal(normAttrib, 1, 0, 0);
+                    }
                 }
             }
         }
@@ -338,6 +412,7 @@ public class MapDataUtility {
      * @param type The type of tile shade is being applied to.
      *             0: Floor tile
      *             1,2,3: Left,front,right wall tile
+     *             4: Force full lower-wall shade
      *             Anything else: Use no shade (index 0)
      */
     private static void addShade(Attribute attrib, int x, int y, int type) {
@@ -458,6 +533,9 @@ public class MapDataUtility {
                     ind++;
                 }
                 break;
+            case 4: // force full lower-wall shade
+                ind = 17;
+                break;
             default:
                 // apply no shade
                 break;
@@ -520,6 +598,6 @@ public class MapDataUtility {
      * @return
      */
     private static boolean testShapeVal(int x, int y, int index) {
-        return 0 == (mapData.tileData[x][y][1] & (1 << index));
+        return (mapData.tileData[x][y][1] & (1 << index)) != 0;
     }
 }

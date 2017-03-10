@@ -36,7 +36,7 @@ public class RootLayer extends Layer {
 
     public RootLayer() {
         super(null);
-        setState(State.INGAME);
+        setState(State.TITLE);
     }
 
     @Override

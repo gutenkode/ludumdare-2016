@@ -80,7 +80,7 @@ void main()
 
     // apply lighting to fragment, cannot be brighter than the diffuse texture
     vec3 light = max(ambient, vec3(clamp(
-        lightDistCoef*diffuseCoef*flashlightAmbient*shadow + // dark ambient circle around player
+        lightDistCoef*diffuseCoef*flashlightAmbient + // dark ambient circle around player
         lightDistCoef*coneDiffuseCoef*shadow, // flashlight and shadow map
         0.0, 1.0)));
 
@@ -93,9 +93,14 @@ void main()
 		vec3 thisLight = dot(bumpNormal,l1)*eLightColor[i]*lightDistCoef*clamp(shadow,.5,1);
 	    light = max(light,thisLight);
 	}
-
-	light = clamp(light,vec3(0),vec3(2));
+	// actually apply lighting
+	light = clamp(light,vec3(0),vec3(1));
 	FragColor.rgb *= light;
+
+	// fade edges of the map
+	//FragColor.rgb = mix(vec3(0),FragColor.rgb,clamp(vertexPos.x,0,1));
+	//FragColor.rgb = mix(vec3(0),FragColor.rgb,clamp(vertexPos.y,0,1));
+
     // final global color adjustement, colorMult takes precedence over colorAdd
 	FragColor = colorMult * (colorAdd + FragColor);
 }

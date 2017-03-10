@@ -4,8 +4,6 @@ import entities.Entity;
 import map.*;
 import mote4.scenegraph.Scene;
 import mote4.scenegraph.Window;
-import mote4.scenegraph.target.DepthTexture;
-import mote4.util.matrix.GenericMatrix;
 import mote4.util.matrix.Transform;
 import mote4.util.shader.ShaderMap;
 import mote4.util.shader.Uniform;
@@ -168,11 +166,15 @@ public class Editor implements Scene {
             // tile shape
             else if (GLFW.glfwGetKey(Window.getWindowID(), GLFW.GLFW_KEY_LEFT_BRACKET) == GLFW.GLFW_PRESS) {
                 if (!keyPressed)
-                    me.toggleGroundTile(xPos,yPos);
+                    me.toggleTileShapeBit(xPos,yPos,0);
                 keyPressed = true;
             } else if (GLFW.glfwGetKey(Window.getWindowID(), GLFW.GLFW_KEY_RIGHT_BRACKET) == GLFW.GLFW_PRESS) {
                 if (!keyPressed)
-                    me.toggleWallTile(xPos,yPos);
+                    me.toggleTileShapeBit(xPos,yPos,1);
+                keyPressed = true;
+            } else if (GLFW.glfwGetKey(Window.getWindowID(), GLFW.GLFW_KEY_BACKSLASH) == GLFW.GLFW_PRESS) {
+                if (!keyPressed)
+                    me.toggleTileShapeBit(xPos,yPos,2);
                 keyPressed = true;
             }
             // texture coords

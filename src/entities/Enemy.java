@@ -88,7 +88,7 @@ public class Enemy extends Entity {
                 velY -= vec.y;
             } else {
                 // else, move towards next patrol node
-                vec = new Vector2f((float)(posX-patrol[patrolIndex][0]), (float)(posY-patrol[patrolIndex][1]));
+                vec = new Vector2f((posX-patrol[patrolIndex][0]), (posY-patrol[patrolIndex][1]));
                 if (vec.length() > .1) { // if the enemy is not already close enough to the node
                     vec.normalise();
                     velX -= vec.x;

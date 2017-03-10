@@ -12,6 +12,7 @@ layout(location = 5) in vec2 ShadeIn;
 
 /*noperspective*/ out vec2 texCoord;
 /*noperspective*/ out vec2 shadeCoord;
+out vec3 vertexPos;
 
 uniform mat4 projectionMatrix = mat4(1.0);
 uniform mat4 viewMatrix  = mat4(1.0);
@@ -22,4 +23,5 @@ void main()
 	gl_Position = projectionMatrix * viewMatrix * modelMatrix * VertexIn;
 	texCoord = TexIn;
 	shadeCoord = ShadeIn;
+	vertexPos = vec3(modelMatrix * VertexIn);
 }

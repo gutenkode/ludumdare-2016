@@ -52,39 +52,19 @@ public class MapEditor {
             mapData.rebuildMesh();
         }
     }
-    /**
-     * Edits the tile shape value to toggle drawing of ground tiles.
-     * @param x
-     * @param y
-     */
-    public void toggleGroundTile(int x, int y) {
-        int val = mapData.tileData[x][y][1]+2;
-        mapData.tileData[x][y][1] = val % 4;
-        mapData.rebuildMesh();
 
-    }
-    /**
-     * Edits the tile shape value to toggle drawing of wall tiles.
-     * @param x
-     * @param y
-     */
-    public void toggleWallTile(int x, int y) {
-        switch (mapData.tileData[x][y][1]) {
-            case 0:
-                mapData.tileData[x][y][1] = 1;
-                break;
-            case 1:
-                mapData.tileData[x][y][1] = 0;
-                break;
-            case 2:
-                mapData.tileData[x][y][1] = 3;
-                break;
-            case 3:
-                mapData.tileData[x][y][1] = 2;
-                break;
-        }
+    public void setTileShapeBit(int x, int y, int bit, boolean value) {
+        if (value)
+            mapData.tileData[x][y][1] |= 1 << bit;
+        else
+            mapData.tileData[x][y][1] &= ~(1 << bit);
         mapData.rebuildMesh();
     }
+    public void toggleTileShapeBit(int x, int y, int bit) {
+        int val = mapData.tileData[x][y][1] & (1 << bit);
+        setTileShapeBit(x,y,bit, val == 0);
+    }
+
     public void editHeight(int x, int y, int chg) {
         mapData.heightData[x][y] += chg;
         mapData.rebuildMesh();

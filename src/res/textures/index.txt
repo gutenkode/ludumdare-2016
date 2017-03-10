@@ -54,9 +54,10 @@ object/barrel		obj_barrel
 object/fluorescent	obj_fluorescent
 object/ceiling		obj_ceiling
 object/chain		obj_chain
+object/pipe		obj_pipe
 
 #color/test		color_test
-#color/white		color_white
+color/white		color_white
 
 post/noise		post_noise
 post/vignette		post_vignette

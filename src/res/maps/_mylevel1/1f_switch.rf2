@@ -37,6 +37,11 @@ height=14
 <entitydata>
 RoomLink,6,0,1,1,1,1b_puzzle1
 
+StaticObject,2.1,4,Crate
+StaticObject,3,4,Crate
+StaticObject,2.5,4,Crate,.8
+StaticObject,0.7,4.9,Barrel
+
 ToggleButton,6,5,0
 ToggleButton,4,9,0
 ToggleButton,8,9,1
