@@ -115,6 +115,7 @@ public class Postprocess implements Scene {
     // render final mix shader to screen
         framebuffer.makeCurrent();
         ShaderMap.use("quad_final");
+        Uniform.varFloat("dofCoef", dofCoef);
 
         //Uniform.varFloat("bloomCoef", .5f);
         Uniform.varFloat("colorMult", colorMult,colorMult,colorMult); // for fading in/out
@@ -313,9 +314,7 @@ public class Postprocess implements Scene {
      * @param val 1 forces full blur, -1 forces no blur, 0 is default.
      */
     public static void setDOFCoef(float val) {
-        ShaderMap.use("quad_final");
         dofCoefTarget = val;
-        Uniform.varFloat("dofCoef", dofCoef);
     }
     public static void fadeOut(Runnable function) {
         // I really hope I know what I'm doing...
