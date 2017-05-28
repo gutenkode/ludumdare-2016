@@ -27,7 +27,7 @@ public class RootLayer extends Layer {
 
     private MultiColorFBO sceneFbo, uiFbo;
 
-    static {
+    static { // TODO remove all static code
         title = new Scene[] {new Title(), new TitleUI()};
         ingame = new Scene[] {new Ingame(), new IngameUI(), new TerminalScene()};
         battle = new Scene[] {new Battle(), new BattleUI()};
@@ -80,16 +80,28 @@ public class RootLayer extends Layer {
     }
     @Override
     public void makeCurrent() {}
+
+    /**
+     * Rebuilds framebuffers used for rendering without changing the resolution.
+     */
+    public void refreshFramebuffer() {
+        framebufferResized(renderWidth, renderHeight);
+    }
+
     @Override
     public void framebufferResized(int width, int height) {
         float ratio = width/(float)height;
 
-        renderHeight = Const.WINDOW_HEIGHT; // 1080/3;
+        renderHeight = Vars.WINDOW_HEIGHT; // 1080/3;
         renderWidth = (int)(renderHeight*ratio);
+
+        int renderScale = 1;
+        if (Vars.useSSAA())
+            renderScale = 2;
 
         if (sceneFbo != null)
             sceneFbo.destroy();
-        sceneFbo = new MultiColorFBO(renderWidth,renderHeight,true,false,2);
+        sceneFbo = new MultiColorFBO(renderWidth*renderScale,renderHeight*renderScale,true,false,2);
         TextureMap.delete("fbo_scene");
         TextureMap.delete("fbo_dofvalue");
         sceneFbo.addToTextureMap("fbo_scene",0);
@@ -97,7 +109,7 @@ public class RootLayer extends Layer {
         if (uiFbo != null)
             uiFbo.destroy();
         int[] buffers = new int[] {-1, sceneFbo.getColorBufferID(1)};
-        uiFbo = new MultiColorFBO(renderWidth,renderHeight,false,false,buffers);
+        uiFbo = new MultiColorFBO(renderWidth*renderScale,renderHeight*renderScale,false,false,buffers);
         //uiFbo = new FBO(renderWidth,renderHeight,false,false,null);
         TextureMap.delete("fbo_ui");
         uiFbo.addToTextureMap("fbo_ui",0);

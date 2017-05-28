@@ -9,6 +9,7 @@ import mote4.util.vertex.mesh.Mesh;
 import org.lwjgl.opengl.GL11;
 import rpgsystem.Inventory;
 import rpgsystem.Item;
+import ui.IngameUIManager;
 
 /**
  * A door that will only open if the player has the right keycard, 
@@ -22,7 +23,7 @@ public class KeyDoor extends Entity {
     private float rot, openVal = 0;
     private int keycardLevel, tileX, tileY;
     private int delay = 0, alertCycle = 0;
-    private boolean playerOn = false, flicker, renderAlert;
+    private boolean doorUnlocked = false, flicker, renderAlert, playerInRange;
     
     static {
         mesh = StaticMeshBuilder.constructVAO(GL11.GL_TRIANGLE_FAN, 
@@ -79,6 +80,7 @@ public class KeyDoor extends Entity {
     public void onRoomInit() {
         tileHeight = MapManager.getTileHeight((int)posX, (int)posY);
         renderAlert = false;
+        playerInRange = false;
     }
     
     @Override
@@ -94,23 +96,33 @@ public class KeyDoor extends Entity {
             // higher-level keycards can open lower-level doors
             switch (keycardLevel) {
                 case 0:
-                    playerOn = true;
+                    doorUnlocked = true;
                     break;
                 case 1:
                     if (Inventory.hasItem(Item.KEYCARD1))
-                        playerOn = true;
+                        doorUnlocked = true;
                 case 2:
                     if (Inventory.hasItem(Item.KEYCARD2))
-                        playerOn = true;
+                        doorUnlocked = true;
                 case 3:
                     if (Inventory.hasItem(Item.KEYCARD3))
-                        playerOn = true;
+                        doorUnlocked = true;
                 case 4:
                     if (Inventory.hasItem(Item.KEYCARD4))
-                        playerOn = true;
+                        doorUnlocked = true;
                     break;
             }
+
+            // display a toast message for door status
+            if (!playerInRange && keycardLevel > 0)
+                if (doorUnlocked)
+                    IngameUIManager.logMessage("Access granted.");
+                else
+                    IngameUIManager.logMessage("LV"+keycardLevel+" keycard required.");
+            playerInRange = true;
         }
+        else
+            playerInRange = false;
 
         if (MapManager.getTimelineState().isAlertTriggered()) {
             openVal = 0;
@@ -121,7 +133,7 @@ public class KeyDoor extends Entity {
                 alertCycle %= 4;
             }
         } else {
-            if (playerOn) {
+            if (doorUnlocked) {
                 if (openVal < 1)
                     openVal += .05;
             } else {
@@ -130,7 +142,7 @@ public class KeyDoor extends Entity {
             }
         }
 
-        playerOn = false;
+        doorUnlocked = false;
         flicker = !flicker;
     }
 

@@ -6,9 +6,8 @@ import java.util.StringTokenizer;
 import mote4.util.vertex.builder.Attribute;
 import mote4.util.vertex.builder.ModernMeshBuilder;
 import mote4.util.vertex.mesh.Mesh;
-import nullset.Const;
+import nullset.Vars;
 import org.lwjgl.opengl.GL11;
-import rpgbattle.EnemyData;
 import rpgsystem.Item;
 import rpgsystem.Pickupable;
 import rpgsystem.Skill;
@@ -387,18 +386,18 @@ public class MapDataUtility {
      *                0 is currently used for floor textures and 2 for wall textures.
      */
     private static void addTex(Attribute attrib, int i, int j, int offset, int texType) {
-        float indX = (int)(mapData.tileData[i][j][texType]%Const.TILESHEET_X)*Const.TILE_SIZE_X;
-        float indY = (int)(mapData.tileData[i][j][texType]/Const.TILESHEET_X)*Const.TILE_SIZE_Y;
-        indY += offset*Const.TILE_SIZE_Y;
+        float indX = (int)(mapData.tileData[i][j][texType]% Vars.TILESHEET_X)* Vars.TILE_SIZE_X;
+        float indY = (int)(mapData.tileData[i][j][texType]/ Vars.TILESHEET_X)* Vars.TILE_SIZE_Y;
+        indY += offset* Vars.TILE_SIZE_Y;
 
         attrib.add(
             indX, indY,
-            indX, indY+Const.TILE_SIZE_Y,
-            indX+Const.TILE_SIZE_X, indY,
+            indX, indY+ Vars.TILE_SIZE_Y,
+            indX+ Vars.TILE_SIZE_X, indY,
 
-            indX+Const.TILE_SIZE_X, indY,
-            indX, indY+Const.TILE_SIZE_Y,
-            indX+Const.TILE_SIZE_X, indY+Const.TILE_SIZE_Y
+            indX+ Vars.TILE_SIZE_X, indY,
+            indX, indY+ Vars.TILE_SIZE_Y,
+            indX+ Vars.TILE_SIZE_X, indY+ Vars.TILE_SIZE_Y
         );
     }
 
@@ -542,17 +541,17 @@ public class MapDataUtility {
         }
 
         // calculate texture coordinates based on the value of 'ind'
-        float indX = (int)(ind%Const.TILESHEET_X )*Const.TILE_SIZE_X;
-        float indY = (int)(ind/Const.TILESHEET_X )*Const.TILE_SIZE_Y;
+        float indX = (int)(ind% Vars.TILESHEET_X )* Vars.TILE_SIZE_X;
+        float indY = (int)(ind/ Vars.TILESHEET_X )* Vars.TILE_SIZE_Y;
         // and add it to the Attribute
         attrib.add(
             indX, indY,
-            indX, indY+Const.TILE_SIZE_Y,
-            indX+Const.TILE_SIZE_X, indY,
+            indX, indY+ Vars.TILE_SIZE_Y,
+            indX+ Vars.TILE_SIZE_X, indY,
 
-            indX+Const.TILE_SIZE_X, indY,
-            indX, indY+Const.TILE_SIZE_Y,
-            indX+Const.TILE_SIZE_X, indY+Const.TILE_SIZE_Y
+            indX+ Vars.TILE_SIZE_X, indY,
+            indX, indY+ Vars.TILE_SIZE_Y,
+            indX+ Vars.TILE_SIZE_X, indY+ Vars.TILE_SIZE_Y
         );
     }
 

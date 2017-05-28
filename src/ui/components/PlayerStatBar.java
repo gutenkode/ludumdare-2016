@@ -8,7 +8,7 @@ import mote4.util.texture.TextureMap;
 import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.builder.StaticMeshBuilder;
 import mote4.util.vertex.mesh.Mesh;
-import nullset.Const;
+import nullset.Vars;
 import org.lwjgl.opengl.GL11;
 import rpgbattle.BattleManager;
 import rpgbattle.fighter.FighterStats;
@@ -37,7 +37,7 @@ public class PlayerStatBar {
         lastHealthText = lastStaminaText = lastManaText = -1;
         healthRender = staminaRender = manaRender = 0;
         
-        borderMesh = MenuMeshCreator.create(50, 0, BORDER_W, BORDER_H, Const.UI_SCALE);
+        borderMesh = MenuMeshCreator.create(50, 0, BORDER_W, BORDER_H, Vars.UI_SCALE);
 
         statusIconMesh = StaticMeshBuilder.constructVAO(GL11.GL_TRIANGLE_FAN,
                 2, new float[] {0,0, 0,9, 9,9, 9,0},
@@ -93,7 +93,7 @@ public class PlayerStatBar {
         // offset to correct location, add pixel shift with playerShake
         manaPreviewCycle += .15;
         model.setIdentity();
-        model.translate(x-80+(int)playerShake, y+Const.UI_SCALE);
+        model.translate(x-80+(int)playerShake, y+ Vars.UI_SCALE);
         model.makeCurrent();
         
         // smooth sliding of stat bars

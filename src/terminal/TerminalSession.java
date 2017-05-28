@@ -8,7 +8,7 @@ import mote4.util.texture.TextureMap;
 import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.mesh.Mesh;
 import mote4.util.vertex.mesh.ScrollingText;
-import nullset.Const;
+import nullset.Vars;
 import terminal.filesystem.Directory;
 import terminal.filesystem.Node;
 import terminal.filesystem.program.DefaultProgram;
@@ -173,7 +173,7 @@ public class TerminalSession {
                 TextureMap.bindUnfiltered("font_terminal");
             } else
                 t.render();
-            model.translate(0, Const.UI_SCALE);
+            model.translate(0, Vars.UI_SCALE);
             model.makeCurrent();
         }
         //FontUtils.setCharPixelWidth(16);

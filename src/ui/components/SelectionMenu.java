@@ -6,7 +6,7 @@ import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.builder.StaticMeshBuilder;
 import mote4.util.vertex.mesh.Mesh;
 import mote4.util.vertex.mesh.ScrollingText;
-import nullset.Const;
+import nullset.Vars;
 import nullset.Input;
 import org.lwjgl.opengl.GL11;
 import ui.MenuMeshCreator;
@@ -105,23 +105,23 @@ public class SelectionMenu {
         if (textList[0] == null || !textList[0].getFullStr().equals("["+b.getTitle()+"]")) {
             if (textList[0] != null)
                 textList[0].destroy();
-            textList[0] = new ScrollingText("["+b.getTitle()+"]", "font_1", Const.UI_SCALE/3, Const.UI_SCALE/4, Const.UI_SCALE, Const.UI_SCALE, speed);
+            textList[0] = new ScrollingText("["+b.getTitle()+"]", "font_1", Vars.UI_SCALE/3, Vars.UI_SCALE/4, Vars.UI_SCALE, Vars.UI_SCALE, speed);
         }
         for (int i = 0; i < b.getNumElements(); i++) {
             if (textList[i+1] == null || !textList[i+1].getFullStr().equals("   "+b.getElementName(i))) {
                 if (textList[i+1] != null)
                     textList[i+1].destroy();
-                textList[i+1] = new ScrollingText("   " + b.getElementName(i), "font_1", Const.UI_SCALE/3, Const.UI_SCALE/4 + Const.UI_SCALE * (i+1), Const.UI_SCALE, Const.UI_SCALE, speed);
+                textList[i+1] = new ScrollingText("   " + b.getElementName(i), "font_1", Vars.UI_SCALE/3, Vars.UI_SCALE/4 + Vars.UI_SCALE * (i+1), Vars.UI_SCALE, Vars.UI_SCALE, speed);
             }
             float tempWidth = FontUtils.getStringWidth("   "+b.getElementName(i));
             maxWidth = Math.max(maxWidth, tempWidth);
         }
 
-        borderW = (int)(Const.UI_SCALE*maxWidth)-Const.UI_SCALE;
-        borderH = (b.getNumElements())*Const.UI_SCALE-Const.UI_SCALE/2;
+        borderW = (int)(Vars.UI_SCALE*maxWidth)- Vars.UI_SCALE;
+        borderH = (b.getNumElements())* Vars.UI_SCALE- Vars.UI_SCALE/2;
         if (border != null)
             border.destroy();
-        border = MenuMeshCreator.create(Const.UI_SCALE, Const.UI_SCALE, renderBorderW, renderBorderH, Const.UI_SCALE);
+        border = MenuMeshCreator.create(Vars.UI_SCALE, Vars.UI_SCALE, renderBorderW, renderBorderH, Vars.UI_SCALE);
     }
     
     public void update() {
@@ -165,7 +165,7 @@ public class SelectionMenu {
         if (redraw) {
             if (border != null)
                 border.destroy();
-            border = MenuMeshCreator.create(Const.UI_SCALE, Const.UI_SCALE, renderBorderW, renderBorderH, Const.UI_SCALE);
+            border = MenuMeshCreator.create(Vars.UI_SCALE, Vars.UI_SCALE, renderBorderW, renderBorderH, Vars.UI_SCALE);
         }
     }
     
@@ -177,8 +177,8 @@ public class SelectionMenu {
             m.render();
         //text.render();
         
-        model.translate(-Const.UI_SCALE/3, Const.UI_SCALE/3.5f);
-        model.translate(cursorAnimation*Const.UI_SCALE*.2f, (1+cursorPos)*Const.UI_SCALE);
+        model.translate(-Vars.UI_SCALE/3, Vars.UI_SCALE/3.5f);
+        model.translate(cursorAnimation* Vars.UI_SCALE*.2f, (1+cursorPos)* Vars.UI_SCALE);
         model.makeCurrent();
         TextureMap.bindUnfiltered("ui_cursor");
         cursor.render();

@@ -1,10 +1,9 @@
 package ui.components;
 
 import mote4.util.texture.TextureMap;
-import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.mesh.Mesh;
 import mote4.util.vertex.mesh.ScrollingText;
-import nullset.Const;
+import nullset.Vars;
 import ui.MenuMeshCreator;
 
 /**
@@ -20,7 +19,7 @@ public class DialogueMenu {
                             BORDER_H = 48;
     
     static {
-        border = MenuMeshCreator.create(Const.UI_SCALE,Const.UI_SCALE, BORDER_W, BORDER_H, Const.UI_SCALE);
+        border = MenuMeshCreator.create(Vars.UI_SCALE, Vars.UI_SCALE, BORDER_W, BORDER_H, Vars.UI_SCALE);
     }
     
     public static void setText(String s) {
@@ -28,7 +27,7 @@ public class DialogueMenu {
             text.destroy();
         
         //FontUtils.useMetric("font_1");
-        text = new ScrollingText(s, "font_1", Const.UI_SCALE/2, Const.UI_SCALE/2, Const.UI_SCALE, Const.UI_SCALE, 2);
+        text = new ScrollingText(s, "font_1", Vars.UI_SCALE/2, Vars.UI_SCALE/2, Vars.UI_SCALE, Vars.UI_SCALE, 2);
     }
     
     public static void render() {

@@ -21,9 +21,7 @@ public class BossBehavior extends EnemyBehavior {
     }
 
     @Override
-    public void initAct() {
-        actDelay = 60;
-        performActTime = 40;
+    public int initAct() {
 
         if (fighter.stats.health < fighter.stats.maxHealth/2
                 && Math.random() > .75)
@@ -46,20 +44,24 @@ public class BossBehavior extends EnemyBehavior {
             BattleUIManager.logMessage("They attack.");
             action = 0;
         }
+
+        return 40;
     }
 
     @Override
-    void performAct() {
+    public int act() {
         switch (action) {
             case 0:
                 useAttack();
-                break;
+                return 40;
             case 1:
                 fighter.restoreHealth(40);
-                break;
+                return 40;
             case 2:
                 useAttack(1.5);
-                break;
+                return 40;
+            default:
+                return 0;
         }
     }
 

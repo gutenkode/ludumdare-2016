@@ -7,7 +7,7 @@ import mote4.util.shader.ShaderMap;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.mesh.MeshMap;
-import nullset.Const;
+import nullset.Vars;
 import nullset.Input;
 import nullset.RootLayer;
 import terminal.TerminalSession;
@@ -104,16 +104,16 @@ public class EditorUI implements Scene {
         TextureMap.bindUnfiltered("ui_square_cursor");
         int[] pos = Editor.currentTileTexInds();
 
-        int x = (int)(pos[0] % Const.TILESHEET_X);
-        int y = (int)(pos[0] / Const.TILESHEET_Y);
+        int x = (int)(pos[0] % Vars.TILESHEET_X);
+        int y = (int)(pos[0] / Vars.TILESHEET_Y);
         trans.model.setIdentity();
         trans.model.translate(RootLayer.width()-256+16+32*x,16+32*y);
         trans.model.scale(128/8,128/8,1);
         trans.makeCurrent();
         MeshMap.render("quad");
 
-        x = (int)(pos[1] % Const.TILESHEET_X);
-        y = (int)(pos[1] / Const.TILESHEET_Y);
+        x = (int)(pos[1] % Vars.TILESHEET_X);
+        y = (int)(pos[1] / Vars.TILESHEET_Y);
         trans.model.setIdentity();
         trans.model.translate(RootLayer.width()-256+16+32*x,16+32*y);
         trans.model.scale(128/8,128/8,1);

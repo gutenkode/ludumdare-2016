@@ -9,6 +9,7 @@ import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.mesh.MeshMap;
 import nullset.RootLayer;
+import nullset.Vars;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -26,8 +27,9 @@ public class Postprocess implements Scene {
     private Random random;
     private static int width, height;
     private static float dofCoef, dofCoefTarget;
-    private static FBO combineScene, ditherScene, uiUpscaleScene,
+    private static FBO combineScene, uiUpscaleScene,
                        hdrScene, dofScene1, dofScene2;
+    private static FBO[] ditherScene;
     private static FBO[][] bloomScene;
     
     public Postprocess() {
@@ -35,6 +37,7 @@ public class Postprocess implements Scene {
         colorMult = 1;
         dofCoef = dofCoefTarget = 0;
         bloomScene = new FBO[NUM_BLOOM_FBOS][2];
+        ditherScene = new FBO[2];
     }
 
     @Override
@@ -78,25 +81,30 @@ public class Postprocess implements Scene {
         
     // render 3D scene to dither FBO
     // this is used to create the combined FBO and used as the final pass of the 3D scene
-        ditherScene.makeCurrent();
+        ditherScene[0].makeCurrent();
         glClear(GL_COLOR_BUFFER_BIT);
         
         ShaderMap.use("quad_dither");
         Uniform.varFloat("screenSize", width, height);
-        TextureMap.bindUnfiltered("fbo_scene");
+        TextureMap.bindFiltered("fbo_scene");
         MeshMap.render("quad");
         
     // render UI scene to UI upscale scene - simple upscale to improve filtering effects
-    // ditherScene is also upscaled, for the scene
+    // same with dither scene
         uiUpscaleScene.makeCurrent();
         glClear(GL_COLOR_BUFFER_BIT);
-        
         ShaderMap.use("quad");
         TextureMap.bindUnfiltered("fbo_ui");
         MeshMap.render("quad");
 
+        ditherScene[1].makeCurrent();
+        glClear(GL_COLOR_BUFFER_BIT);
+        TextureMap.bindUnfiltered("fbo_dither0");
+        MeshMap.render("quad");
+
     // create DOF scene from dithered scene, just a simple blur
-        createDOFTexture("fbo_dither");
+        //if (dofCoef > 0)
+            createDOFTexture("fbo_dither0");
         
     // render scene and UI to the combineScene,
     // which is used to create the bloom scene
@@ -104,7 +112,7 @@ public class Postprocess implements Scene {
         glClear(GL_COLOR_BUFFER_BIT);
         
         ShaderMap.use("quad");
-        TextureMap.bindFiltered("fbo_scene");
+        TextureMap.bindFiltered("fbo_dither1");
         MeshMap.render("quad");
         TextureMap.bindFiltered("fbo_ui");
         MeshMap.render("quad");
@@ -119,10 +127,15 @@ public class Postprocess implements Scene {
 
         //Uniform.varFloat("bloomCoef", .5f);
         Uniform.varFloat("colorMult", colorMult,colorMult,colorMult); // for fading in/out
-        Uniform.varFloat("rand", random.nextFloat(), random.nextFloat()); // random position for static
-        
-        // other shader values are set once when resizeBuffers is called
-        TextureMap.bindFiltered("fbo_dither"); // upscaled/dithered scene, binds to "tex_scene"
+        //Uniform.varFloat("rand", random.nextFloat(), random.nextFloat()); // random position for static
+
+
+        if (Vars.useFiltering())
+            TextureMap.bindFiltered("fbo_dither1"); // upscaled/dithered scene, binds to "tex_scene"
+        else
+            TextureMap.bindUnfiltered("fbo_dither1");
+
+        // all other uniform values are set in initFinalPassShader();
         MeshMap.render("quad");
     }
     
@@ -242,14 +255,19 @@ public class Postprocess implements Scene {
         TextureMap.delete("fbo_combine");
         combineScene.addToTextureMap("fbo_combine");
 
-        // ditherScene and uiUpscaleScene are double the resolution of the scene,
+        // ditherScene1 and uiUpscaleScene are double the resolution of the scene,
         // to improve texture filtering effects
 
-        if (ditherScene != null)
-            ditherScene.destroy();
-        ditherScene = new FBO(width*2,height*2,false,false,null);
-        TextureMap.delete("fbo_dither");
-        ditherScene.addToTextureMap("fbo_dither");
+        if (ditherScene[0] != null)
+            ditherScene[0].destroy();
+        ditherScene[0] = new FBO(width,height,false,false,null);
+        TextureMap.delete("fbo_dither0");
+        ditherScene[0].addToTextureMap("fbo_dither0");
+        if (ditherScene[1] != null)
+            ditherScene[1].destroy();
+        ditherScene[1] = new FBO(width*2,height*2,false,false,null);
+        TextureMap.delete("fbo_dither1");
+        ditherScene[1].addToTextureMap("fbo_dither1");
         
         if (uiUpscaleScene != null)
             uiUpscaleScene.destroy();
@@ -293,15 +311,25 @@ public class Postprocess implements Scene {
         
         initFinalPassShader();
     }
-    private static void initFinalPassShader() {
+
+    /**
+     * Sets all non-changing uniform values for the final pass shader.
+     */
+    public static void initFinalPassShader() {
         ShaderMap.use("quad_final");
-        //Uniform.samplerAndTextureFiltered("tex_scene", -1, "fbo_dither");
-        Uniform.samplerAndTextureFiltered("tex_ui", 4, "fbo_ui_upscale"); // upscaled UI
+
+        if (Vars.useFiltering()) {
+            //Uniform.samplerAndTextureFiltered("tex_scene", 9, "fbo_dither1"); // dithered 3D scene
+            Uniform.samplerAndTextureFiltered("tex_ui", 4, "fbo_ui_upscale"); // upscaled UI
+        } else {
+            //Uniform.samplerAndTextureUnfiltered("tex_scene", 9, "fbo_dither1"); // dithered 3D scene
+            Uniform.samplerAndTextureUnfiltered("tex_ui", 4, "fbo_ui_upscale"); // upscaled UI
+        }
         Uniform.samplerAndTextureFiltered("tex_bloom", 5, "fbo_hdr"); // bloom scene
         Uniform.samplerAndTextureFiltered("tex_dof", 6, "fbo_dof2"); // scene blur
         Uniform.samplerAndTextureUnfiltered("tex_dofvalue", 7, "fbo_dofvalue"); // scene blur mix data
-        Uniform.samplerAndTextureFiltered("tex_noise", 8, "post_noise"); // postprocess
-        Uniform.samplerAndTextureFiltered("tex_vignette", 9, "post_vignette"); // postprocess
+        //Uniform.samplerAndTextureFiltered("tex_noise", -1, "post_noise"); // postprocess
+        Uniform.samplerAndTextureFiltered("tex_vignette", 8, "post_vignette"); // postprocess
         //Uniform.samplerAndTextureFiltered("tex_scanlines", -1, "post_scanlines");
     }
 

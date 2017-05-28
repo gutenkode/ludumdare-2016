@@ -19,9 +19,9 @@ import ui.MenuHandler;
  * @author Peter
  */
 public class PlayerFighter extends Fighter {
-    
+
     private int delay;
-    private boolean turnUsed;
+    private final int attackDelay = 45, skillDelay = 55, itemDelay = 55, runDelay = 45; // delay times for different actions
     
     public PlayerFighter() {
 
@@ -35,29 +35,34 @@ public class PlayerFighter extends Fighter {
     }
     
     @Override
-    public void initAct() {
+    public int initAct() {
         BattleUIManager.startPlayerTurn();
         //BattleUIManager.logMessage("It's your turn.");
-        turnUsed = false;
-        delay = 60;
+        int startDelay = 30;
+        delay = -1;
         
         // stamina regen
         if (statEffects.contains(StatEffect.FATIGUE)) {
             addToast(ToastType.STAMINA.color+"FATIGUE -"+(stats.attack()/2));
             drainStamina(stats.attack()/2);
+            startDelay += 30;
         } else if (stats.stamina != stats.maxStamina) {
             //addToast(ToastType.STAMINA.color+"REGEN");
             restoreStamina(stats.attack()/3);
+            startDelay += 30;
         }
+        return startDelay;
     }
     @Override
-    public boolean act() {
+    public int act() {
+        return delay;
+        /*
         if (turnUsed) {
             delay--;
             if (delay <= 0)
                 return true;
         }
-        return false;
+        return false;*/
     }
     
     @Override
@@ -171,7 +176,7 @@ public class PlayerFighter extends Fighter {
         stats.stamina = Math.max(0, stats.stamina);
         addToast(ToastType.STAMINA, "-"+stats.attack());
         
-        turnUsed = true;
+        delay = attackDelay;
         return true;
     }
     public int getAttackPower() {
@@ -218,21 +223,25 @@ public class PlayerFighter extends Fighter {
         for (Fighter f : targets)
             skill.useBattle(handler,  stats.magic(), f);
 
-        turnUsed = true;
-        return turnUsed;
+        delay = skillDelay;
+        return true;
     }
     public boolean useItem(MenuHandler handler, Item item, Fighter... targets) {
+        boolean turnUsed = false;
         for (Fighter f : targets)
-            if (item.useBattle(handler, f))
+            if (item.useBattle(handler, f)) {
                 turnUsed = true;
-        
+                delay = itemDelay;
+            }
+
         return turnUsed;
     }
     public boolean useRun(MenuHandler handler) {
         BattleUIManager.logMessage("You escape safely!");
         BattleManager.runFromBattle();
-        turnUsed = true;
-        return turnUsed;
+
+        delay = runDelay;
+        return true;
     }
     
     public boolean canUseSkill(Skill s) {

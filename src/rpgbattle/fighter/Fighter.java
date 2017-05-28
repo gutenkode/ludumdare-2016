@@ -5,7 +5,7 @@ import mote4.util.matrix.ModelMatrix;
 import mote4.util.shader.Uniform;
 import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.mesh.Mesh;
-import nullset.Const;
+import nullset.Vars;
 import nullset.RootLayer;
 import rpgbattle.fighter.Fighter.Toast.ToastType;
 import rpgsystem.Element;
@@ -33,13 +33,13 @@ public abstract class Fighter {
     /**
      * Called once at the beginning of a Fighter's turn.
      */
-    public abstract void initAct();
+    public abstract int initAct();
     /**
      * When this Fighter is active, taking its turn, act() will be called
      * until this Fighter indicates that its turn is over.
      * @return Indicates that this Fighter is done taking its turn.
      */
-    public abstract boolean act();
+    public abstract int act();
     
     public abstract void damage(Element e, int stat, int atkPower, int accuracy, boolean crit);
     public abstract void cutHealth(Element e, double percent, int accuracy);
@@ -110,15 +110,11 @@ public abstract class Fighter {
      */
     public void poisonDamage() {
         if (stats.health > 1) {
-            //if (poisonDelay <= 0) {
-            //    poisonDelay = 60*4;
-                lastHealth = stats.health;
-                int dmg = stats.maxHealth / 10;
-                stats.health -= dmg;
-                stats.health = Math.max(1, stats.health);
-                addToast(ToastType.POISON, "POISON -" + (lastHealth - stats.health)); // if health was capped at 1hp, actual damage might be different from dmg
-            //} else
-            //    poisonDelay--;
+            lastHealth = stats.health;
+            int dmg = stats.maxHealth / 10;
+            stats.health -= dmg;
+            stats.health = Math.max(1, stats.health);
+            addToast(ToastType.POISON, "POISON -" + (lastHealth - stats.health)); // if health was capped at 1hp, actual damage might be different from dmg
         }
     }
     
@@ -257,9 +253,9 @@ public abstract class Fighter {
             randX = 0;//(int)(Math.random()*10)-5;
             randY = 0;//(int)(Math.random()*10)-5;
             FontUtils.useMetric("font_1");
-            mesh = FontUtils.createStringColor(text, 0, 0, Const.UI_SCALE, Const.UI_SCALE);
+            mesh = FontUtils.createStringColor(text, 0, 0, Vars.UI_SCALE, Vars.UI_SCALE);
             
-            centerOffset = FontUtils.getStringWidth(text)/2*Const.UI_SCALE;
+            centerOffset = FontUtils.getStringWidth(text)/2* Vars.UI_SCALE;
         }
         public boolean render(ModelMatrix m) {
             if (delay > 0) {

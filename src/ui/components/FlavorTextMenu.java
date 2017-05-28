@@ -4,7 +4,7 @@ import mote4.util.texture.TextureMap;
 import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.mesh.Mesh;
 import mote4.util.vertex.mesh.ScrollingText;
-import nullset.Const;
+import nullset.Vars;
 import ui.MenuMeshCreator;
 
 /**
@@ -28,16 +28,16 @@ public class FlavorTextMenu {
         
         FontUtils.useMetric("font_1");
         //text = FontUtils.createString(s, Const.UI_SCALE/2, Const.UI_SCALE/2, Const.UI_SCALE, Const.UI_SCALE);
-        text = new ScrollingText(s, "font_1", Const.UI_SCALE/2, Const.UI_SCALE/2, Const.UI_SCALE, Const.UI_SCALE, 3);
+        text = new ScrollingText(s, "font_1", Vars.UI_SCALE/2, Vars.UI_SCALE/2, Vars.UI_SCALE, Vars.UI_SCALE, 3);
 
         String[] lines = s.split("\n");
         float maxWidth = 0;
         for (String s1 : lines)
             maxWidth = Math.max(maxWidth, FontUtils.getStringWidth(s1));
 
-        height = (lines.length-1)*Const.UI_SCALE;
-        width = (int)(Const.UI_SCALE*maxWidth)-Const.UI_SCALE;
-        border = MenuMeshCreator.create(Const.UI_SCALE,Const.UI_SCALE, renderWidth, renderHeight, Const.UI_SCALE);
+        height = (lines.length-1)* Vars.UI_SCALE;
+        width = (int)(Vars.UI_SCALE*maxWidth)- Vars.UI_SCALE;
+        border = MenuMeshCreator.create(Vars.UI_SCALE, Vars.UI_SCALE, renderWidth, renderHeight, Vars.UI_SCALE);
     }
     
     public static void render() {
@@ -68,7 +68,7 @@ public class FlavorTextMenu {
         if (redraw) {
             if (border != null)
                 border.destroy();
-            border = MenuMeshCreator.create(Const.UI_SCALE, Const.UI_SCALE, renderWidth, renderHeight, Const.UI_SCALE);
+            border = MenuMeshCreator.create(Vars.UI_SCALE, Vars.UI_SCALE, renderWidth, renderHeight, Vars.UI_SCALE);
         }
     }
 }

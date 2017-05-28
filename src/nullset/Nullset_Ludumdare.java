@@ -1,5 +1,6 @@
 package nullset;
 
+import com.sun.tools.hat.internal.model.Root;
 import map.MapLevelManager;
 import map.MapManager;
 import mote4.scenegraph.Layer;
@@ -20,6 +21,8 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Peter
  */
 public class Nullset_Ludumdare {
+
+    private static RootLayer rootLayer;
     
     public static void main(String[] args) {
         if (System.getProperty("os.name").toLowerCase().contains("mac"))
@@ -27,7 +30,6 @@ public class Nullset_Ludumdare {
         //Window.initFullscreen();
         //Window.initWindowed(1920/2, 1080/2);
         Window.setWindowTitle("Nullset");
-        Window.setVsync(true);
         Window.initWindowedPercent(.666, 16/9.0);
         
         Input.createCharCallback();
@@ -51,7 +53,8 @@ public class Nullset_Ludumdare {
         //FBO ingame = new FBO(1280/2,720/2,true,false,null);
         //FBO ingame = new FBO(1920/3,1080/3,true,false,null);
         //ingame.addToTextureMap("fbo_scene");
-        Window.addLayer(new RootLayer());
+        rootLayer = new RootLayer();
+        Window.addLayer(rootLayer);
         Window.addScene(new Postprocess()); // Postprocess is on the default layer and renders to the screen
         Window.loop();
     }
@@ -73,4 +76,6 @@ public class Nullset_Ludumdare {
         MeshMap.add(StaticMeshBuilder.constructVAOFromOBJ("pipe", false), "pipe");
         MeshMap.add(StaticMeshBuilder.constructVAOFromOBJ("hexahedron", false), "hexahedron");
     }
+
+    public static RootLayer rootLayer() { return rootLayer; }
 }

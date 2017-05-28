@@ -21,9 +21,7 @@ public class NoiseBehavior extends EnemyBehavior {
     }
 
     @Override
-    public void initAct() {
-        actDelay = 60;
-        performActTime = 40;
+    public int initAct() {
 
         if (fighter.stats.health < fighter.stats.maxHealth/2
                 && Math.random() > .5)
@@ -42,10 +40,12 @@ public class NoiseBehavior extends EnemyBehavior {
             BattleUIManager.logMessage("The Noise shivers wildly.");
             action = 0;
         }
+
+        return 30;
     }
 
     @Override
-    void performAct() {
+    public int act() {
         switch (action) {
             case 0:
                 useAttack();
@@ -57,6 +57,8 @@ public class NoiseBehavior extends EnemyBehavior {
                 BattleManager.getPlayer().inflictStatus(StatEffect.FATIGUE, 80);
                 break;
         }
+
+        return 40;
     }
 
     @Override

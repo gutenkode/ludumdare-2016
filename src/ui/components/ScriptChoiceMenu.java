@@ -5,7 +5,7 @@ import mote4.util.texture.TextureMap;
 import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.builder.StaticMeshBuilder;
 import mote4.util.vertex.mesh.Mesh;
-import nullset.Const;
+import nullset.Vars;
 import nullset.Input;
 import org.lwjgl.opengl.GL11;
 import ui.MenuMeshCreator;
@@ -60,11 +60,11 @@ public class ScriptChoiceMenu {
             float tempWidth = FontUtils.getStringWidth("   "+s[i]);
             maxWidth = Math.max(maxWidth, tempWidth);
         }
-        text = FontUtils.createString(str.toString(), Const.UI_SCALE/3, Const.UI_SCALE/4, Const.UI_SCALE, Const.UI_SCALE);
+        text = FontUtils.createString(str.toString(), Vars.UI_SCALE/3, Vars.UI_SCALE/4, Vars.UI_SCALE, Vars.UI_SCALE);
         
-        width = (int)(Const.UI_SCALE*maxWidth)-Const.UI_SCALE;
-        height = (s.length-1)*Const.UI_SCALE-Const.UI_SCALE/2;
-        border = MenuMeshCreator.create(Const.UI_SCALE, Const.UI_SCALE, width, height, Const.UI_SCALE);
+        width = (int)(Vars.UI_SCALE*maxWidth)- Vars.UI_SCALE;
+        height = (s.length-1)* Vars.UI_SCALE- Vars.UI_SCALE/2;
+        border = MenuMeshCreator.create(Vars.UI_SCALE, Vars.UI_SCALE, width, height, Vars.UI_SCALE);
     }
     
     /**
@@ -94,8 +94,8 @@ public class ScriptChoiceMenu {
         TextureMap.bindUnfiltered("font_1");
         text.render();
         
-        model.translate(-Const.UI_SCALE/3, Const.UI_SCALE/3.5f);
-        model.translate(cursorAnimation*Const.UI_SCALE*.2f, cursorPos*Const.UI_SCALE);
+        model.translate(-Vars.UI_SCALE/3, Vars.UI_SCALE/3.5f);
+        model.translate(cursorAnimation* Vars.UI_SCALE*.2f, cursorPos* Vars.UI_SCALE);
         model.makeCurrent();
         TextureMap.bindUnfiltered("ui_cursor");
         cursor.render();

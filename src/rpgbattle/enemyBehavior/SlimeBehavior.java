@@ -21,10 +21,7 @@ public class SlimeBehavior extends EnemyBehavior {
     }
 
     @Override
-    public void initAct() {
-        actDelay = 60;
-        performActTime = 40;
-
+    public int initAct() {
         if (!fighter.hasStatus(StatEffect.DEF_UP)
             && Math.random() > .8)
         {
@@ -53,24 +50,28 @@ public class SlimeBehavior extends EnemyBehavior {
             BattleUIManager.logMessage("The Slime attacks!");
             action = 0;
         }
+
+        return 40;
     }
 
     @Override
-    void performAct() {
+    public int act() {
         switch (action) {
             case 0:
                 useAttack();
-                break;
+                return 40;
             case 1:
                 fighter.inflictStatus(StatEffect.DEF_UP,999);
                 //fighter.restoreHealth(20);
-                break;
+                return 40;
             case 2: 
                 BattleManager.getPlayer().inflictStatus(StatEffect.POISON,80);
-                break;
+                return 40;
             case 3: 
                 BattleManager.getPlayer().inflictStatus(StatEffect.FATIGUE,80);
-                break;
+                return 40;
+            default:
+                return 0;
         }
     }
 

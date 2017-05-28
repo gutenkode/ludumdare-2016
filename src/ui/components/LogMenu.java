@@ -2,10 +2,9 @@ package ui.components;
 
 import mote4.util.matrix.ModelMatrix;
 import mote4.util.texture.TextureMap;
-import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.mesh.Mesh;
 import mote4.util.vertex.mesh.ScrollingText;
-import nullset.Const;
+import nullset.Vars;
 import ui.MenuMeshCreator;
 
 /**
@@ -19,12 +18,12 @@ public class LogMenu {
     private static int offset;
     public static final int NUM_LINES = 4,
                             BORDER_W = 350, 
-                            BORDER_H = Const.UI_SCALE*(NUM_LINES-1);
+                            BORDER_H = Vars.UI_SCALE*(NUM_LINES-1);
     
     static {
         text = new ScrollingText[NUM_LINES];
         offset = 0;
-        border = MenuMeshCreator.create(Const.UI_SCALE,Const.UI_SCALE, BORDER_W, BORDER_H, Const.UI_SCALE);
+        border = MenuMeshCreator.create(Vars.UI_SCALE, Vars.UI_SCALE, BORDER_W, BORDER_H, Vars.UI_SCALE);
     }
     
     public static void addLine(String s) {
@@ -34,7 +33,7 @@ public class LogMenu {
     private static void addOneLine(String s) {
         if (text[0] != null) {
             text[0].destroy();
-            offset += Const.UI_SCALE;
+            offset += Vars.UI_SCALE;
         }
         
         // shift down the list
@@ -47,7 +46,7 @@ public class LogMenu {
         //    buildString.append(log[i]).append("\n");
         
         //FontUtils.useMetric("font_1");
-        text[NUM_LINES-1] = new ScrollingText(s, "font_1", Const.UI_SCALE/2, Const.UI_SCALE/2, Const.UI_SCALE, Const.UI_SCALE, 2);
+        text[NUM_LINES-1] = new ScrollingText(s, "font_1", Vars.UI_SCALE/2, Vars.UI_SCALE/2, Vars.UI_SCALE, Vars.UI_SCALE, 2);
     }
     
     public static void render(ModelMatrix model) {
@@ -60,7 +59,7 @@ public class LogMenu {
                 TextureMap.bindUnfiltered("font_1");
                 model.makeCurrent();
                 text[i].render();
-                model.translate(0, Const.UI_SCALE);
+                model.translate(0, Vars.UI_SCALE);
             }
         if (offset > 0) {
             offset -= 4;

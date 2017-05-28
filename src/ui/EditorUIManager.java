@@ -6,7 +6,7 @@ import mote4.util.shader.ShaderMap;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.mesh.ScrollingText;
-import nullset.Const;
+import nullset.Vars;
 import nullset.Input;
 import nullset.RootLayer;
 import ui.components.SelectionMenu;
@@ -58,9 +58,9 @@ public class EditorUIManager implements MenuHandler {
         }
 
         model.setIdentity();
-        model.translate(Const.UI_SCALE/2, Const.UI_SCALE/2,0);
+        model.translate(Vars.UI_SCALE/2, Vars.UI_SCALE/2,0);
         for (SelectionMenu sm : selectionMenus) {
-            model.translate(Const.UI_SCALE/2, Const.UI_SCALE/2);
+            model.translate(Vars.UI_SCALE/2, Vars.UI_SCALE/2);
             model.makeCurrent();
             model.push();
             sm.render(model);
@@ -81,7 +81,7 @@ public class EditorUIManager implements MenuHandler {
     public static void logMessage(String message) {
         if (logMessage != null)
             logMessage.destroy();
-        logMessage = new ScrollingText(message, "font_1", 0, 0, Const.UI_SCALE, Const.UI_SCALE, 1);
+        logMessage = new ScrollingText(message, "font_1", 0, 0, Vars.UI_SCALE, Vars.UI_SCALE, 1);
         logMessageTimeout = 100;
     }
 

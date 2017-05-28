@@ -14,8 +14,8 @@ import rpgsystem.Element;
 public abstract class EnemyBehavior {
     
     EnemyFighter fighter;
-    int actDelay = 0, // used as a clock for determining sequence of events
-        performActTime = 0; // the time at which performAct() will be called
+    //int actDelay = 0, // used as a clock for determining sequence of events
+    //    performActTime = 0; // the time at which performAct() will be called
 
     public EnemyBehavior(EnemyFighter f) {
         fighter = f;
@@ -45,20 +45,15 @@ public abstract class EnemyBehavior {
      * "turn start" flash, and this method should print to the log the action
      * that is about to happen.
      * This method should not perform any attacks or actions!
-     * This method must set actDelay to its initial value!
+     * @return Delay time, in frames, before calling act()
      */
-    public abstract void initAct();
+    public abstract int initAct();
 
-    public final boolean act() {
-        if (actDelay == performActTime)
-            performAct();
-        actDelay--;
-        return actDelay <= 0;
-    }
     /**
      * The action decided on in initAct() should be performed when this is called.
+     * @return Delay time, in frames, before ending the turn for this enemy.
      */
-    abstract void performAct();
+    public abstract int act();
     
     /**
      * Will process the model matrix to apply any animations upon death for

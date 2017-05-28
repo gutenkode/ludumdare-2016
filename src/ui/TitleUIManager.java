@@ -4,7 +4,7 @@ import mote4.util.matrix.ModelMatrix;
 import mote4.util.matrix.Transform;
 import mote4.util.shader.ShaderMap;
 import mote4.util.texture.TextureMap;
-import nullset.Const;
+import nullset.Vars;
 import nullset.Input;
 import nullset.RootLayer;
 import ui.components.SelectionMenu;
@@ -42,7 +42,7 @@ public class TitleUIManager implements MenuHandler {
         model.setIdentity();
         model.translate(RootLayer.width()/2-50, RootLayer.height()/2,0);
         for (SelectionMenu sm : selectionMenus) {
-            model.translate(Const.UI_SCALE/2, Const.UI_SCALE/2);
+            model.translate(Vars.UI_SCALE/2, Vars.UI_SCALE/2);
             model.makeCurrent();
             model.push();
             sm.render(model);

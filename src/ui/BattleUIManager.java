@@ -7,7 +7,7 @@ import mote4.util.matrix.ModelMatrix;
 import mote4.util.matrix.Transform;
 import mote4.util.shader.ShaderMap;
 import mote4.util.texture.TextureMap;
-import nullset.Const;
+import nullset.Vars;
 import nullset.Input;
 import nullset.RootLayer;
 import rpgbattle.BattleManager;
@@ -85,9 +85,9 @@ public class BattleUIManager implements MenuHandler {
             s.renderAnimations(model);
         }
         // PlayerStatBar sets own shaders
-        PlayerStatBar.render(RootLayer.width()/2, RootLayer.height()-42-Const.UI_SCALE/2, trans);
+        PlayerStatBar.render(RootLayer.width()/2, RootLayer.height()-42- Vars.UI_SCALE/2, trans);
         ShaderMap.use("spritesheet_nolight");
-        PlayerStatBar.renderAnimations(RootLayer.width()/2, RootLayer.height()-10-Const.UI_SCALE/2, model);
+        PlayerStatBar.renderAnimations(RootLayer.width()/2, RootLayer.height()-10- Vars.UI_SCALE/2, model);
 
     ShaderMap.use("texture_color"); // uses the color attribute, for colored text
     trans.makeCurrent();
@@ -106,8 +106,8 @@ public class BattleUIManager implements MenuHandler {
     trans.makeCurrent();
         // LogMenu
         model.setIdentity();
-        model.translate(RootLayer.width()/2-DialogueMenu.BORDER_W/2-Const.UI_SCALE,
-                        .5f*Const.UI_SCALE);
+        model.translate(RootLayer.width()/2-DialogueMenu.BORDER_W/2- Vars.UI_SCALE,
+                        .5f* Vars.UI_SCALE);
         model.makeCurrent();
         LogMenu.render(model);
 
@@ -116,8 +116,8 @@ public class BattleUIManager implements MenuHandler {
         
         if (showDialogue) {
             model.setIdentity();
-            model.translate(RootLayer.width()/2-DialogueMenu.BORDER_W/2-Const.UI_SCALE,
-                            .5f*Const.UI_SCALE);
+            model.translate(RootLayer.width()/2-DialogueMenu.BORDER_W/2- Vars.UI_SCALE,
+                            .5f* Vars.UI_SCALE);
             model.makeCurrent();
             DialogueMenu.render();
         }
@@ -125,7 +125,7 @@ public class BattleUIManager implements MenuHandler {
         if (showScriptChoice) {
             model.setIdentity();
             model.translate(RootLayer.width()/2-DialogueMenu.BORDER_W/2,
-                            RootLayer.height()-40-5*Const.UI_SCALE-ScriptChoiceMenu.height());
+                            RootLayer.height()-40-5* Vars.UI_SCALE-ScriptChoiceMenu.height());
             model.makeCurrent();
             ScriptChoiceMenu.render(model);
         }
@@ -133,9 +133,9 @@ public class BattleUIManager implements MenuHandler {
         if (playerTurn) 
         {
             model.setIdentity();
-            model.translate(0, Const.UI_SCALE*2+DialogueMenu.BORDER_H);
+            model.translate(0, Vars.UI_SCALE*2+DialogueMenu.BORDER_H);
             for (SelectionMenu sm : selectionMenus) {
-                model.translate(Const.UI_SCALE/2, Const.UI_SCALE/2);
+                model.translate(Vars.UI_SCALE/2, Vars.UI_SCALE/2);
                 model.makeCurrent();
                 model.push();
                 sm.render(model);
@@ -149,14 +149,14 @@ public class BattleUIManager implements MenuHandler {
                     yOffset = 0;
                 else
                     yOffset = selectionMenus.peek().cursorPos()+.75f;
-                yOffset *= Const.UI_SCALE;
-                model.translate(selectionMenus.peek().width()+Const.UI_SCALE*2,yOffset);
+                yOffset *= Vars.UI_SCALE;
+                model.translate(selectionMenus.peek().width()+ Vars.UI_SCALE*2,yOffset);
                 model.makeCurrent();
                 FlavorTextMenu.render();
                 
                 if (showSprite) 
                 {
-                    model.translate(0, Const.UI_SCALE*2+FlavorTextMenu.height());
+                    model.translate(0, Vars.UI_SCALE*2+FlavorTextMenu.height());
                     model.makeCurrent();
                     SpriteMenu.render(model);
                 }
@@ -177,6 +177,10 @@ public class BattleUIManager implements MenuHandler {
         refreshEnemies();
         LogMenu.clear();
     }
+
+    /**
+     * Create the sprite objects for enemies in a battle.
+     */
     public static void refreshEnemies() {
         if (fighters != null) {
             enemySprites = new ArrayList<>();

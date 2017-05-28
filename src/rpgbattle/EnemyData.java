@@ -130,6 +130,7 @@ public class EnemyData {
             case "SLIME3":
             case "SLIME4":
                 return new SlimeBehavior(fighter);
+                /*
             case "BGINR1":
                 return new BGinR1Behavior(fighter);
             case "BGINR2":
@@ -147,7 +148,7 @@ public class EnemyData {
             case "VILEDRINK1":
             case "VILEDRINK2":
                 return new PoisonedDrinkBehavior(fighter);
-
+            */
             case "NOISE":
                 return new NoiseBehavior(fighter);
             case "BOSS":

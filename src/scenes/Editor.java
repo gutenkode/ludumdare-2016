@@ -11,12 +11,10 @@ import mote4.util.texture.TextureMap;
 import mote4.util.vertex.builder.MeshBuilder;
 import mote4.util.vertex.mesh.Mesh;
 import mote4.util.vertex.mesh.MeshMap;
-import nullset.Const;
+import nullset.Vars;
 import nullset.Input;
 import org.lwjgl.glfw.GLFW;
 import ui.EditorUIManager;
-
-import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -188,11 +186,11 @@ public class Editor implements Scene {
                 keyPressed = true;
             } else if (GLFW.glfwGetKey(Window.getWindowID(), GLFW.GLFW_KEY_I) == GLFW.GLFW_PRESS) {
                 if (!keyPressed)
-                    me.editTileInd1(xPos,yPos,-(int)Const.TILESHEET_X);
+                    me.editTileInd1(xPos,yPos,-(int) Vars.TILESHEET_X);
                 keyPressed = true;
             } else if (GLFW.glfwGetKey(Window.getWindowID(), GLFW.GLFW_KEY_K) == GLFW.GLFW_PRESS) {
                 if (!keyPressed)
-                    me.editTileInd1(xPos,yPos,(int)Const.TILESHEET_Y);
+                    me.editTileInd1(xPos,yPos,(int) Vars.TILESHEET_Y);
                 keyPressed = true;
             } else
                 keyPressed = false;

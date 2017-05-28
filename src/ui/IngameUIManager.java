@@ -11,7 +11,7 @@ import mote4.util.matrix.Transform;
 import mote4.util.shader.ShaderMap;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.mesh.ScrollingText;
-import nullset.Const;
+import nullset.Vars;
 import nullset.Input;
 import rpgbattle.BattleManager;
 import ui.components.FlavorTextMenu;
@@ -93,7 +93,7 @@ public class IngameUIManager implements MenuHandler {
 
         // PlayerStatBar, sets own shaders
         if (statBarSlide < .95)
-            PlayerStatBar.render(54, RootLayer.height()-42-Const.UI_SCALE/2+(int)(60*statBarSlide), trans);
+            PlayerStatBar.render(54, RootLayer.height()-42- Vars.UI_SCALE/2+(int)(60*statBarSlide), trans);
 
         // initialize state for the rest of the UI
         ShaderMap.use("texture_uiblur");
@@ -115,8 +115,8 @@ public class IngameUIManager implements MenuHandler {
             // the dialogue box will auto-align with the bottom of the screen
             model.translate(0, dialogueSlide*100);
             // and center in the X direction
-            model.translate(RootLayer.width()/2-DialogueMenu.BORDER_W/2-Const.UI_SCALE,
-                    RootLayer.height()-40-3*Const.UI_SCALE);
+            model.translate(RootLayer.width()/2-DialogueMenu.BORDER_W/2- Vars.UI_SCALE,
+                    RootLayer.height()-40-3* Vars.UI_SCALE);
             model.makeCurrent();
             DialogueMenu.render();
         }
@@ -127,8 +127,8 @@ public class IngameUIManager implements MenuHandler {
                 // sprite
                 // no smooth in/out animation, but not too noticeable next to dialogue bar
                 model.setIdentity();
-                model.translate(RootLayer.width()/2+DialogueMenu.BORDER_W/2+Const.UI_SCALE,
-                        RootLayer.height()-40-3*Const.UI_SCALE);
+                model.translate(RootLayer.width()/2+DialogueMenu.BORDER_W/2+ Vars.UI_SCALE,
+                        RootLayer.height()-40-3* Vars.UI_SCALE);
                 model.makeCurrent();
                 SpriteMenu.render(model);
 
@@ -136,8 +136,8 @@ public class IngameUIManager implements MenuHandler {
                 // !!!! needs a simple animation
                 if (showScriptChoice) {
                     model.setIdentity();
-                    model.translate(RootLayer.width()/2-DialogueMenu.BORDER_W/2-Const.UI_SCALE,
-                            RootLayer.height()-40-5*Const.UI_SCALE-ScriptChoiceMenu.height());
+                    model.translate(RootLayer.width()/2-DialogueMenu.BORDER_W/2- Vars.UI_SCALE,
+                            RootLayer.height()-40-5* Vars.UI_SCALE-ScriptChoiceMenu.height());
                     model.makeCurrent();
                     ScriptChoiceMenu.render(model);
                 }
@@ -147,7 +147,7 @@ public class IngameUIManager implements MenuHandler {
                 // when exiting the final menu and unpausing the game, the closing animation will still play
                 model.setIdentity();
                 for (SelectionMenu sm : selectionMenus) {
-                    model.translate(Const.UI_SCALE/2, Const.UI_SCALE/2);
+                    model.translate(Vars.UI_SCALE/2, Vars.UI_SCALE/2);
                     model.makeCurrent();
                     model.push();
                     sm.render(model);
@@ -161,18 +161,18 @@ public class IngameUIManager implements MenuHandler {
                         yOffset = 0;
                     else
                         yOffset = selectionMenus.peek().cursorPos()+.75f;
-                    yOffset *= Const.UI_SCALE;
+                    yOffset *= Vars.UI_SCALE;
 
                     flavorTextRenderYOffset -= (flavorTextRenderYOffset-yOffset)/2;
 
-                    model.translate(selectionMenus.peek().width()+Const.UI_SCALE*2,flavorTextRenderYOffset);
+                    model.translate(selectionMenus.peek().width()+ Vars.UI_SCALE*2,flavorTextRenderYOffset);
                     model.makeCurrent();
                     FlavorTextMenu.render();
 
                     // the sprite's position is relative to the flavor text box, model is not reset
                     if (showSprite) 
                     {
-                        model.translate(0, Const.UI_SCALE*2+FlavorTextMenu.height()-1);
+                        model.translate(0, Vars.UI_SCALE*2+FlavorTextMenu.height()-1);
                         model.makeCurrent();
                         SpriteMenu.render(model);
                     }
@@ -183,13 +183,13 @@ public class IngameUIManager implements MenuHandler {
         // it is visual only and has no affect on menu logic
         if (closingMenu != null) {
             menuCloseTransition += 3+menuCloseTransition*.5;
-            if (menuCloseTransition > closingMenu.height()+Const.UI_SCALE/2*(selectionMenus.size()+1)) {
+            if (menuCloseTransition > closingMenu.height()+ Vars.UI_SCALE/2*(selectionMenus.size()+1)) {
                 closingMenu.destroy();
                 closingMenu = null;
             } else {
                 model.setIdentity();
-                model.translate(Const.UI_SCALE / 2 * (selectionMenus.size() + 1),
-                        Const.UI_SCALE / 2 * (selectionMenus.size() + 1));
+                model.translate(Vars.UI_SCALE / 2 * (selectionMenus.size() + 1),
+                        Vars.UI_SCALE / 2 * (selectionMenus.size() + 1));
                 model.translate(0, -menuCloseTransition);
                 model.makeCurrent();
                 closingMenu.render(model);
@@ -210,7 +210,7 @@ public class IngameUIManager implements MenuHandler {
     public static void logMessage(String message) {
         if (logMessage != null)
             logMessage.destroy();
-        logMessage = new ScrollingText(message, "font_1", 0, 0, Const.UI_SCALE, Const.UI_SCALE, 1);
+        logMessage = new ScrollingText(message, "font_1", 0, 0, Vars.UI_SCALE, Vars.UI_SCALE, 1);
         logMessageTimeout = 100;
     }
     public static void playScript(ScriptTrigger t, String scriptName) {

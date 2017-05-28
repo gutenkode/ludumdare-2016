@@ -1,6 +1,7 @@
 package ui.selectionmenubehavior;
 
 import mote4.scenegraph.Window;
+import nullset.Vars;
 import ui.MenuHandler;
 
 /**
@@ -11,7 +12,7 @@ public class OptionsMenu implements SelectionMenuBehavior {
     private MenuHandler handler;
 
     private String title = "OPTIONS";
-    private String[] options = {"Toggle Fullscreen","<vsync>","Exit"};
+    private String[] options = {"Toggle Fullscreen","<vsync>","<supersample>","<filter>","Exit"};
 
     public OptionsMenu(MenuHandler h) {
         handler = h;
@@ -19,9 +20,17 @@ public class OptionsMenu implements SelectionMenuBehavior {
     }
     private void refreshOptions() {
         if (Window.isVsyncEnabled())
-            options[1] = "Disable Vsync";
+            options[1] = "Vsync: On";
         else
-            options[1] = "Enable Vsync";
+            options[1] = "Vsync: Off";
+        if (Vars.useSSAA())
+            options[2] = "SSAA: On";
+        else
+            options[2] = "SSAA: Off";
+        if (Vars.useFiltering())
+            options[3] = "Filtering: On";
+        else
+            options[3] = "Filtering: Off";
     }
 
     @Override
@@ -42,14 +51,24 @@ public class OptionsMenu implements SelectionMenuBehavior {
     @Override
     public void onAction(int index) {
         switch(index) {
-            case 0:
+            case 0: // fullscreen
                 if (Window.isFullscreen())
                     Window.setWindowedPercent(.75, 16/9.0);
                 else
                     Window.setFullscreen();
                 break;
-            case 1:
+            case 1: // vsync
                 Window.setVsync(!Window.isVsyncEnabled());
+                refreshOptions();
+                handler.forceMenuRefocus();
+                break;
+            case 2: // supersample
+                Vars.setSSAA(!Vars.useSSAA());
+                refreshOptions();
+                handler.forceMenuRefocus();
+                break;
+            case 3: // filter
+                Vars.setFiltering(!Vars.useFiltering());
                 refreshOptions();
                 handler.forceMenuRefocus();
                 break;

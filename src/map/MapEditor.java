@@ -1,7 +1,7 @@
 package map;
 
 import entities.Entity;
-import nullset.Const;
+import nullset.Vars;
 
 import java.util.ArrayList;
 
@@ -35,7 +35,7 @@ public class MapEditor {
     public void editTileInd1(int x, int y, int chg) {
         if (mapData.tileData[x][y][0]+chg >= 0) {
             mapData.tileData[x][y][0] += chg;
-            mapData.tileData[x][y][0] %= Const.TILESHEET_X*Const.TILESHEET_Y;
+            mapData.tileData[x][y][0] %= Vars.TILESHEET_X* Vars.TILESHEET_Y;
             mapData.rebuildMesh();
         }
     }
@@ -48,7 +48,7 @@ public class MapEditor {
     public void editTileInd2(int x, int y, int chg) {
         if (mapData.tileData[x][y][2]+chg >= 0) {
             mapData.tileData[x][y][2] += chg;
-            mapData.tileData[x][y][0] %= Const.TILESHEET_X*Const.TILESHEET_Y;
+            mapData.tileData[x][y][0] %= Vars.TILESHEET_X* Vars.TILESHEET_Y;
             mapData.rebuildMesh();
         }
     }

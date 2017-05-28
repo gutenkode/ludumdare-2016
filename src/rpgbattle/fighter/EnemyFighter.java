@@ -41,13 +41,13 @@ public class EnemyFighter extends Fighter {
     }
     
     @Override
-    public void initAct() {
+    public int initAct() {
         actionStartFlash();
-        behavior.initAct();
+        return behavior.initAct();
     }
     
     @Override
-    public boolean act() {
+    public int act() {
         return behavior.act();
     }
     

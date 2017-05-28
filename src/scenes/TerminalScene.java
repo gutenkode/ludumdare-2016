@@ -3,8 +3,7 @@ package scenes;
 import mote4.scenegraph.Scene;
 import mote4.util.matrix.Transform;
 import mote4.util.shader.ShaderMap;
-import mote4.util.texture.TextureMap;
-import nullset.Const;
+import nullset.Vars;
 import nullset.Input;
 import terminal.TerminalSession;
 
@@ -122,7 +121,7 @@ public class TerminalScene implements Scene {
     public void framebufferResized(int width, int height) {
         trans.projection.setOrthographic(0, 0, width, height, -1, 1);
         trans.view.setIdentity();
-        trans.view.translate(width/2-200,Const.UI_SCALE/2);
+        trans.view.translate(width/2-200, Vars.UI_SCALE/2);
     }
 
     @Override
