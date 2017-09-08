@@ -1,11 +1,16 @@
 package rpgbattle;
 
-import nullset.RootLayer;
+import mote4.util.audio.AudioPlayback;
+import main.RootLayer;
+import rpgbattle.battleAction.BattleAction;
 import rpgbattle.fighter.Fighter;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+
 import rpgbattle.fighter.EnemyFighter;
 import rpgbattle.fighter.PlayerFighter;
-import rpgsystem.StatEffect;
+import rpgsystem.StatusEffect;
 import scenes.Battle;
 import scenes.Postprocess;
 import ui.BattleUIManager;
@@ -22,20 +27,33 @@ public class BattleManager {
     private static int stateDelay;
     private static BattleState currentState;
     private static final PlayerFighter playerFighter;
+    private static final Queue<BattleAction> actions;
 
     private enum BattleState {
-        START_BATTLE,
-        START_TURN,
-        FIGHTER_TURN,
-        END_TURN,
-        END_BATTLE;
+        START_BATTLE,   // actions to perform at the start of a battle
+        START_TURN,     // actions to perform at the start of a fighter's turn
+        FIGHTER_TURN,   // actions to perform during a fighter's turn
+        ACTION,         // BattleActions created during the fighter's turn, to be finished before the end of the turn
+        END_TURN,       // actions to perform at the end of a fighter's turn
+        END_BATTLE,     // actions to perform at the end of a battle
+        PLAYER_LOOSE;   // actions to perform when the player hits 0 HP
     }
     
     static {
         playerFighter = new PlayerFighter();
+        actions = new LinkedList<>();
     }
-    
-    public static void initEnemies(String... enemyNames) {
+
+    /**
+     * Calling this method with a list of enemy names will start a battle.
+     * This is the root method for starting the battle load procedure.
+     * @param enemyNames List of enemy names as Strings to fight.
+     */
+    public static void startBattle(String... enemyNames) {
+        AudioPlayback.playSfx("sfx_battle_start");
+        // RootScene -> go to battle
+        RootLayer.transitionToBattle();
+
         fighters = new ArrayList<>();
         enemies = new ArrayList<>();
         
@@ -45,6 +63,7 @@ public class BattleManager {
             EnemyFighter enemy = new EnemyFighter(s);
             fighters.add(enemy);
             enemies.add(enemy);
+            Battle.setEnemies(enemies);
             BattleUIManager.initEnemies(enemies);
             BattleUIManager.logMessage(enemy.encounterString);
         }
@@ -59,74 +78,93 @@ public class BattleManager {
     }
     
     public static void update() {
+        int val;
         if (stateDelay > 0) // global delay for advancing to the next state
             stateDelay--;
         else {
             switch (currentState) {
-                case START_BATTLE: // actions to perform at the start of a battle
+                case START_BATTLE:
                     currentFighter = playerFighter;
                     currentState = BattleState.START_TURN;
                     break;
-                case START_TURN: // actions to perform at the start of a fighter's turn
-                    stateDelay = currentFighter.initAct();
-                    currentState = BattleState.FIGHTER_TURN;
+                case START_TURN:
+                    if (enemies.isEmpty() && currentFighter == playerFighter) {
+                        // win state
+                        currentState = BattleState.END_BATTLE;
+                        stateDelay = 100;
+                        BattleUIManager.logMessage("You win!");
+                    } else {
+                        Battle.lookAtEnemy(enemies.indexOf(currentFighter), false);
+                        actions.clear();
+                        stateDelay = currentFighter.initAct();
+                        currentState = BattleState.FIGHTER_TURN;
+                    }
                     break;
-                case FIGHTER_TURN: // actions to perform during a fighter's turn
-                    // call act() on the current fighter until it returns
-                    // a value to be the delay until the next state
-                    int val = currentFighter.act();
+                case FIGHTER_TURN:
+                    /*
+                     call act() on the current fighter until it returns
+                     a value to be the delay until the next state
+                     generally speaking, BattleActions should be added
+                     to the queue during this step.
+                     */
+                    val = currentFighter.act();
                     if (val != -1) {
                         stateDelay = val;
+                        currentState = BattleState.ACTION;
+                    }
+                    break;
+                case ACTION:
+                    // perform all actions until the queue is empty
+                    if (actions.isEmpty())
                         currentState = BattleState.END_TURN;
+                    else {
+                        val = actions.peek().act();
+                        if (val != -1) {
+                            stateDelay = val;
+                            actions.poll();
+                        }
                     }
                     break;
-                case END_TURN: // actions to perform at the end of a fighter's turn
+                case END_TURN:
                     // poison damage happens at the end of a turn
-                    if (currentFighter.statEffects.contains(StatEffect.POISON)) {
-                        currentFighter.poisonDamage();
-                        stateDelay = 60;
+                    if (currentFighter.statusEffects.contains(StatusEffect.POISON)) {
+                        if (currentFighter.equals(playerFighter) && enemies.isEmpty()) {
+                            // player doesn't take poison damage at the end of their turn if all enemies are dead
+                        } else {
+                            currentFighter.poisonDamage();
+                            stateDelay = 50;
+                        }
                     }
 
-                    // advance to the next fighter in the list
-                    int ind = fighters.indexOf(currentFighter);
-                    ind++;
-                    ind %= fighters.size();
-                    currentFighter = fighters.get(ind);
+                    if (playerFighter.stats.health <= 0) {
+                        // the player ran out of HP, game over
+                        BattleUIManager.logMessage("You lost...");
+                        currentState = BattleState.PLAYER_LOOSE;
+                    } else {
+                        // advance to the next fighter in the list
+                        int ind = fighters.indexOf(currentFighter);
+                        ind++;
+                        ind %= fighters.size();
+                        currentFighter = fighters.get(ind);
 
-                    currentState = BattleState.START_TURN;
+                        currentState = BattleState.START_TURN;
+                    }
                     break;
-                case END_BATTLE: // actions to perform at the end of a battle
+                case END_BATTLE:
                     Postprocess.fadeOut(RootLayer::exitBattle);
-                    playerFighter.statEffects.clear(); // remove status effects after battle
+                    playerFighter.statusEffects.clear(); // remove status effects after battle
+                    playerFighter.stats.resetBuffs();  // reset stats after battle
+                    break;
+                case PLAYER_LOOSE:
+                    // do nothing
                     break;
             }
         }
-
-        /*
-        if (exitBattle) 
-        {
-            stateDelay--;
-            if (stateDelay == 0) {
-                Postprocess.fadeOut(RootLayer::exitBattle);
-                playerFighter.statEffects.clear(); // remove status effects after battle
-            }
-                //RootScene.setState(RootScene.State.INGAME);
-        }
-        else if (currentFighter.act())
-        {
-            // poison damage happens at the end of a turn
-            if (currentFighter.statEffects.contains(StatEffect.POISON))
-                currentFighter.poisonDamage();
-
-            // advance to the next fighter in the list
-            int ind = fighters.indexOf(currentFighter);
-            ind++;
-            ind %= fighters.size();
-            currentFighter = fighters.get(ind);
-            currentFighter.initAct();
-        }*/
     }
-    
+
+    public static void addAction(BattleAction a) {
+        actions.add(a);
+    }
     /**
      * When an EnemyFighter's HP hits zero, it will call this function.
      * @param f 
@@ -134,27 +172,18 @@ public class BattleManager {
     public static void enemyDied(EnemyFighter f) {
         if (enemies.contains(f)) 
         {
-            BattleUIManager.logMessage(f.deathString);
-            
             if (f == currentFighter) {
-                int ind = fighters.indexOf(currentFighter);
-                ind++;
-                ind %= fighters.size();
-                currentFighter = fighters.get(ind);
-                currentFighter.initAct();
+                throw new IllegalStateException(); // TODO remove this, maybe
             }
             
             enemies.remove(f);
             fighters.remove(f);
-            
-            if (enemies.isEmpty()) {
-                currentState = BattleState.END_BATTLE;
-                stateDelay = 150;
-                BattleUIManager.logMessage("You win!");
-            }
         }
     }
-
+    /**
+     * End the current battle instantly. No run percentage is performed here -
+     * this function ends the battle upon a successful escape.
+     */
     public static void runFromBattle() {
         currentState = BattleState.END_BATTLE;
         stateDelay = 75;

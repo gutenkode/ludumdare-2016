@@ -6,10 +6,12 @@ import mote4.util.shader.ShaderMap;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.mesh.ScrollingText;
-import nullset.Vars;
-import nullset.Input;
-import nullset.RootLayer;
-import ui.components.SelectionMenu;
+import main.Vars;
+import main.Input;
+import main.RootLayer;
+import ui.components.FlavorTextMenu;
+import ui.components.selectionMenu.SelectionMenu;
+import ui.components.selectionMenu.SingleSelectionMenu;
 import ui.selectionmenubehavior.editor.RootEditorMenu;
 import ui.selectionmenubehavior.SelectionMenuBehavior;
 
@@ -22,6 +24,8 @@ public class EditorUIManager implements MenuHandler {
 
     private static final EditorUIManager manager;
     private static final Stack<SelectionMenu> selectionMenus;
+
+    private static boolean showFlavorText = false, lockFlavorText = false;
 
     private static ScrollingText logMessage; // simple string that appears to announce events in the overworld
     private static int logMessageTimeout = 0;
@@ -66,6 +70,19 @@ public class EditorUIManager implements MenuHandler {
             sm.render(model);
             model.pop();
         }
+        if (!selectionMenus.empty() && showFlavorText)
+        {
+            float yOffset;
+            if (lockFlavorText)
+                yOffset = 0;
+            else
+                yOffset = selectionMenus.peek().cursorPos()+.75f;
+            yOffset *= Vars.UI_SCALE;
+
+            model.translate(selectionMenus.peek().width()+ Vars.UI_SCALE*2,yOffset);
+            model.makeCurrent();
+            FlavorTextMenu.render();
+        }
     }
 
     public static void openRootMenu() {
@@ -89,9 +106,10 @@ public class EditorUIManager implements MenuHandler {
 
     @Override
     public void openMenu(SelectionMenuBehavior b) {
+        closeFlavorText();
         if (selectionMenus.empty())
             Input.pushLock(Input.Lock.MENU);
-        SelectionMenu sm = new SelectionMenu(b);
+        SelectionMenu sm = new SingleSelectionMenu(b);
         selectionMenus.push(sm);
         sm.onFocus();
     }
@@ -105,10 +123,13 @@ public class EditorUIManager implements MenuHandler {
     }
     @Override
     public void closeMenu() {
+        if (Input.currentLock() != Input.Lock.MENU)
+            return;
+        closeFlavorText();
         if (selectionMenus.size() > 0) {
             selectionMenus.pop();
             if (selectionMenus.empty())
-                Input.popLock();
+                Input.popLock(Input.Lock.MENU);
             else
                 selectionMenus.peek().onFocus();
         }
@@ -140,18 +161,20 @@ public class EditorUIManager implements MenuHandler {
     }
     @Override
     public void showFlavorText(boolean lock, String s) {
-
+        lockFlavorText = lock;
+        FlavorTextMenu.setText(s);
+        showFlavorText = true;
     }
     @Override
     public void showFlavorText(boolean lock, String s, String sprite) {
-
+        throw new UnsupportedOperationException();
     }
     @Override
     public void setFlavorTextLock(boolean lock) {
-
+        lockFlavorText = lock;
     }
     @Override
     public void closeFlavorText() {
-
+        showFlavorText = false;
     }
 }

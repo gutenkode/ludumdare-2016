@@ -3,8 +3,8 @@ package scenes;
 import mote4.scenegraph.Scene;
 import mote4.util.matrix.Transform;
 import mote4.util.shader.ShaderMap;
-import nullset.Vars;
-import nullset.Input;
+import main.Vars;
+import main.Input;
 import terminal.TerminalSession;
 
 /**
@@ -34,7 +34,7 @@ public class TerminalScene implements Scene {
     }
     
     @Override
-    public void update(double delta) {
+    public void update(double time, double delta) {
         if (Input.currentLock() == Input.Lock.TERMINAL) 
         {
             if (cursorCooldown <= 0) {
@@ -107,7 +107,7 @@ public class TerminalScene implements Scene {
     }
 
     @Override
-    public void render(double delta) {
+    public void render(double time, double delta) {
         if (Input.currentLock() == Input.Lock.TERMINAL) 
         {
             ShaderMap.use("texture");
@@ -149,7 +149,7 @@ public class TerminalScene implements Scene {
             Postprocess.setDOFCoef(0);
             //session.destroy();
             session = null;
-            Input.popLock();
+            Input.popLock(Input.Lock.TERMINAL);
             Input.recordTyped(false);
             terminalOpen = false;
         }

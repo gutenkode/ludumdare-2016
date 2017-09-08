@@ -1,13 +1,15 @@
 package ui;
 
+import mote4.util.audio.AudioPlayback;
 import mote4.util.matrix.ModelMatrix;
 import mote4.util.matrix.Transform;
 import mote4.util.shader.ShaderMap;
 import mote4.util.texture.TextureMap;
-import nullset.Vars;
-import nullset.Input;
-import nullset.RootLayer;
-import ui.components.SelectionMenu;
+import main.Vars;
+import main.Input;
+import main.RootLayer;
+import ui.components.selectionMenu.SelectionMenu;
+import ui.components.selectionMenu.SingleSelectionMenu;
 import ui.selectionmenubehavior.SelectionMenuBehavior;
 import ui.selectionmenubehavior.TitleMenu;
 
@@ -54,7 +56,9 @@ public class TitleUIManager implements MenuHandler {
 
     @Override
     public void openMenu(SelectionMenuBehavior b) {
-        SelectionMenu sm = new SelectionMenu(b);
+        SelectionMenu sm = new SingleSelectionMenu(b);
+        if (!selectionMenus.empty())
+            AudioPlayback.playSfx("sfx_menu_open_pane");
         selectionMenus.push(sm);
         sm.onFocus();
     }
@@ -69,6 +73,7 @@ public class TitleUIManager implements MenuHandler {
     @Override
     public void closeMenu() {
         if (selectionMenus.size() > 1) {
+            AudioPlayback.playSfx("sfx_menu_close_pane");
             selectionMenus.pop();
             selectionMenus.peek().onFocus();
         }

@@ -156,5 +156,22 @@
     "Is there anything I can say to change\nyour mind? ...Probably not.",
     "If you attack me, I will do everything in\nmy power to kill you.",
     "Are you ready for that?"
+  ],
+  "bossFight1": [
+    "$SPRITE talk_boss",
+    "You're more capable than I thought.\nMaybe... maybe this won't end well for me.",
+    "Tell me... do you know why you're here?",
+    "$PROMPT_Yes_$YES_No_$NO",
+    "$NO",
+    "No, of course not. You wouldn't remember a thing.",
+    "You CAN'T remember a thing.",
+    "Stop this. Stop now. I... I can't protect you anymore...",
+    "$GOTO $A",
+    "$YES",
+    "Liar.",
+    "Be careful where you place your trust.\nThat's a lesson you learn fast down here.\nEither that, or you die.",
+    "$A",
+    "No...\nNo!",
+    "I... can't die here!..."
   ]
 }

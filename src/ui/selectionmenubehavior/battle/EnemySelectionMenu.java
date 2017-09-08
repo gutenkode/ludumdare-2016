@@ -75,10 +75,16 @@ public class EnemySelectionMenu implements SelectionMenuBehavior {
             f[0] = fighters.get(index);
         }
         callback.accept(f);
+        Battle.disableEnemyGlow();
     }
 
     @Override
-    public void onHighlight(int index) {}
+    public void onHighlight(int index) {
+        if (multiTarget)
+            Battle.lookAtEnemy(-2,true);
+        else if (inclEnemies)
+            Battle.lookAtEnemy(index,true);
+    }
 
     @Override
     public void onFocus() {
@@ -86,7 +92,10 @@ public class EnemySelectionMenu implements SelectionMenuBehavior {
     }
 
     @Override
-    public void onClose() { handler.closeMenu(); }
+    public void onClose() {
+        handler.closeMenu();
+        Battle.lookAtEnemy(-1,false);
+    }
     @Override
     public void onCloseCleanup() { handler.setFlavorTextLock(false); }
 }

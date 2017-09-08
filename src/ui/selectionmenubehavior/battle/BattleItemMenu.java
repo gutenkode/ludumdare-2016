@@ -3,7 +3,7 @@ package ui.selectionmenubehavior.battle;
 import java.util.ArrayList;
 import rpgbattle.BattleManager;
 import rpgbattle.fighter.Fighter;
-import rpgsystem.DefaultTarget;
+import rpgsystem.BattleEffect;
 import rpgsystem.Inventory;
 import rpgsystem.Item;
 import ui.BattleUIManager;
@@ -49,10 +49,10 @@ public class BattleItemMenu implements SelectionMenuBehavior {
             handler.closeMenu();
         else {
             currentItem = items.get(index);
-            boolean e = false;
-            if (currentItem.defaultTarget == DefaultTarget.ENEMY)
-                e = true;
-            handler.openMenu(new EnemySelectionMenu(handler, this::itemCallback, false, e, !e));
+            boolean targetEnemies = false;
+            if (currentItem.battleEffect == BattleEffect.ATTACK)
+                targetEnemies = true;
+            handler.openMenu(new EnemySelectionMenu(handler, this::itemCallback, false, targetEnemies, !targetEnemies));
         }
     }
     public void itemCallback(Fighter... f) {
@@ -84,7 +84,12 @@ public class BattleItemMenu implements SelectionMenuBehavior {
     public void onCloseCleanup() {}
 
     private void rebuildMenu() {
-        items = Inventory.get();
+        ArrayList<Item> allItems = Inventory.get();
+        items = new ArrayList<>();
+        // only list items that can be used in battle
+        for (Item i : allItems)
+            if (i.battleEffect != BattleEffect.NONE)
+                items.add(i);
         options = new String[items.size()+1];
         options[options.length-1] = "Exit";
         for (int i = 0; i < options.length-1; i++)

@@ -3,7 +3,7 @@ package ui.components;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.mesh.Mesh;
 import mote4.util.vertex.mesh.ScrollingText;
-import nullset.Vars;
+import main.Vars;
 import ui.MenuMeshCreator;
 
 /**

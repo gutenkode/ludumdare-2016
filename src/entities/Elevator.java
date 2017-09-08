@@ -6,7 +6,8 @@ import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.builder.StaticMeshBuilder;
 import mote4.util.vertex.mesh.Mesh;
-import nullset.Input;
+import main.Input;
+import main.Vars;
 import org.lwjgl.opengl.GL11;
 
 /**
@@ -17,11 +18,11 @@ public class Elevator extends Entity {
     
     private static Mesh mesh;
     
-    private boolean state = true, inputLockActive = false;
+    private boolean state, inputLockActive = false;
     private float height, cycle,
-                  floatTileHeight;
+                floatTileHeight,
+                lightCycle = 0;
     private int baseTileHeight, maxHeight,
-                lightCycle = 0,
                 triggerCooldown = 0; // to only trigger when the player first gets on
     
     static {
@@ -82,7 +83,7 @@ public class Elevator extends Entity {
             else {
                 cycle = 1;
                 if (inputLockActive)
-                    Input.popLock();
+                    Input.popLock(Input.Lock.ELEVATOR);
                 inputLockActive = false;
             }
         } else {
@@ -91,31 +92,27 @@ public class Elevator extends Entity {
             else {
                 cycle = 0;
                 if (inputLockActive)
-                    Input.popLock();
+                    Input.popLock(Input.Lock.ELEVATOR);
                 inputLockActive = false;
             }
         }
         
-        height = (float)Math.sin(cycle*Math.PI -Math.PI/2);
-        height = (height+1)/2;
+        height = (float)Vars.smoothStep(cycle);
         floatTileHeight = baseTileHeight+Math.max(.075f, maxHeight*height);
         tileHeight = Math.round(floatTileHeight);
 
-        lightCycle++;
-        lightCycle %= 100;
+        lightCycle += .075;
+        //lightCycle %= 100;
     }
     
     @Override
     public void render(TransformationMatrix model) {
-        model.translate((float)posX-.5f, (float)posY-.5f, floatTileHeight+.01f);
+        model.translate(posX-.5f, posY-.5f, floatTileHeight);
         model.makeCurrent();
         
         Uniform.varFloat("spriteInfo", 3,1,0);
-        Uniform.varFloat("emissiveMult", 1);
-        if (lightCycle > 70)
-            Uniform.varFloat("spriteInfoEmissive", 3,1, 2);
-        else
-            Uniform.varFloat("spriteInfoEmissive", 3,1, 1);
+        Uniform.varFloat("emissiveMult", (float)(Math.sin(lightCycle)+2)/2);
+        Uniform.varFloat("spriteInfoEmissive", 3,1, 2);
         TextureMap.bindUnfiltered("entity_elevator");
         mesh.render();
         
@@ -124,4 +121,12 @@ public class Elevator extends Entity {
 
     @Override
     public String getName() { return "Elevator"; }
+    @Override
+    public String getAttributeString() {
+        return super.getAttributeString()+"\nbaseHeight:"+baseTileHeight+", maxHeight:base+"+maxHeight+", up:"+state;
+    }
+    @Override
+    public String serialize() {
+        return this.getClass().getSimpleName() +","+ (int)(posX-.5) +","+ (int)(posY-.5) +","+ maxHeight +","+ state;
+    }
 }

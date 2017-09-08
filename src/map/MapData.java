@@ -54,7 +54,7 @@ public class MapData {
 
     /**
      * Signals that the current mesh should be rebuilt.
-     * The mesh will not be rebuilt until render() is called again.
+     * The mesh will not be rebuilt until render3d() is called again.
      */
     public void rebuildMesh() { meshBuilt = false; }
 

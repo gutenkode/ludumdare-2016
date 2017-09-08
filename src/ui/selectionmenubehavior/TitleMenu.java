@@ -1,8 +1,8 @@
 package ui.selectionmenubehavior;
 
 import mote4.scenegraph.Window;
-import nullset.Input;
-import nullset.RootLayer;
+import main.Input;
+import main.RootLayer;
 import scenes.Postprocess;
 import ui.MenuHandler;
 
@@ -56,12 +56,12 @@ public class TitleMenu implements  SelectionMenuBehavior {
     }
 
     private void newGameCallback() {
-        RootLayer.setState(RootLayer.State.INGAME);
-        Input.popLock();
+        RootLayer.loadIngame();
+        Input.popLock(Input.Lock.FADE);
     }
     private void editorCallback() {
-        RootLayer.setState(RootLayer.State.EDITOR);
-        Input.popLock();
+        RootLayer.loadEditor();
+        Input.popLock(Input.Lock.FADE);
     }
 
     @Override

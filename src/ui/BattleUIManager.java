@@ -3,23 +3,24 @@ package ui;
 import java.util.ArrayList;
 import java.util.Stack;
 
+import mote4.util.audio.AudioPlayback;
 import mote4.util.matrix.ModelMatrix;
 import mote4.util.matrix.Transform;
 import mote4.util.shader.ShaderMap;
 import mote4.util.texture.TextureMap;
-import nullset.Vars;
-import nullset.Input;
-import nullset.RootLayer;
+import main.Vars;
+import main.Input;
+import main.RootLayer;
 import rpgbattle.BattleManager;
 import rpgbattle.fighter.EnemyFighter;
 import ui.components.DialogueMenu;
-import ui.components.EnemySprite;
 import ui.components.FlavorTextMenu;
 import ui.components.LogMenu;
 import ui.components.PlayerStatBar;
 import ui.components.ScriptChoiceMenu;
-import ui.components.SelectionMenu;
+import ui.components.selectionMenu.SelectionMenu;
 import ui.components.SpriteMenu;
+import ui.components.selectionMenu.SingleSelectionMenu;
 import ui.script.ScriptReader;
 import ui.selectionmenubehavior.battle.RootBattleMenu;
 import ui.selectionmenubehavior.SelectionMenuBehavior;
@@ -33,8 +34,8 @@ public class BattleUIManager implements MenuHandler {
     private static final BattleUIManager manager;
     private static final Stack<SelectionMenu> selectionMenus;
     private static ScriptReader currentScript;
-    private static ArrayList<EnemySprite> enemySprites; // sprites for all enemies to be drawn
-    private static ArrayList<EnemyFighter> fighters; // stored to easily refresh enemy sprites on display resize
+    //private static ArrayList<EnemySprite> enemySprites; // sprites for all enemies to be drawn
+    private static ArrayList<EnemyFighter> enemies; // stored to easily refresh enemy sprites on display resize
     
     private static boolean playerTurn = false,
                            scriptPlaying = false,
@@ -49,9 +50,7 @@ public class BattleUIManager implements MenuHandler {
         selectionMenus = new Stack<>();
     }
     
-    private BattleUIManager() {
-       
-    }
+    private BattleUIManager() {}
     
     public static void update() {
         if (playerTurn) 
@@ -69,8 +68,6 @@ public class BattleUIManager implements MenuHandler {
             } 
             else if (Input.isKeyNew(Input.Keys.YES)) {
                 currentScript.advance(manager);
-                //scriptPlaying = false;
-                //Input.popLock();
             }
         }
     }
@@ -80,9 +77,8 @@ public class BattleUIManager implements MenuHandler {
     ShaderMap.use("spritesheet_nolight"); // shader bindings are unindented for readability
     trans.makeCurrent();
         // EnemySprite
-        for (EnemySprite s : enemySprites) {
-            s.render(model);
-            s.renderAnimations(model);
+        for (EnemyFighter f : enemies) {
+            f.getSprite().render2d(model);
         }
         // PlayerStatBar sets own shaders
         PlayerStatBar.render(RootLayer.width()/2, RootLayer.height()-42- Vars.UI_SCALE/2, trans);
@@ -93,15 +89,21 @@ public class BattleUIManager implements MenuHandler {
     trans.makeCurrent();
         // enemy toasts
         TextureMap.bindUnfiltered("font_1");
-        for (EnemySprite s : enemySprites) {
+        for (EnemyFighter f : enemies) {
             model.setIdentity();
-            s.renderToast(model);
+            f.getSprite().renderToast(model);
         }
         // player toasts
         model.setIdentity();
         model.translate(RootLayer.width()/2, RootLayer.height()-60);
         BattleManager.getPlayer().renderToast(model);
-        
+        // enemy stat buff text
+        TextureMap.bindUnfiltered("font_6px");
+        for (EnemyFighter f : enemies) {
+            model.setIdentity();
+            f.getSprite().renderStatText(model);
+        }
+
     ShaderMap.use("texture"); // log menu is not blurred
     trans.makeCurrent();
         // LogMenu
@@ -125,7 +127,7 @@ public class BattleUIManager implements MenuHandler {
         if (showScriptChoice) {
             model.setIdentity();
             model.translate(RootLayer.width()/2-DialogueMenu.BORDER_W/2,
-                            RootLayer.height()-40-5* Vars.UI_SCALE-ScriptChoiceMenu.height());
+                            80);
             model.makeCurrent();
             ScriptChoiceMenu.render(model);
         }
@@ -173,21 +175,21 @@ public class BattleUIManager implements MenuHandler {
      */
     public static void initEnemies(ArrayList<EnemyFighter> f) {
         // enemySprites do not have a destroy() method
-        fighters = f;
+        enemies = f;
         refreshEnemies();
         LogMenu.clear();
     }
 
     /**
-     * Create the sprite objects for enemies in a battle.
+     * Initialize the positions of the sprite objects for enemies in a battle.
      */
     public static void refreshEnemies() {
-        if (fighters != null) {
-            enemySprites = new ArrayList<>();
+        if (enemies != null) {
             int startX = RootLayer.width()/2-(96*(BattleManager.getEnemies().size()-1));
             int startY = RootLayer.height()/2;
-            for (EnemyFighter f : fighters) {
-                enemySprites.add(new EnemySprite(startX, startY, f));
+            for (EnemyFighter f : enemies) {
+                //f.getSprite().setPos(0, 0);
+                //f.getSprite().setPos(startX, startY);
                 startX += 96*2;
             }
         }
@@ -199,8 +201,10 @@ public class BattleUIManager implements MenuHandler {
         //Input.pushLock(Input.Lock.MENU);
         playerTurn = true;
         manager.openMenu(new RootBattleMenu(manager));
+        AudioPlayback.playSfx("sfx_menu_playerturn");
     }
     public static void endPlayerTurn() {
+        playerTurn = false;
         while (!selectionMenus.isEmpty())
             manager.closeMenu();
     }
@@ -221,12 +225,15 @@ public class BattleUIManager implements MenuHandler {
         currentScript.advance(manager);
         //DialogueMenu.setText(script.dialogue[0]);
     }
+    public static boolean isScriptPlaying() { return scriptPlaying; }
     
     // menu methods
     
     @Override
     public void openMenu(SelectionMenuBehavior b) {
-        SelectionMenu sm = new SelectionMenu(b);
+        SelectionMenu sm = new SingleSelectionMenu(b);
+        if (!selectionMenus.empty())
+            AudioPlayback.playSfx("sfx_menu_open_pane");
         selectionMenus.push(sm);
         sm.onFocus();
     }
@@ -246,9 +253,10 @@ public class BattleUIManager implements MenuHandler {
         selectionMenus.pop().destroy();
         if (selectionMenus.empty()) {
             playerTurn = false;
-            //Input.popLock();
         } else {
             selectionMenus.peek().onFocus();
+            if (playerTurn)
+                AudioPlayback.playSfx("sfx_menu_close_pane");
         }
     }
     
@@ -291,7 +299,7 @@ public class BattleUIManager implements MenuHandler {
     public void endScript(boolean b) {
         showDialogue = false;
         scriptPlaying = false;
-        Input.popLock();
+        Input.popLock(Input.Lock.SCRIPT);
     }
     
     // flavor text methods

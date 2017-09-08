@@ -16,6 +16,7 @@ import ui.IngameUIManager;
 public class LaserGrid extends Entity {
     
     private static Mesh mesh;
+    private static int length;
     
     private float cycle;
     
@@ -28,6 +29,7 @@ public class LaserGrid extends Entity {
     }
     
     public LaserGrid(int x, int y, int l) {
+        length = l;
         hitboxW = l*.5f;
         hitboxH = .2f;
         posX = x+hitboxW;
@@ -68,8 +70,11 @@ public class LaserGrid extends Entity {
     }
 
     @Override
-    public String getName() { return "Laser Wall"; }
-
+    public String getName() { return "LaserGrid"; }
+    @Override
+    public String serialize() {
+        return this.getClass().getSimpleName() +","+ (int)(posX-.5) +","+ (int)(posY-.5) +","+ length;
+    }
 
     @Override
     public boolean hasLight() { return true; }

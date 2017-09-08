@@ -3,12 +3,14 @@ package ui.components;
 import mote4.util.matrix.ModelMatrix;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
+import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.builder.StaticMeshBuilder;
 import mote4.util.vertex.mesh.Mesh;
+import main.RootLayer;
+import main.Vars;
 import org.lwjgl.opengl.GL11;
-import rpgbattle.BattleManager;
 import rpgbattle.fighter.EnemyFighter;
-import rpgsystem.StatEffect;
+import rpgsystem.StatusEffect;
 
 /**
  *
@@ -17,84 +19,203 @@ import rpgsystem.StatEffect;
 public class EnemySprite {
     
     public static final Mesh sprite, statusIconMesh, barMesh;
+    private static final float barLength = 64;
+    private Mesh statText;
+    private int atk, def, mag, showStatHealthChangeDelay;
+    private boolean glow, showStats;
+    private double glowCycle;
     
     static {
         sprite = StaticMeshBuilder.constructVAO(GL11.GL_TRIANGLE_FAN,
-                                   2, new float[] {-96,-96, -96,96, 96,96, 96,-96},
+                                   2, new float[] {-1,-1, -1,1, 1,1, 1,-1},
+                                   //2, new float[] {-96,-96, -96,96, 96,96, 96,-96},
                                    2, new float[] {0,0, 0,1, 1,1, 1,0},
                                    0, null, null);
         statusIconMesh = StaticMeshBuilder.constructVAO(GL11.GL_TRIANGLE_FAN,
                 2, new float[] {0,0, 0,9, 9,9, 9,0},
                 2, new float[] {0,0, 0,1, 1,1, 1,0},
                 0, null, null);
-        float barLength = 96;
         barMesh = StaticMeshBuilder.constructVAO(GL11.GL_TRIANGLE_FAN,
                 2, new float[] {0,0, 0,6, barLength,6, barLength,0},
                 2, new float[] {0,0, 0,1, 1,1, 1,0},
                 0, null, null);
     }
     
-    private int posX, posY;
+    private float posX, posY;
+    private int posX2d, posY2d;
     private EnemyFighter fighter;
     private float lastHealth, renderHealth;
-    
+
+    private int currentFrame, currentFrameDelay;
+    private float[] spriteInfo;
+
+    public EnemySprite(EnemyFighter f) {
+        this(0,0,f);
+    }
     public EnemySprite(int x, int y, EnemyFighter f) {
         posX = x;
         posY = y;
         fighter = f;
-        lastHealth = renderHealth = 1;
+        lastHealth = renderHealth = 0;
+
+        currentFrame = (int)(Math.random()*f.frameDelay.length);
+        currentFrameDelay = (int)(Math.random()*f.frameDelay[currentFrame]);
+        spriteInfo = new float[] {f.frameDelay.length, 1, 0};
+
+        statText = FontUtils.createStringColor("",0,0,0,0);
     }
-    
+
+    public void setPos(float x, float y) {
+        posX = x;
+        posY = y;
+    }
+    public void setPos2d(float... coords) {
+        posX2d = (int)((coords[0]+1)/2*RootLayer.width());
+        posY2d = (int)((coords[1]+1)/2*RootLayer.height());
+    }
+    public float getPosX() { return posX; }
+    public float getPosY() { return posY; }
+
     /**
-     * Simply translates the model matrix to the position of this EnemySprite.
-     * Used for rendering toasts.
-     * @param model 
+     * A constant pulsing glow, to indicate that this enemy is currently selected.
+     * @param e
      */
-    public void renderToast(ModelMatrix model) {
-        model.translate(fighter.shakeValue()+posX, posY);
-        model.makeCurrent();
-        fighter.renderToast(model);
+    public void glow(boolean e) {
+        glow(e,0);
     }
-    public void render(ModelMatrix model) {
+    public void glow(boolean e, double init) {
+        glow = e;
+        glowCycle = init;
+        if (e)
+            showStats(true);
+    }
+    public void showStats(boolean e) { showStats = e; }
+
+    public void render3d(ModelMatrix model) {
         TextureMap.bindUnfiltered(fighter.spriteName);
 
         model.setIdentity();
-        model.translate(fighter.shakeValue()+posX, posY);
+        fighter.updateShake();
+        model.translate(fighter.shakeValue()*.01f+posX, 0, posY);
         if (fighter.isDead())
             fighter.runDeathAnimation(model);
         model.makeCurrent();
 
         // the sprite
-        Uniform.varFloat("colorAdd", fighter.updateFlash());
-        Uniform.varFloat("spriteInfo", fighter.updateSpriteInfo());
-        sprite.render(); // 96*2 by 96*2
+        if (glow) {
+            float c = .75f-(float)((Math.sin(glowCycle)+1)/4.0);
+            Uniform.varFloat("colorAdd", c*.9f,c*.8f,c*.2f);
+        } else
+            Uniform.varFloat("colorAdd", fighter.updateFlash());
+        updateSpriteInfo();
+        Uniform.varFloat("spriteInfo", spriteInfo);
+        sprite.render(); // currently locked to 96*2 by 96*2
         Uniform.varFloat("colorAdd", 0,0,0);
 
-        // health bar
-        model.translate(-48, 96);
+        renderAnimations(model);
+    }
+    /**
+     * Updates the battle animations for this fighter.
+     * @param model
+     */
+    private void renderAnimations(ModelMatrix model) {
+        model.setIdentity();
+        model.translate(posX, 0, posY+.1f); // z offset to prevent z-fighting
         model.makeCurrent();
-        TextureMap.bindUnfiltered("ui_statbars");
-        renderBar(3, 0, 1, model);
+
+        fighter.renderAnim();
+    }
+
+    public void render2d(ModelMatrix model) {
         float healthPercent = (float)fighter.stats.health/fighter.stats.maxHealth;
-        renderHealth -= (renderHealth-healthPercent)/10;
-        renderBar(6, 0, lastHealth, model);
-        renderBar(0, 0, renderHealth, model);
-        if (Math.abs(renderHealth-healthPercent) < .01)
+        boolean healthIsCurrent = Math.abs(renderHealth-healthPercent) < .01;
+        if (healthIsCurrent)
             lastHealth = healthPercent;
+        else
+            showStatHealthChangeDelay = 30;
 
-        // status icons
-        model.translate(6, 4);
-        model.makeCurrent();
-        Uniform.varFloat("spriteInfo", 1,1,0);
-        for (StatEffect s : fighter.statEffects) {
-            TextureMap.bindUnfiltered(s.spriteName);
-            statusIconMesh.render();
+        if (showStats || !healthIsCurrent || showStatHealthChangeDelay > 0)
+        {
+            showStatHealthChangeDelay--;
 
-            model.translate(10, 0);
+            // health bar
+            model.setIdentity();
+            model.translate(posX2d - barLength / 2, posY2d);
             model.makeCurrent();
+            TextureMap.bindUnfiltered("ui_statbars");
+            renderBar(3, 0, 1, model);
+            renderHealth -= (renderHealth - healthPercent) / 10;
+            renderBar(6, 0, lastHealth, model);
+            renderBar(0, 0, renderHealth, model);
+
+            // status icons
+            model.translate(6, 4);
+            model.makeCurrent();
+            Uniform.varFloat("spriteInfo", 1,1,0);
+            for (StatusEffect s : fighter.statusEffects) {
+                TextureMap.bindUnfiltered(s.spriteName);
+                statusIconMesh.render();
+
+                model.translate(10, 0);
+                model.makeCurrent();
+            }
         }
     }
-    private static void renderBar(int index, int yOffset, float percent, ModelMatrix model) {
+    /**
+     * Simply translates the model matrix to the position of this EnemySprite.
+     * Used for rendering toasts.
+     * @param model
+     */
+    public void renderToast(ModelMatrix model) {
+        model.translate(posX2d, posY2d);
+        model.makeCurrent();
+        fighter.renderToast(model);
+    }
+    /**
+     * Render the text showing stat buffs/debuffs.
+     * @param model
+     */
+    public void renderStatText(ModelMatrix model) {
+        if (!showStats)
+            return;
+        int aBuff = fighter.stats.getAtkBuff();
+        int dBuff = fighter.stats.getDefBuff();
+        int mBuff = fighter.stats.getMagBuff();
+        if (atk != aBuff || def != dBuff || mag != mBuff) {
+            StringBuilder sb = new StringBuilder();
+            if (aBuff > 0)
+                sb.append("ATK +"+aBuff+" ");
+            else if (aBuff < 0)
+                sb.append("ATK "+aBuff+" ");
+            if (dBuff > 0)
+                sb.append("DEF +"+dBuff+" ");
+            else if (aBuff < 0)
+                sb.append("DEF "+dBuff+" ");
+            if (mBuff > 0)
+                sb.append("MAG +"+mBuff);
+            else if (aBuff < 0)
+                sb.append("MAG "+mBuff);
+            FontUtils.useMetric("6px");
+            statText.destroy();
+            statText = FontUtils.createStringColor(sb.toString(), 0,0, Vars.UI_SCALE, Vars.UI_SCALE);
+        }
+        atk = aBuff;
+        def = dBuff;
+        mag = mBuff;
+
+        model.translate(posX2d+barLength/2+1, posY2d);
+        model.makeCurrent();
+        statText.render();
+    }
+
+    /**
+     * Utility to render3d the health bar.
+     * @param index
+     * @param yOffset
+     * @param percent
+     * @param model
+     */
+    private void renderBar(int index, int yOffset, float percent, ModelMatrix model) {
         model.push();
         model.translate(0, yOffset);
         model.scale(percent, 1, 1);
@@ -104,12 +225,19 @@ public class EnemySprite {
         model.pop();
         model.makeCurrent();
     }
-
-    public void renderAnimations(ModelMatrix model) {
-        model.setIdentity();
-        model.translate(posX, posY);
-        model.makeCurrent();
-
-        fighter.updateAnim();
+    /**
+     * Updates animation data for this enemy and returns the array needed
+     * for rendering the correct tilesheet frame.
+     * @return
+     */
+    private void updateSpriteInfo() {
+        currentFrameDelay--;
+        if (currentFrameDelay <= 0) {
+            currentFrame++;
+            currentFrame %= fighter.frameDelay.length;
+            currentFrameDelay = fighter.frameDelay[currentFrame];
+            spriteInfo[2] = currentFrame;
+        }
+        glowCycle += .15;
     }
 }

@@ -26,15 +26,18 @@ public class StaticObject extends Entity {
         CHAIN,
         PIPE;
     }
-    
+
     private float floatHeight, val0, val1;
-    
+
+    private final String model;
+    private final float origVal;
     private final Type TYPE;
     private final boolean solid;
     private boolean b1;
     
     public StaticObject(float x, float y, String model, float val) {
-        val0 = val;
+        origVal = val0 = val;
+        this.model = model;
         posX = x+.5f;
         posY = y+.5f;
         hitboxW = hitboxH = .3f;
@@ -238,6 +241,13 @@ public class StaticObject extends Entity {
 
     @Override
     public String getName() { return "Static: "+TYPE.name(); }
+    public String getAttributeString() {
+        return super.getAttributeString()+"\ntype:"+TYPE.name();
+    }
+    @Override
+    public String serialize() {
+        return this.getClass().getSimpleName() +","+ (int)(posX-.5) +","+ (int)(posY-.5) +","+ model +","+ origVal;
+    }
 
     @Override
     public boolean hasLight() { return TYPE == Type.FLUORESCENT && b1; }

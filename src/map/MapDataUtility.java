@@ -6,7 +6,7 @@ import java.util.StringTokenizer;
 import mote4.util.vertex.builder.Attribute;
 import mote4.util.vertex.builder.ModernMeshBuilder;
 import mote4.util.vertex.mesh.Mesh;
-import nullset.Vars;
+import main.Vars;
 import org.lwjgl.opengl.GL11;
 import rpgsystem.Item;
 import rpgsystem.Pickupable;
@@ -20,7 +20,7 @@ import rpgsystem.SkillModifier;
  */
 public class MapDataUtility {
 
-    public static ArrayList<Entity> constructEntities(ArrayList<String> entityData) {
+    public static ArrayList<Entity> deserializeEntities(ArrayList<String> entityData) {
         ArrayList<Entity> list = new ArrayList<>();
         int x,y,h,width,height;
         for (String s : entityData) {

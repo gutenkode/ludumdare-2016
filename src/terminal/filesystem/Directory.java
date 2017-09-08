@@ -15,7 +15,7 @@ public class Directory extends Node {
     }
 
     @Override
-    public String name() { return "/"+name; }
+    public String name() { return name+"/"; }
     public void addChild(Node n) { children.add(n); n.parent = this; }
     public ArrayList<Node> contents() { return children; }
 }

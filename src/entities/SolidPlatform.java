@@ -60,4 +60,8 @@ public class SolidPlatform extends Entity {
 
     @Override
     public String getName() { return "Solid Platform"; }
+    @Override
+    public String serialize() {
+        return this.getClass().getSimpleName() +","+ (int)(posX-.5) +","+ (int)(posY-.5) +","+ tileHeight;
+    }
 }

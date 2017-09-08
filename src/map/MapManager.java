@@ -9,9 +9,9 @@ import mote4.util.matrix.*;
 import mote4.util.shader.ShaderMap;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
-import nullset.Input;
+import main.Input;
 
-import nullset.RootLayer;
+import main.RootLayer;
 import scenes.Editor;
 import scenes.Postprocess;
 
@@ -144,7 +144,7 @@ public class MapManager {
         player.moveTo(loc[0], loc[1]); // move the player to the new location
         runOnRoomInit();
         newMapName = null;
-        Input.popLock();
+        Input.popLock(Input.Lock.FADE);
     }
     /**
      * Called whenever a room is loaded, initializes entities and lights.
@@ -204,7 +204,7 @@ public class MapManager {
         lightVector[1] = -(float)Math.cos(flashlightDir[0]);
         lightVector[2] = 0;
         
-    // render static map mesh
+    // render3d static map mesh
         ShaderMap.use("ingame_map");
         TextureMap.bindUnfiltered("tileset_1");
         //shadowProj.makeCurrent();
@@ -216,7 +216,7 @@ public class MapManager {
         trans.makeCurrent();
         currentTimeline.getMapData().render();
         
-    // render entity tilesheets
+    // render3d entity tilesheets
         ShaderMap.use("spritesheet_light");
         //shadowProj.makeCurrent();
         Uniform.varFloat("flashlightAngle", lightVector);
@@ -230,7 +230,7 @@ public class MapManager {
             e.render(trans.model);
         }
 
-    // render hitboxes
+    // render3d hitboxes
         /*
         ShaderMap.use("color");
         //Uniform.varFloat("colorMult", 1,0,0,1);
@@ -258,7 +258,7 @@ public class MapManager {
         Uniform.varFloat("lightPos", player.posX(),
                                                     player.posY()+player.hitboxH(),
                                                     player.elevatorHeight()+1f);
-        // render static map mesh
+        // render3d static map mesh
         shadowModel.setIdentity();
         shadowModel.makeCurrent();
         currentTimeline.getMapData().render();
@@ -266,9 +266,9 @@ public class MapManager {
         //ShaderMap.use("shadowMap_tex"); // entity textures may have transparent parts, so texture data must be checked
         //shadowProj.makeCurrent();
 
-        // render entity tilesheets, the player is not rendered
+        // render3d entity tilesheets, the player is not rendered
         for (Entity e : currentTimeline.getEntities()) {
-            // add a check for whether this entity should render shadows
+            // add a check for whether this entity should render3d shadows
             shadowModel.setIdentity(); // entities don't reset the model matrix
             //shadowModel.makeCurrent();
             e.render(shadowModel);

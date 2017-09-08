@@ -11,8 +11,8 @@ import mote4.util.texture.TextureMap;
 import mote4.util.vertex.builder.MeshBuilder;
 import mote4.util.vertex.mesh.Mesh;
 import mote4.util.vertex.mesh.MeshMap;
-import nullset.Vars;
-import nullset.Input;
+import main.Vars;
+import main.Input;
 import org.lwjgl.glfw.GLFW;
 import ui.EditorUIManager;
 
@@ -116,7 +116,7 @@ public class Editor implements Scene {
     }
 
     @Override
-    public void update(double delta) {
+    public void update(double time, double delta) {
         if (me == null)
             return;
 
@@ -223,14 +223,14 @@ public class Editor implements Scene {
     }
 
     @Override
-    public void render(double delta) {
+    public void render(double time, double delta) {
         glEnable(GL_DEPTH_TEST);
         glClearColor(0, 0, 0, 0);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
         if (me != null)
         {
-            // render static map mesh
+            // render3d static map mesh
             ShaderMap.use("ingame_nolight");
             TextureMap.bindUnfiltered("tileset_1");
             Uniform.samplerAndTextureUnfiltered("tex_shade", 2, "tileset_shade");
@@ -239,7 +239,7 @@ public class Editor implements Scene {
             trans.makeCurrent();
             me.getMapData().render();
 
-            // render cursor, BEFORE entities
+            // render3d cursor, BEFORE entities
             ShaderMap.use("color");
             float cval = ((float)Math.cos(cursorRot)+1)/4+.25f;
             Uniform.varFloat("colorMult", cval, 0, 0, cval);
@@ -252,7 +252,7 @@ public class Editor implements Scene {
 
             if (me.getEntities() != null && !me.getEntities().isEmpty())
             {
-                // render entity tilesheets
+                // render3d entity tilesheets
                 ShaderMap.use("spritesheet_nolight");
                 trans.makeCurrent();
                 for (Entity e : me.getEntities()) {
@@ -260,7 +260,7 @@ public class Editor implements Scene {
                     e.render(trans.model);
                 }
 
-                // render hitboxes
+                // render3d hitboxes
                 ShaderMap.use("color");
                 Uniform.varFloat("colorMult", 1, 1, 1, 1);
                 glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

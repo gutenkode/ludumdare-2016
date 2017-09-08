@@ -1,22 +1,21 @@
 package ui;
 
 import entities.ScriptTrigger;
-import nullset.RootLayer;
-import ui.components.SpriteMenu;
-import ui.components.DialogueMenu;
-import ui.components.SelectionMenu;
+import mote4.util.audio.AudioPlayback;
+import main.RootLayer;
+import ui.components.*;
+
 import java.util.Stack;
 import mote4.util.matrix.ModelMatrix;
 import mote4.util.matrix.Transform;
 import mote4.util.shader.ShaderMap;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.mesh.ScrollingText;
-import nullset.Vars;
-import nullset.Input;
+import main.Vars;
+import main.Input;
 import rpgbattle.BattleManager;
-import ui.components.FlavorTextMenu;
-import ui.components.PlayerStatBar;
-import ui.components.ScriptChoiceMenu;
+import ui.components.selectionMenu.SelectionMenu;
+import ui.components.selectionMenu.SingleSelectionMenu;
 import ui.script.ScriptReader;
 import ui.selectionmenubehavior.ingame.RootIngameMenu;
 import ui.selectionmenubehavior.SelectionMenuBehavior;
@@ -42,7 +41,8 @@ public class IngameUIManager implements MenuHandler {
                            showFlavorText = false,
                            lockFlavorText = false,
                            showSprite = false,
-                           showScriptChoice = false;
+                           showScriptChoice = false,
+                           showSkillCostMenu = false;
     
     private static float dialogueSlide, // position slide for the dialogue box
                          statBarSlide, // position slide for the player's stat bar
@@ -73,6 +73,7 @@ public class IngameUIManager implements MenuHandler {
             } 
             else if (Input.isKeyNew(Input.Keys.YES)) {
                 currentScript.advance(manager);
+                AudioPlayback.playSfx("sfx_menu_open_pane");
             }
         }
 
@@ -136,8 +137,8 @@ public class IngameUIManager implements MenuHandler {
                 // !!!! needs a simple animation
                 if (showScriptChoice) {
                     model.setIdentity();
-                    model.translate(RootLayer.width()/2-DialogueMenu.BORDER_W/2- Vars.UI_SCALE,
-                            RootLayer.height()-40-5* Vars.UI_SCALE-ScriptChoiceMenu.height());
+                    model.translate(10+RootLayer.width()/2-DialogueMenu.BORDER_W/2- Vars.UI_SCALE,
+                            RootLayer.height()-32-5* Vars.UI_SCALE-ScriptChoiceMenu.height());
                     model.makeCurrent();
                     ScriptChoiceMenu.render(model);
                 }
@@ -177,6 +178,21 @@ public class IngameUIManager implements MenuHandler {
                         SpriteMenu.render(model);
                     }
                 }
+                if (showSkillCostMenu) {
+                    model.setIdentity();
+                    float x = RootLayer.width()-SkillCostMenu.width()-Vars.UI_SCALE*3;
+                    float y = Vars.UI_SCALE;
+                    model.translate(x,y);
+                    model.makeCurrent();
+                    SkillCostMenu.render();
+                    ShaderMap.use("vertexcolor");
+                    model.translate(2,2);
+                    trans.makeCurrent();
+                    SkillCostMenu.renderBars();
+                    ShaderMap.use("texture");
+                    trans.makeCurrent();
+                    SkillCostMenu.renderBarText();
+                }
             }
         }
         // when a menu is closed it will play an exit animation before being completely destroyed
@@ -200,11 +216,11 @@ public class IngameUIManager implements MenuHandler {
     // static methods for encapsulated functions
     
     public static void pauseGame() {
-        if (gamePaused)
+        if (gamePaused || Input.currentLock() != Input.Lock.PLAYER) // can only pause if the player is in control and not already paused
             return;
-        
         Input.pushLock(Input.Lock.MENU);
         gamePaused = true;
+        AudioPlayback.playSfx("sfx_menu_open_main");
         manager.openMenu(new RootIngameMenu(manager));
     }
     public static void logMessage(String message) {
@@ -221,12 +237,17 @@ public class IngameUIManager implements MenuHandler {
         currentScript = new ScriptReader(scriptName);
         currentScript.advance(manager);
     }
+    public static void showSkillCostMenu(boolean show) {
+        showSkillCostMenu = show;
+    }
     
     // menu methods
     
     @Override
     public void openMenu(SelectionMenuBehavior b) {
-        SelectionMenu sm = new SelectionMenu(b);
+        SelectionMenu sm = new SingleSelectionMenu(b);
+        if (!selectionMenus.empty())
+            AudioPlayback.playSfx("sfx_menu_open_pane");
         selectionMenus.push(sm);
         sm.onFocus();
     }
@@ -240,6 +261,8 @@ public class IngameUIManager implements MenuHandler {
     }
     @Override
     public void closeMenu() {
+        if (Input.currentLock() != Input.Lock.MENU)
+            return;
         showDialogue = false;
         showFlavorText = false;
         showSprite = false;
@@ -249,9 +272,11 @@ public class IngameUIManager implements MenuHandler {
         closingMenu = selectionMenus.pop();
         if (selectionMenus.empty()) {
             gamePaused = false;
-            Input.popLock();
+            Input.popLock(Input.Lock.MENU);
+            AudioPlayback.playSfx("sfx_menu_close_main");
         } else {
             selectionMenus.peek().onFocus();
+            AudioPlayback.playSfx("sfx_menu_close_pane");
         }
     }
     
@@ -294,9 +319,11 @@ public class IngameUIManager implements MenuHandler {
     }
     @Override
     public void endScript(boolean b) {
+        if (Input.currentLock() != Input.Lock.SCRIPT)
+            return;
         showDialogue = false;
         scriptPlaying = false;
-        Input.popLock();
+        Input.popLock(Input.Lock.SCRIPT);
         if (!b)
             trigger.reset();
     }

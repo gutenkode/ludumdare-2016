@@ -1,5 +1,6 @@
 package ui.selectionmenubehavior.skill;
 
+import ui.IngameUIManager;
 import ui.MenuHandler;
 import ui.selectionmenubehavior.SelectionMenuBehavior;
 
@@ -71,11 +72,13 @@ public class RootSkillMenu implements SelectionMenuBehavior {
 
     @Override
     public void onFocus() {
+        IngameUIManager.showSkillCostMenu(true);
     }
 
     @Override
     public void onClose() {
         handler.closeMenu();
+        IngameUIManager.showSkillCostMenu(false);
     }
     @Override
     public void onCloseCleanup() {}

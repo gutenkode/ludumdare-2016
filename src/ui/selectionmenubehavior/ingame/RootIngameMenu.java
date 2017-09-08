@@ -16,7 +16,7 @@ public class RootIngameMenu implements SelectionMenuBehavior {
     private MenuHandler handler;
     
     private String title = "MENU";
-    private String[] options = {"Inventory","Skills","Options","Exit"};
+    private String[] options = {"Items","Skills","Options","Exit"};
 
     public RootIngameMenu(MenuHandler h) {
         handler = h;
@@ -40,7 +40,7 @@ public class RootIngameMenu implements SelectionMenuBehavior {
     @Override
     public void onAction(int index) {
         switch (getElementName(index)) {
-            case "Inventory":
+            case "Items":
                 handler.openMenu(new IngameItemMenu(handler));
                 break;
             case "Skills":

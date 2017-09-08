@@ -8,6 +8,7 @@ import rpgbattle.fighter.Fighter;
 import rpgbattle.fighter.FighterStats;
 import rpgsystem.Element;
 
+import java.util.HashMap;
 import java.util.IllegalFormatException;
 
 /**
@@ -18,7 +19,7 @@ import java.util.IllegalFormatException;
 public class EnemyData {
     private static final JSONObject json;
     static {
-        json = new JSONObject(FileIO.readFile("/res/files/enemies.json"));
+        json = new JSONObject(FileIO.getString("/res/files/enemies.json"));
     }
     
     public static String getIngameSprite(String enemyName) {
@@ -44,6 +45,9 @@ public class EnemyData {
     public static String getDeathString(String enemyName) {
         return json.getJSONObject(enemyName).getJSONObject("battle").getString("death");
     }
+    public static String getBattleMusic(String enemyName) {
+        return json.getJSONObject(enemyName).getJSONObject("battle").getString("music");
+    }
     public static String getDisplayName(String enemyName) {
         return json.getJSONObject(enemyName).getString("name");
     }
@@ -67,28 +71,25 @@ public class EnemyData {
      * @param enemyName
      * @return
      */
-    public static FighterStats populateStats(String enemyName,Fighter f) {
+    public static FighterStats populateStats(String enemyName, Fighter f) {
         JSONObject enemyJson = json.getJSONObject(enemyName);
         int h = enemyJson.getJSONObject("battle").getJSONObject("stats").getInt("health");
         int atk = enemyJson.getJSONObject("battle").getJSONObject("stats").getInt("attack");
         int def = enemyJson.getJSONObject("battle").getJSONObject("stats").getInt("defense");
         int mag = enemyJson.getJSONObject("battle").getJSONObject("stats").getInt("magic");
-        double ev = enemyJson.getJSONObject("battle").getJSONObject("stats").getDouble("evasion");
-        double crit = enemyJson.getJSONObject("battle").getJSONObject("stats").getDouble("critrate");
-        
-        double[] emult = new double[Element.values().length];
-        JSONArray arr = enemyJson.getJSONObject("battle").getJSONArray("elementMult");
-        if (arr.length() != Element.values().length)
-            throw new IllegalStateException("Incorrect number of element multipliers in enemy definition.");
-        for (int i = 0; i < Element.values().length; i++)
-        {
-            emult[i] = arr.getDouble(i);
+
+        // build the elemental resistances hashmap
+        // currently quite messy
+        HashMap<Element, Element.Resistance> emult = new HashMap<>();
+        JSONObject elements = enemyJson.getJSONObject("battle").getJSONObject("element");
+        for (String key : elements.keySet()) {
+            String val = elements.getString(key);
+            emult.put(Element.valueOf(key), Element.Resistance.valueOf(val));
         }
 
         FighterStats stats = new FighterStats(f,
                 h,0,0,
                 atk,def,mag,
-                ev,crit,
                 emult);
         return stats;
     }

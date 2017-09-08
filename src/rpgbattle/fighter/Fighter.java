@@ -1,15 +1,17 @@
 package rpgbattle.fighter;
 
 import java.util.ArrayList;
+
+import mote4.util.audio.AudioPlayback;
 import mote4.util.matrix.ModelMatrix;
 import mote4.util.shader.Uniform;
 import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.mesh.Mesh;
-import nullset.Vars;
-import nullset.RootLayer;
+import main.Vars;
+import main.RootLayer;
 import rpgbattle.fighter.Fighter.Toast.ToastType;
 import rpgsystem.Element;
-import rpgsystem.StatEffect;
+import rpgsystem.StatusEffect;
 import ui.BattleUIManager;
 import ui.components.BattleAnimation;
 
@@ -19,30 +21,34 @@ import ui.components.BattleAnimation;
  */
 public abstract class Fighter {
     
-    public ArrayList<StatEffect> statEffects = new ArrayList<>();
+    public ArrayList<StatusEffect> statusEffects = new ArrayList<>();
     private ArrayList<BattleAnimation> battleAnimations = new ArrayList<>();
     public FighterStats stats;
-    
-    float[] flash = new float[] {0,0,0};
-    double shake, shakeVel;
+
     protected int lastHealth, lastStamina, lastMana;
-    
-    private int doubleFlashDelay = -1; // used to trigger the second flash from actionStartFlash()
-    private float flashDecay; // the rate at which a flash color will fade
+
+    double shake, shakeVel;
+    float[] targetFlash, flash = new float[] {0,0,0};
+    private int flashState = 0; // indicates the state of the flash effect. Even = increase, Odd = decrease
+    private float flashSpeed, // the rate at which a flash color will change
+                  flashIndex; // current state of the flash effect
     
     /**
      * Called once at the beginning of a Fighter's turn.
+     * @return If >= 0, indicates that this Fighter is done performing any on-start actions.
      */
     public abstract int initAct();
     /**
      * When this Fighter is active, taking its turn, act() will be called
      * until this Fighter indicates that its turn is over.
-     * @return Indicates that this Fighter is done taking its turn.
+     * Any actions created by this Fighter will be ran next.
+     * @return If >= 0, indicates that this Fighter is done taking its turn.
      */
     public abstract int act();
     
     public abstract void damage(Element e, int stat, int atkPower, int accuracy, boolean crit);
-    public abstract void cutHealth(Element e, double percent, int accuracy);
+    public abstract void darkDamage(Element e, double percent, int accuracy);
+    public abstract void lightDamage(Element e, int accuracy);
     /**
      * Runs an accuracy check for an attack against this Fighter.
      * Returns true the % of time the attack should hit.
@@ -51,59 +57,75 @@ public abstract class Fighter {
      */
     final boolean calculateHit(int accuracy) {
         double rand = Math.random();
-        return (rand < accuracy*.01-stats.evasion());
-        // if random value is less than attack's accuracy minus evasion
+        return (rand < accuracy*.01);
+        // if random value is less than attack's accuracy
     }
     /**
      * Standardized method for performing damage calculation.
-     * @param element
-     * @param strength
-     * @param crit 
+     * @param element Element of the attack.
+     * @param skillPower Power of the skill used.
+     * @param atkStat Attack stat of the attacker.
+     * @param crit Whether this is a critical hit.
      */
-    final int calculateDamage(Element element, int strength, boolean crit) {
-        // use this formula instead, from Persona...
+    final int calculateDamage(Element element, int atkStat, int skillPower, boolean crit) {
         /*
-        DMG = 5 x sqrt(ST/EN x ATK) x MOD x HITS X RND
+            Use this formula instead, from Persona...
+            DMG = 5 x sqrt(ST/EN x ATK) x MOD x HITS x RND
 
-        DMG = Damage
-        ST = Character's Strength stat
-        EN = Enemy's Endurance stat
-        ATK = Atk value of equipped weapon OR Pwr value of used skill
-        MOD = Modifier based on the difference between character level and enemy level
-        HITS= Number of hits (for physical skills)
-        RND = Randomness factor (according to DragoonKain33, may be roughly between 0.95 and 1.05)
+            DMG = Damage
+            ST  = Character's Strength stat
+            EN  = Enemy's Endurance stat
+            ATK = Atk value of equipped weapon OR Pwr value of used skill
+            MOD = Modifier based on the difference between character level and enemy level
+            HITS= Number of hits (for physical skills)
+            RND = Randomness factor (according to DragoonKain33, may be roughly between 0.95 and 1.05)
          */
 
         // elemental strength/weakness
-        double elementMultVal = stats.elementMultiplier(element.index);
+        Element.Resistance resistance = stats.elementResistance(element);
 
-        int dmg;
-        if (crit) {// criticals have 1.5 power and use /1.5 the defense stat
-            dmg = (int)(1.5*strength/(stats.defense()/1.5));
+        double StEnRatio;
+        if (crit) {
+            // critical hits have 3/2 power, 2/3 the defense stat, and ignore defense buffs
+            int critDef = Math.min(stats.defense(), stats.baseDefense());
+            StEnRatio = (1.5*atkStat) / (critDef/1.5);
             addToast("CRITICAL");
         } else
-            dmg = strength/stats.defense();
+            StEnRatio = atkStat/(double)stats.defense();
+
+        double dmg =  5 * Math.sqrt(StEnRatio * skillPower);
 
         // multiplier for attack elemental type
-        dmg *= elementMultVal;
-        if (elementMultVal > 1)
-            addToast("WEAK");
-        else if (elementMultVal < 1)
-            addToast("RESIST...");
+        switch (resistance) {
+            case WEAK:
+                addToast("WEAK");
+                dmg *= 1.5;
+                break;
+            case RES:
+                addToast("RESIST...");
+                dmg *= 0.5;
+                break;
+            case NULL:
+                addToast("NULL");
+                dmg = 0;
+                break;
+        }
         
-        // slight randomness, add/subtract up to a 10th of total damage
-        dmg += (int)((Math.random()*dmg*.2)-(dmg*.1));
+        // slight randomness, add/subtract up to a 20th of total damage
+        dmg += (Math.random()*dmg*.1)-(dmg*.05);
 
         // damage cap
         dmg = Math.min(9999, dmg);
 
-        if (dmg == 0)
+        dmg = Math.round(dmg);
+
+        if (dmg == 0 && resistance != Element.Resistance.NULL)
             addToast("NO DAMAGE");
 
         // flash the sprite the color of the elemental attack
         flash(element.color);
         
-        return dmg;
+        return (int)dmg;
     }
     /**
      * Inflicts damage from poison.
@@ -111,17 +133,19 @@ public abstract class Fighter {
     public void poisonDamage() {
         if (stats.health > 1) {
             lastHealth = stats.health;
-            int dmg = stats.maxHealth / 10;
+            int dmg = stats.maxHealth / 12;
             stats.health -= dmg;
             stats.health = Math.max(1, stats.health);
+            AudioPlayback.playSfx("sfx_skill_status");
             addToast(ToastType.POISON, "POISON -" + (lastHealth - stats.health)); // if health was capped at 1hp, actual damage might be different from dmg
         }
     }
     
     public boolean isDead() { return stats.health <= 0; }
     
-    public void inflictStatus(StatEffect e, int accuracy) {
+    public void inflictStatus(StatusEffect e, int accuracy) {
         if (calculateHit(accuracy)) {
+            AudioPlayback.playSfx("sfx_skill_status");
             BattleUIManager.logMessage(getStatusEffectString(e));
             switch (e) {
                 case POISON:
@@ -130,28 +154,26 @@ public abstract class Fighter {
                 case FATIGUE:
                     addToast(ToastType.STAMINA, e.name.toUpperCase());
                     break;
-                case DEF_UP:
-                    addToast("+DEFENSE");
-                    break;
                 default:
                     addToast(e.name.toUpperCase());
                     break;
             }
             this.addAnim(new BattleAnimation(BattleAnimation.Type.STATUS));
-            if (!statEffects.contains(e)) {
-                statEffects.add(e);
+            if (!statusEffects.contains(e)) {
+                statusEffects.add(e);
             }
         } else {
             addToast("MISS");
+            AudioPlayback.playSfx("sfx_skill_miss");
         }
     }
-    protected abstract String getStatusEffectString(StatEffect e);
-    public boolean hasStatus(StatEffect e) {
-        return statEffects.contains(e);
+    protected abstract String getStatusEffectString(StatusEffect e);
+    public boolean hasStatus(StatusEffect e) {
+        return statusEffects.contains(e);
     }
-    public void cureStatus(StatEffect e) {
+    public void cureStatus(StatusEffect e) {
         addToast("CURED "+e.name.toUpperCase());
-        statEffects.remove(e);
+        statusEffects.remove(e);
     }
     
     /**
@@ -160,26 +182,47 @@ public abstract class Fighter {
      * @param rgb 
      */
     void flash(float... rgb) {
-        if (rgb.length == 3)
-            flash = rgb.clone();
-        flashDecay = .9f;
+        if (rgb.length != 3)
+            throw new IllegalArgumentException("Flash color array must have three components.");
+        flash = new float[] {0,0,0};
+        targetFlash = rgb.clone();
+        flashIndex = 0;
+        flashState = 2;
+        flashSpeed = .06f;
     }
     /**
      * A special double flash indicating this Fighter is about to use its turn.
      */
     void actionStartFlash() {
-        doubleFlashDelay = 10;
-        flash[0] = flash[1] = flash[2] = .1f;
-        flashDecay = 1.2f;
+        flash = new float[] {0,0,0};
+        targetFlash = new float[] {1,1,1};
+        flashIndex = 0;
+        flashState = 4; // flash twice
+        flashSpeed = .135f;
     }
+
+    /**
+     * Update and return the flash effect values.
+     * @return
+     */
     public float[] updateFlash() {
-        doubleFlashDelay--;
-        if (doubleFlashDelay == 0) {
-            flashDecay = .8f;
+        if (flashState > 0) {
+            if (flashState % 2 == 0) {
+                // even, increase
+                flashIndex += flashSpeed;
+                if (flashIndex >= 1)
+                    flashState--;
+            } else {
+                // odd, decrease
+                flashIndex -= flashSpeed;
+                if (flashIndex <= 0) {
+                    flashState--;
+                    flash[0] = flash[1] = flash[2] = 0;
+                }
+            }
+            for (int i = 0; i < 3; i++)
+                flash[i] = targetFlash[i]*flashIndex;
         }
-        flash[0] *= flashDecay;
-        flash[1] *= flashDecay;
-        flash[2] *= flashDecay;
         return flash;
     }
     
@@ -197,16 +240,19 @@ public abstract class Fighter {
     public int lastStamina() { return lastStamina; }
     public int lastMana() { return lastMana; }
 
-    public int shakeValue() {
+    /**
+     * Updates the shake effect value.
+     * @return
+     */
+    public void updateShake() {
         shake += shakeVel;
-        shakeVel -= shake/6;
-        shake *= .9;
-        shakeVel *= .9;
-
-        return (int)shake;
+        shakeVel -= shake/3;
+        shake *= .85;
+        shakeVel *= .8;
     }
+    public int shakeValue() { return (int)shake; }
     
-    // text "toasts" for displaying damage/restore amounts
+    ////// text "toasts" for displaying damage/restore amounts
     
     private ArrayList<Toast> toast = new ArrayList<>();
     private static final int TOAST_DELAY = 30; // frames to wait for every toast already in the queue
@@ -281,12 +327,13 @@ public abstract class Fighter {
         }
     }
 
-    // battle animation handling
+    ////// battle animation handling
 
     public void addAnim(BattleAnimation ba) {
         battleAnimations.add(ba);
     }
-    public void updateAnim() {
+    public boolean hasAnimationsLeft() { return !battleAnimations.isEmpty(); }
+    public void renderAnim() {
         for (int i = 0; i < battleAnimations.size(); i++) {
             if (battleAnimations.get(i).render()) {
                 battleAnimations.remove(i);

@@ -80,6 +80,10 @@ public class Terminal extends Entity {
 
     @Override
     public String getName() { return "Terminal"; }
+    @Override
+    public String serialize() {
+        return this.getClass().getSimpleName() +","+ (int)(posX-.5) +","+ (int)(posY-.25);
+    }
 
     @Override
     public boolean hasLight() { return true; }

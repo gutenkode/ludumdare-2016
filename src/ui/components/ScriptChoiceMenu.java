@@ -1,12 +1,13 @@
 package ui.components;
 
+import mote4.util.audio.AudioPlayback;
 import mote4.util.matrix.ModelMatrix;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.builder.StaticMeshBuilder;
 import mote4.util.vertex.mesh.Mesh;
-import nullset.Vars;
-import nullset.Input;
+import main.Vars;
+import main.Input;
 import org.lwjgl.opengl.GL11;
 import ui.MenuMeshCreator;
 
@@ -78,11 +79,14 @@ public class ScriptChoiceMenu {
         if (Input.isKeyNew(Input.Keys.DOWN)) {
             cursorPos++;
             cursorPos %= numElements;
+            AudioPlayback.playSfx("sfx_menu_hover");
         } else if (Input.isKeyNew(Input.Keys.UP)) {
             cursorPos--;
             if (cursorPos < 0)
                 cursorPos = numElements-1;
+            AudioPlayback.playSfx("sfx_menu_hover");
         } else if (Input.isKeyNew(Input.Keys.YES)) {
+            AudioPlayback.playSfx("sfx_menu_select");
             return cursorPos;
         }
         return -1;

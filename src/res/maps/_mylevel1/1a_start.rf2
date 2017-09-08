@@ -31,14 +31,12 @@ StaticObject,5,1,Crate
 StaticObject,4,3,Barrel
 StaticObject,5,1.5,Fluorescent
 StaticObject,1,1,Ceiling
-StaticObject,2,2,Chain,02
-StaticObject,4,2,Chain,12
 StaticObject,1,6,Pipe,-1
 Elevator,5,5,2,true
 Enemy,3,3,SLIME
 Water,-2
-ItemPickup,2,1,SKILL_BOLT
+ItemPickup,2,1,SKILL_ELEC
 ItemPickup,3,1,SKILL_ICE
 ItemPickup,4,1,MOD_MULTI_TARGET
-ItemPickup,3,3,SKILL_CURE
+ItemPickup,3,3,SKILL_HEAL
 </entitydata>

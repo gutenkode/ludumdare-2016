@@ -36,7 +36,7 @@ public class ScriptLoader {
             scripts.clear();
         else
             scripts = new HashMap<>();
-        JSONObject json = new JSONObject(FileIO.readFile("/res/maps/"+path+"/scripts.json"));
+        JSONObject json = new JSONObject(FileIO.getString("/res/maps/"+path+"/scripts.json"));
         for (String key : json.keySet()) {
             JSONArray arr = json.getJSONArray(key);
             String[] dialogue = new String[arr.length()];

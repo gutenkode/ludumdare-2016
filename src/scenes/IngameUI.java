@@ -2,8 +2,7 @@ package scenes;
 
 import mote4.scenegraph.Scene;
 import mote4.util.matrix.Transform;
-import mote4.util.shader.ShaderMap;
-import nullset.Input;
+import main.Input;
 import static org.lwjgl.opengl.GL11.*;
 import ui.IngameUIManager;
 
@@ -20,7 +19,7 @@ public class IngameUI implements Scene {
     }
 
     @Override
-    public void update(double delta) {
+    public void update(double time, double delta) {
         IngameUIManager.update();
         
         if (Input.currentLock() == Input.Lock.PLAYER)
@@ -29,7 +28,7 @@ public class IngameUI implements Scene {
     }
 
     @Override
-    public void render(double delta) {
+    public void render(double time, double delta) {
         //glClear(GL_COLOR_BUFFER_BIT);
         glDisable(GL_DEPTH_TEST);
         

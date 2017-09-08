@@ -7,35 +7,33 @@
     },
     "battle": {
       "sprite": "entity_battle_slime",
+      "encounter": "A Slime draws near!",
+      "death": "The Slime melts into a puddle.",
+      "background": "red",
+      "music": "battle_normal",
+      "maxEnemies": "3",
       "spriteFrames": [
         16,
         12,
         16,
         12
       ],
-      "encounter": "A Slime draws near!",
-      "death": "The Slime melts into a puddle.",
-      "background": "red",
-      "maxEnemies": "3",
       "stats": {
         "health": 60,
         "attack": 10,
         "defense": 10,
-        "magic": 10,
-        "evasion": 0.15,
-        "critrate": 0.05
+        "magic": 10
       },
-      "elementMult": [
-        1,
-        0.5,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1
-      ]
+      "element": {
+        "PHYS": "N",
+        "BOMB": "N",
+        "FIRE": "RES",
+        "ELEC": "N",
+        "ICE": "WEAK",
+        "ACID": "NULL",
+        "DARK": "N",
+        "LIGHT": "N"
+      }
     }
   },
   "NOISE": {
@@ -46,34 +44,32 @@
     },
     "battle": {
       "sprite": "entity_battle_noise",
+      "encounter": "The Noise approaches.",
+      "death": "The Noise flickers out of existence.",
+      "background": "red",
+      "music": "battle_normal",
+      "maxEnemies": "1",
       "spriteFrames": [
         5,
         5,
         5
       ],
-      "encounter": "The Noise approaches.",
-      "death": "The Noise flickers out of existence.",
-      "background": "red",
-      "maxEnemies": "1",
       "stats": {
         "health": 64,
         "attack": 10,
         "defense": 7,
-        "magic": 10,
-        "evasion": 0,
-        "critrate": 0
+        "magic": 10
       },
-      "elementMult": [
-        0.01,
-        0.5,
-        0.5,
-        0.5,
-        1,
-        1,
-        1,
-        1,
-        1
-      ]
+      "element": {
+        "PHYS": "NULL",
+        "BOMB": "WEAK",
+        "FIRE": "RES",
+        "ELEC": "RES",
+        "ICE": "RES",
+        "ACID": "RES",
+        "DARK": "WEAK",
+        "LIGHT": "WEAK"
+      }
     }
   },
   "BOSS": {
@@ -84,33 +80,31 @@
     },
     "battle": {
       "sprite": "entity_battle_boss",
+      "encounter": "The last battle.",
+      "death": "...",
+      "background": "grayscale",
+      "music": "battle_boss",
+      "maxEnemies": "1",
       "spriteFrames": [
         80,
         30
       ],
-      "encounter": "The last battle.",
-      "death": "...",
-      "background": "grayscale",
-      "maxEnemies": "1",
       "stats": {
-        "health": 300,
+        "health": 400,
         "attack": 20,
         "defense": 15,
-        "magic": 10,
-        "evasion": 0.3,
-        "critrate": 0.1
+        "magic": 10
       },
-      "elementMult": [
-        1,
-        1.5,
-        0.5,
-        1,
-        1,
-        1,
-        0.1,
-        1,
-        1
-      ]
+      "element": {
+        "PHYS": "N",
+        "BOMB": "N",
+        "FIRE": "WEAK",
+        "ELEC": "N",
+        "ICE": "N",
+        "ACID": "NULL",
+        "DARK": "NULL",
+        "LIGHT": "NULL"
+      }
     }
   }
 }

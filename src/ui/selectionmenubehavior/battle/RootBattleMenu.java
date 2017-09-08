@@ -4,6 +4,7 @@ import rpgbattle.BattleManager;
 import rpgbattle.fighter.Fighter;
 import ui.BattleUIManager;
 import ui.MenuHandler;
+import ui.components.PlayerStatBar;
 import ui.selectionmenubehavior.SelectionMenuBehavior;
 import ui.selectionmenubehavior.battle.BattleItemMenu;
 import ui.selectionmenubehavior.battle.BattleSkillMenu;
@@ -68,9 +69,12 @@ public class RootBattleMenu implements SelectionMenuBehavior {
     @Override
     public void onHighlight(int index) {
         handler.closeDialogue();
+        PlayerStatBar.stopStatPreview();
         switch (getElementName(index)) {
             case "Attack":
-                handler.showFlavorText(false, "Power: "+BattleManager.getPlayer().getAttackPower());
+                String s = "Power: "+BattleManager.getPlayer().getAttackPower()+"\n   "+(int)(100*BattleManager.getPlayer().getAttackPowerPercent())+"%";
+                handler.showFlavorText(false, s);
+                PlayerStatBar.previewStaminaCost(BattleManager.getPlayer().getAttackStaminaCost(), false);
                 break;
             case "Guard":
                 handler.showFlavorText(false, "Defense up this turn.");
@@ -82,7 +86,8 @@ public class RootBattleMenu implements SelectionMenuBehavior {
                 handler.showFlavorText(false, "Use an item.");
                 break;
             case "Run":
-                handler.showFlavorText(false, "Success chance: 100%");
+                int percent = (int)(BattleManager.getPlayer().getRunPercent()*100);
+                handler.showFlavorText(false, "Success chance: "+percent+"%");
                 break;
             default:
                 handler.closeFlavorText();
@@ -98,5 +103,7 @@ public class RootBattleMenu implements SelectionMenuBehavior {
         // can't close the root menu in a battle
     }
     @Override
-    public void onCloseCleanup() {}
+    public void onCloseCleanup() {
+        PlayerStatBar.stopStatPreview();
+    }
 }

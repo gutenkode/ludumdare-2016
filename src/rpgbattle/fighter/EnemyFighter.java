@@ -1,28 +1,31 @@
 package rpgbattle.fighter;
 
+import mote4.util.audio.AudioPlayback;
 import mote4.util.matrix.ModelMatrix;
 import rpgbattle.BattleManager;
 import rpgbattle.EnemyData;
 import rpgbattle.enemyBehavior.EnemyBehavior;
 import rpgbattle.fighter.Fighter.Toast.ToastType;
 import rpgsystem.Element;
-import rpgsystem.StatEffect;
+import rpgsystem.StatusEffect;
+import ui.BattleUIManager;
+import ui.components.EnemySprite;
 
 /**
  * Encapsulates the logic of an enemy in a battle.
  * @author Peter
  */
 public class EnemyFighter extends Fighter {
-    
-    private int currentFrame, currentFrameDelay;
-    private int[] frameDelay;
-    private float[] spriteInfo;
+
+    public final int[] frameDelay;
     public final String enemyName,
                         displayName,
                         spriteName,
                         encounterString,
                         deathString;
     private EnemyBehavior behavior;
+    private EnemySprite sprite;
+    private float deathScale = 1;
     
     public EnemyFighter(String enemyName) {
         this.enemyName = enemyName;
@@ -30,14 +33,11 @@ public class EnemyFighter extends Fighter {
         spriteName = EnemyData.getBattleSprite(enemyName);
         encounterString =  EnemyData.getEncounterString(enemyName);
         deathString = EnemyData.getDeathString(enemyName);
-        frameDelay = EnemyData.getFrameDelay(enemyName);
         stats = EnemyData.populateStats(enemyName,this);
-        
-        currentFrame = (int)(Math.random()*frameDelay.length);
-        currentFrameDelay = (int)(Math.random()*frameDelay[currentFrame]);
-        spriteInfo = new float[] {frameDelay.length, 1, 0};
+        frameDelay = EnemyData.getFrameDelay(enemyName);
         
         behavior = EnemyData.getBehavior(this);
+        sprite = new EnemySprite(this);
     }
     
     @Override
@@ -54,7 +54,7 @@ public class EnemyFighter extends Fighter {
     @Override
     public void damage(Element e, int stat, int atkPower, int accuracy, boolean crit) {
         if (calculateHit(accuracy)) {
-            int dmg = calculateDamage(e,stat*atkPower,crit);
+            int dmg = calculateDamage(e, stat, atkPower,crit);
 
             if (dmg != 0) {
                 // actually do health subtraction
@@ -72,15 +72,26 @@ public class EnemyFighter extends Fighter {
         }
     }
     @Override
-    public void cutHealth(Element e, double percent, int accuracy) {
-        if (calculateHit(accuracy)) {
-            double elementMultVal = stats.elementMultiplier(e.index);
-            if (elementMultVal > 1)
-                addToast("WEAK");
-            else if (elementMultVal < 1)
-                addToast("RESIST...");
+    public void darkDamage(Element e, double percent, int accuracy) {
+        if (calculateHit(accuracy))
+        {
+            Element.Resistance res = stats.elementResistance(e);
+            switch (res) {
+                case WEAK:
+                    addToast("WEAK");
+                    percent *= 1.5;
+                    break;
+                case RES:
+                    addToast("RESIST...");
+                    percent *= 0.5;
+                    break;
+                case NULL:
+                    addToast("NULL");
+                    percent = 0;
+                    break;
+            }
 
-            int dmg = (int)(stats.health*percent*elementMultVal);
+            int dmg = (int)(stats.health*percent);
 
             if (dmg != 0) {
                 // actually do health subtraction
@@ -95,6 +106,32 @@ public class EnemyFighter extends Fighter {
                 BattleManager.enemyDied(this);
         } else {
             addToast("MISS");
+        }
+    }
+    @Override
+    public void lightDamage(Element e, int accuracy) {
+        Element.Resistance res = stats.elementResistance(e);
+        switch (res) {
+            case WEAK:
+                addToast("WEAK");
+                accuracy *= 1.5;
+                break;
+            case RES:
+                addToast("RESIST...");
+                accuracy *= 0.5;
+                break;
+            case NULL:
+                addToast("NULL");
+                accuracy = 0;
+                break;
+        }
+        if (calculateHit(accuracy)) {
+            lastHealth = stats.health;
+            stats.health = 0;
+            BattleManager.enemyDied(this);
+        } else {
+            addToast("MISS");
+            AudioPlayback.playSfx("sfx_skill_miss");
         }
     }
     @Override
@@ -113,36 +150,29 @@ public class EnemyFighter extends Fighter {
     public boolean restoreStamina(int amount) {return false; }
     @Override
     public boolean restoreMana(int amount) { return false; }
-    
-    /**
-     * Updates animation data for this enemy and returns the array needed
-     * for rendering the correct tilesheet frame.
-     * @return 
-     */
-    public float[] updateSpriteInfo() { 
-        currentFrameDelay--;
-        if (currentFrameDelay <= 0) {
-            currentFrame++;
-            currentFrame %= frameDelay.length;
-            currentFrameDelay = frameDelay[currentFrame];
-            spriteInfo[2] = currentFrame;
-        }
-        return spriteInfo; 
-    }
-    
+
     public void runDeathAnimation(ModelMatrix model) {
-        behavior.runDeathAnimation(model);
+        model.scale(deathScale,1,1);
+        if (deathScale > 0) {
+            deathScale -= .035;
+            if (deathScale < 0)
+                deathScale = 0;
+        }
     }
+    public boolean isDeathAnimationFinished() { return deathScale <= 0; }
+    public EnemySprite getSprite() { return sprite; }
+    
+    //public void runDeathAnimation(ModelMatrix model) {
+    //    behavior.runDeathAnimation(model);
+    //}
 
     @Override
-    protected String getStatusEffectString(StatEffect e) {
+    protected String getStatusEffectString(StatusEffect e) {
         switch (e) {
             case POISON:
                 return "The "+displayName+" is poisoned!";
             case FATIGUE:
                 return "The "+displayName+" is fatigued!";
-            case DEF_UP:
-                return "The "+displayName+"'s defense increased!";
             default:
                 return "The "+displayName+" is now [" + e.name() + "]!";
         }

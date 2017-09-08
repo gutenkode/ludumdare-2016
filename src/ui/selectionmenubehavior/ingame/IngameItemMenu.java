@@ -14,7 +14,7 @@ public class IngameItemMenu implements SelectionMenuBehavior {
     
     private MenuHandler handler;
     
-    private String title = "INVENTORY";
+    private String title = "ITEMS";
     private String[] options;
     ArrayList<Item> items;
         

@@ -8,7 +8,7 @@ import mote4.util.texture.TextureMap;
 import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.mesh.Mesh;
 import mote4.util.vertex.mesh.ScrollingText;
-import nullset.Vars;
+import main.Vars;
 import terminal.filesystem.Directory;
 import terminal.filesystem.Node;
 import terminal.filesystem.program.DefaultProgram;

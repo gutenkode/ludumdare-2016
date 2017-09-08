@@ -81,6 +81,10 @@ public class ToggleButton extends Entity {
     @Override
     public String getName() { return "Toggle Button"; }
     @Override
+    public String getAttributeString() {
+        return super.getAttributeString()+"\nindex:"+index;
+    }
+    @Override
     public boolean hasLight() { return true; }
     @Override
     public float[] lightPos() { return new float[] {posX,posY,tileHeight+.3f}; }
@@ -98,5 +102,9 @@ public class ToggleButton extends Entity {
             default:
                 return new float[] {0,0,0};
         }
+    }
+    @Override
+    public String serialize() {
+        return this.getClass().getSimpleName() +","+ (int)(posX-.5) +","+ (int)(posY-.5) +","+ index;
     }
 }

@@ -1,6 +1,7 @@
 package rpgsystem;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Stores the player's inventory.
@@ -12,7 +13,7 @@ public class Inventory {
     
     static {
         inventory = new ArrayList<>();
-        //inventory.add(Item.KEYCARD4);
+        inventory.add(Item.KEYCARD4);
         inventory.add(Item.POTION);
         inventory.add(Item.ENERGY_DRINK);
         inventory.add(Item.MANA_HYPO);
@@ -60,6 +61,7 @@ public class Inventory {
                 inventory.add(i); 
                 break;
         }
+        Collections.sort(inventory);
     }
     public static void removeItem(Item i){ inventory.remove(i); }
     public static void removeItem(String s){

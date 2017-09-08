@@ -1,53 +1,71 @@
 package rpgsystem;
 
+import mote4.util.audio.AudioPlayback;
 import rpgbattle.BattleManager;
 import rpgbattle.fighter.Fighter;
-import static rpgsystem.DefaultTarget.*;
-import ui.BattleUIManager;
 import ui.MenuHandler;
+import ui.components.BattleAnimation;
+
+import static rpgsystem.BattleEffect.*;
+import static rpgsystem.Item.ItemType.*;
 
 /**
- *
+ * Items and their properties.
+ * This is currently more monolithic than I'd like...
  * @author Peter
  */
 public enum Item implements Pickupable {
+
     KEYCARD1("Lv1 Keycard",
-        "A keycard with the text \"Level 1\" written\non it.",
-        "item_keycard1", NO_TARGET, false),
+        "A keycard with the text\n\"Level 1\" written on it.",
+        "item_keycard1", null, null, NONE, KEY),
     KEYCARD2("Lv2 Keycard",
-        "A keycard with the text \"Level 2\" written\non it.",
-        "item_keycard2", NO_TARGET, false),
+        "A keycard with the text\n\"Level 2\" writtenon it.",
+        "item_keycard2", null, null, NONE, KEY),
     KEYCARD3("Lv3 Keycard",
-        "A keycard with the text \"Level 3\" written\non it.",
-        "item_keycard3", NO_TARGET, false),
+        "A keycard with the text\n\"Level 3\" written on it.",
+        "item_keycard3", null, null, NONE, KEY),
     KEYCARD4("Lv4 Keycard",
-        "A keycard with the text \"Level 4\" written\non it.",
-        "item_keycard4", NO_TARGET, false),
+        "A keycard with the text\n\"Level 4\" written on it.",
+        "item_keycard4", null, null, NONE, KEY),
 
     POTION("Potion",
-        "A small purple flask.\nRestores a fair amount of health.",
-        "item_potion", PLAYER, true),
+            "A small purple flask.\nRestores "+HEALTH_HEAL+" health.",
+            "item_potion", "You drink the potion.", "Your health is full!",
+            HEAL, CONSUMABLE),
     ENERGY_DRINK("Energy Drink",
-        "Linked to several heart conditions.\nRestores a fair amount of stamina.",
-        "item_drink", PLAYER, true),
+            "Linked to several heart conditions.\nRestores \"+STAMINA_HEAL+\" stamina.",
+            "item_drink", "You down the whole can.", "Your stamina is full!",
+            HEAL, CONSUMABLE),
     MANA_HYPO("Mana Hypo",
-        "A syringe filled with a glowing blue liquid.\nRestores a fair amount of mana.",
-        "item_hypo", PLAYER, true),
+            "A syringe filled with a glowing blue liquid.\nRestores \"+MANA_HEAL+\" mana.",
+            "item_hypo", "You inject the contents of the hypo.", "Your mana is full!",
+            HEAL, CONSUMABLE),
     GRENADE("Grenade",
-        "An explosive weapon.\nDeals damage to enemies.",
-        "item_grenade", ENEMY, true);
+            "An explosive weapon.\nDeals high damage to enemies.",
+            "item_grenade", "You throw the grenade!", "You can't use this right now.",
+            ATTACK, CONSUMABLE);
 
-    public final String name, desc, spriteName;
-    public final boolean canDiscard;
-    public final DefaultTarget defaultTarget;
-    Item(String n, String d, String s, DefaultTarget t, boolean dis) {
+    public final String name, desc, spriteName, useString, noUseString;
+    public final ItemType itemType;
+    public final BattleEffect battleEffect;
+    Item(String n, String d, String s, String use, String noUse, BattleEffect t, ItemType i) {
         name = n;
         desc = d;
         spriteName = s;
-        canDiscard = dis;
-        defaultTarget = t;
+        useString = use;
+        noUseString = noUse;
+        itemType = i;
+        battleEffect = t;
     }
-    
+
+    private static final int HEALTH_HEAL = 75, STAMINA_HEAL = 100, MANA_HEAL = 50, BOMB_POWER = 100;
+
+    public enum ItemType {
+        CONSUMABLE,
+        KEY;
+    }
+
     /**
      * Use an item in the overworld.
      * @param handler
@@ -57,41 +75,50 @@ public enum Item implements Pickupable {
         switch (this) {
             case KEYCARD1:
             case KEYCARD2:
+            case KEYCARD3:
+            case KEYCARD4:
                 handler.showDialogue("The card will open nearby\ndoors automatically.", this.spriteName);
                 return false;
                 
             case POTION:
-                if (BattleManager.getPlayer().restoreHealth(60)) {
+                if (BattleManager.getPlayer().restoreHealth(HEALTH_HEAL)) {
                     discard();
                     handler.closeMenu();
-                    handler.showDialogue("You drink the potion.\nDelicious!");
+                    handler.showDialogue(this.useString);
+                    AudioPlayback.playSfx("sfx_skill_heal");
                     return true;
                 }
-                handler.showDialogue("Your health is full!", this.spriteName);
+                handler.showDialogue(this.noUseString, this.spriteName);
+                AudioPlayback.playSfx("sfx_menu_invalid");
                 return false;
+
             case ENERGY_DRINK:
-                if (BattleManager.getPlayer().restoreStamina(60)) {
-                    BattleUIManager.logMessage("You down the whole can.");
+                if (BattleManager.getPlayer().restoreStamina(STAMINA_HEAL)) {
                     discard();
                     handler.closeMenu();
-                    handler.showDialogue("You down the whole can.");
+                    handler.showDialogue(this.useString);
+                    AudioPlayback.playSfx("sfx_skill_heal");
                     return true;
                 }
-                handler.showDialogue("Your stamina is full!", spriteName);
+                handler.showDialogue(this.noUseString, spriteName);
+                AudioPlayback.playSfx("sfx_menu_invalid");
                 return false;
+
             case MANA_HYPO:
-                if (BattleManager.getPlayer().restoreMana(40)) {
-                    BattleUIManager.logMessage("You inject the contents of the hypo.");
+                if (BattleManager.getPlayer().restoreMana(MANA_HEAL)) {
                     discard();
                     handler.closeMenu();
-                    handler.showDialogue("You inject the contents of the hypo.");
+                    handler.showDialogue(this.useString);
+                    AudioPlayback.playSfx("sfx_skill_heal");
                     return true;
                 }
-                handler.showDialogue("Your mana is full!", spriteName);
+                handler.showDialogue(this.noUseString, spriteName);
+                AudioPlayback.playSfx("sfx_menu_invalid");
                 return false;
                 
             default:
                 handler.showDialogue("You can't use this here.", this.spriteName);
+                AudioPlayback.playSfx("sfx_menu_invalid");
                 return false;
         }
     }
@@ -104,42 +131,74 @@ public enum Item implements Pickupable {
     public boolean useBattle(MenuHandler handler, Fighter fighter) {
         switch (this) {
             case POTION:
-                if (fighter.restoreHealth(60)) {
-                    BattleUIManager.logMessage("You drink the potion. Delicious!");
+                if (fighter.restoreHealth(HEALTH_HEAL)) {
+                    AudioPlayback.playSfx("sfx_skill_heal");
                     discard();
                     return true;
                 }
-                handler.showDialogue("Your health is full!", spriteName);
-                return false;
+                throw new IllegalStateException("Attempted to use item in battle that cannot be used.");
+
             case GRENADE:
-                BattleUIManager.logMessage("You throw the grenade! Boom!");
-                fighter.damage(Element.EXPLOSIVE, 90, 10, 100, false);
+                fighter.damage(Element.BOMB, BOMB_POWER, 10, 100, false);
+                fighter.addAnim(new BattleAnimation(BattleAnimation.Type.FIRE));
+                AudioPlayback.playSfx("sfx_skill_bomb");
                 discard();
                 return true;
+
             case ENERGY_DRINK:
-                if (fighter.restoreStamina(60)) {
-                    BattleUIManager.logMessage("You down the whole can.");
+                if (fighter.restoreStamina(STAMINA_HEAL)) {
+                    AudioPlayback.playSfx("sfx_skill_heal");
                     discard();
                     return true;
                 }
-                handler.showDialogue("Your stamina is full!", spriteName);
-                return false;
+                throw new IllegalStateException("Attempted to use item in battle that cannot be used.");
+
             case MANA_HYPO:
-                if (fighter.restoreMana(40)) {
-                    BattleUIManager.logMessage("You inject the contents of the hypo.");
+                if (fighter.restoreMana(MANA_HEAL)) {
+                    AudioPlayback.playSfx("sfx_skill_heal");
                     discard();
                     return true;
                 }
-                handler.showDialogue("Your mana is full!", spriteName);
-                return false;
+                throw new IllegalStateException("Attempted to use item in battle that cannot be used.");
+
             default:
-                handler.showDialogue("You can't use this here.", spriteName);
-                return false;
+                throw new IllegalStateException("Attempted to use item in battle that cannot be used.");
         }
     }
     public void discard() {
-        if (canDiscard)
+        if (itemType == CONSUMABLE)
             Inventory.get().remove(this);
+    }
+    public boolean checkCanUseInBattle(MenuHandler handler, Fighter f) {
+        switch (this) {
+            case POTION:
+                if (f.stats.health == f.stats.maxHealth) {
+                    handler.showDialogue(this.noUseString);
+                    AudioPlayback.playSfx("sfx_menu_invalid");
+                    return false;
+                }
+                return true;
+            case ENERGY_DRINK:
+                if (f.stats.stamina == f.stats.maxStamina) {
+                    handler.showDialogue(this.noUseString);
+                    AudioPlayback.playSfx("sfx_menu_invalid");
+                    return false;
+                }
+                return true;
+            case GRENADE:
+                return true;
+            case MANA_HYPO:
+                if (f.stats.mana == f.stats.maxMana) {
+                    handler.showDialogue(this.noUseString);
+                    AudioPlayback.playSfx("sfx_menu_invalid");
+                    return false;
+                }
+                return true;
+            default:
+                handler.showDialogue("Can't use this right now.");
+                AudioPlayback.playSfx("sfx_menu_invalid");
+                return false;
+        }
     }
 
     @Override
@@ -147,8 +206,6 @@ public enum Item implements Pickupable {
     @Override
     public String overworldSprite() { return spriteName; };
     @Override
-    public void pickup() {
-        Inventory.addItem(this);
-    }
+    public void pickup() { Inventory.addItem(this); }
 }
 

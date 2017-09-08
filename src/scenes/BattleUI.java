@@ -20,13 +20,13 @@ public class BattleUI implements Scene {
     }
 
     @Override
-    public void update(double delta) {
+    public void update(double time, double delta) {
         BattleManager.update();
         BattleUIManager.update();
     }
 
     @Override
-    public void render(double delta) {
+    public void render(double time, double delta) {
         //glClear(GL_COLOR_BUFFER_BIT);
         glDisable(GL_DEPTH_TEST);
 

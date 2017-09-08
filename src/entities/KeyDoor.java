@@ -21,9 +21,9 @@ public class KeyDoor extends Entity {
     private static Mesh mesh;
     
     private float rot, openVal = 0;
-    private int keycardLevel, tileX, tileY;
+    private int tileX, tileY, keycardLevel, dir;
     private int delay = 0, alertCycle = 0;
-    private boolean doorUnlocked = false, flicker, renderAlert, playerInRange;
+    private boolean doorUnlocked = false, flicker, alertActive, playerInRange;
     
     static {
         mesh = StaticMeshBuilder.constructVAO(GL11.GL_TRIANGLE_FAN, 
@@ -43,6 +43,7 @@ public class KeyDoor extends Entity {
         tileY = y;
         // dir defines the wall that the door is against
         // 0 = up, 1 = right, 2 = down, 3 = left
+        this.dir = dir;
         switch (dir) {
             case 0:
                 posX = x+.5f;
@@ -79,7 +80,7 @@ public class KeyDoor extends Entity {
     @Override
     public void onRoomInit() {
         tileHeight = MapManager.getTileHeight((int)posX, (int)posY);
-        renderAlert = false;
+        alertActive = false;
         playerInRange = false;
     }
     
@@ -114,17 +115,22 @@ public class KeyDoor extends Entity {
             }
 
             // display a toast message for door status
-            if (!playerInRange && keycardLevel > 0)
-                if (doorUnlocked)
-                    IngameUIManager.logMessage("Access granted.");
-                else
-                    IngameUIManager.logMessage("LV"+keycardLevel+" keycard required.");
+            if (!playerInRange) {
+                if (alertActive)
+                    IngameUIManager.logMessage("Security lockdown in effect.");
+                else if (keycardLevel > 0) {
+                    if (doorUnlocked)
+                        IngameUIManager.logMessage("Access granted.");
+                    else
+                        IngameUIManager.logMessage("LV" + keycardLevel + " keycard required.");
+                }
+            }
             playerInRange = true;
         }
         else
             playerInRange = false;
 
-        if (MapManager.getTimelineState().isAlertTriggered()) {
+        if (alertActive) {
             openVal = 0;
             delay--;
             if (delay <= 0) {
@@ -189,8 +195,8 @@ public class KeyDoor extends Entity {
         model.pop();
 
         if (MapManager.getTimelineState().isAlertTriggered()) {
-            if (!renderAlert) {
-                renderAlert = true;
+            if (!alertActive) {
+                alertActive = true;
                 MapManager.refreshLighting();
             }
 
@@ -216,8 +222,8 @@ public class KeyDoor extends Entity {
 
             Uniform.varFloat("emissiveMult", 0);
         } else {
-            if (renderAlert) {
-                renderAlert = false;
+            if (alertActive) {
+                alertActive = false;
                 MapManager.refreshLighting();
             }
         }
@@ -225,7 +231,7 @@ public class KeyDoor extends Entity {
         /*
         Uniform.varFloat("spriteInfo", 3,7,keycardLevel+3*openVal);
         TextureMap.bindUnfiltered("entity_keyDoor");
-        mesh.render();
+        mesh.render3d();
         
         if (MapManager.getTimelineState().isAlertTriggered()) {
             Uniform.varFloat("emissiveMult", 1);
@@ -233,12 +239,12 @@ public class KeyDoor extends Entity {
             Uniform.varFloat("spriteInfoEmissive", 3,7,12+alertCycle);
             model.translate(0,.35f,0);
             model.makeCurrent();
-            mesh.render();
+            mesh.render3d();
             Uniform.varFloat("spriteInfo", 3,7,16+alertCycle/2);
             Uniform.varFloat("spriteInfoEmissive", 3,7,16+alertCycle/2);
             model.translate(0,.15f,0);
             model.makeCurrent();
-            mesh.render();
+            mesh.render3d();
             Uniform.varFloat("emissiveMult", 0);
         }
         */
@@ -246,14 +252,22 @@ public class KeyDoor extends Entity {
 
     @Override
     public String getName() { return "Door"; }
+    @Override
+    public String getAttributeString() {
+        return super.getAttributeString()+"\nlevel:"+keycardLevel+", rotation:"+rot;
+    }
+    @Override
+    public String serialize() {
+        return this.getClass().getSimpleName() +","+ tileX +","+ tileY +","+ keycardLevel +","+ dir;
+    }
 
     @Override
-    public boolean hasLight() { return keycardLevel > 0 || renderAlert; }
+    public boolean hasLight() { return keycardLevel > 0 || alertActive; }
     @Override
     public float[] lightPos() { return new float[] {tileX+.5f,tileY+.5f,tileHeight+1f}; }
     @Override
     public float[] lightColor() {
-        if (renderAlert)
+        if (alertActive)
             return new float[] {2,.5f,0};
         else
             return new float[] {.54f,.58f,1};

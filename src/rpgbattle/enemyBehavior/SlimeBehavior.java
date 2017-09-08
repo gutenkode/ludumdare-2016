@@ -2,8 +2,11 @@ package rpgbattle.enemyBehavior;
 
 import mote4.util.matrix.ModelMatrix;
 import rpgbattle.BattleManager;
+import rpgbattle.battleAction.BattleAction;
+import rpgbattle.battleAction.BuffAction;
+import rpgbattle.battleAction.StatusAction;
 import rpgbattle.fighter.EnemyFighter;
-import rpgsystem.StatEffect;
+import rpgsystem.StatusEffect;
 import ui.BattleUIManager;
 
 /**
@@ -11,75 +14,38 @@ import ui.BattleUIManager;
  * @author Peter
  */
 public class SlimeBehavior extends EnemyBehavior {
-    
-    private int action;
-    private float deathCycle;
 
     public SlimeBehavior(EnemyFighter f) {
         super(f);
-        deathCycle = 1;
     }
 
     @Override
     public int initAct() {
-        if (!fighter.hasStatus(StatEffect.DEF_UP)
-            && Math.random() > .8)
+        if (fighter.stats.getDefBuff() < 2
+            && Math.random() > .6)
         {
-            BattleUIManager.logMessage("The Slime uses Harden!");
-            action = 1;
+            BattleUIManager.logMessage("The Slime congeals on the floor.");
+            BattleManager.addAction(new BuffAction(fighter, BuffAction.Stat.DEF, 1));
         } 
-        else if (!BattleManager.getPlayer().hasStatus(StatEffect.POISON)
+        else if (!BattleManager.getPlayer().hasStatus(StatusEffect.POISON)
             && Math.random() > .85) 
         {
             BattleUIManager.logMessage("The Slime spits acid!");
-            action = 2;
-        } /*
-        else if (!BattleManager.getPlayer().hasStatus(StatEffect.FATIGUE)
-            && Math.random() > .85) 
-        {
-            BattleUIManager.logMessage("The Slime casts an oppressive aura!");
-            action = 3;
-        } */
-        else if (Math.random() > .8) 
+            BattleManager.addAction(new StatusAction(BattleManager.getPlayer(), StatusEffect.POISON, 80));
+        }
+        else if (Math.random() > .8)
         {
             BattleUIManager.logMessage("The Slime eyes you carefully.");
-            action = -1;
+            return BattleAction.STD_INIT_DELAY+BattleAction.STD_ACTION_DELAY;
         } 
         else 
         {
             BattleUIManager.logMessage("The Slime attacks!");
-            action = 0;
+            useAttack();
         }
-
-        return 40;
+        return BattleAction.STD_INIT_DELAY;
     }
 
     @Override
-    public int act() {
-        switch (action) {
-            case 0:
-                useAttack();
-                return 40;
-            case 1:
-                fighter.inflictStatus(StatEffect.DEF_UP,999);
-                //fighter.restoreHealth(20);
-                return 40;
-            case 2: 
-                BattleManager.getPlayer().inflictStatus(StatEffect.POISON,80);
-                return 40;
-            case 3: 
-                BattleManager.getPlayer().inflictStatus(StatEffect.FATIGUE,80);
-                return 40;
-            default:
-                return 0;
-        }
-    }
-
-    @Override
-    public void runDeathAnimation(ModelMatrix model) {
-        model.translate(0, (1-deathCycle)*96);
-        model.scale(1, deathCycle, 1);
-        //if (deathCycle > .1)
-            deathCycle *= .95;
-    }
+    public int act() { return 0; }
 }

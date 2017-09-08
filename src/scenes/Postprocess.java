@@ -8,8 +8,8 @@ import mote4.util.shader.ShaderMap;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.mesh.MeshMap;
-import nullset.RootLayer;
-import nullset.Vars;
+import main.RootLayer;
+import main.Vars;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -41,7 +41,7 @@ public class Postprocess implements Scene {
     }
 
     @Override
-    public void update(double delta) {
+    public void update(double time, double delta) {
         // update fade-to-black effect
         // call the specified callback when the fade is complete
         // then unfade
@@ -63,11 +63,11 @@ public class Postprocess implements Scene {
     }
 
     @Override
-    public void render(double delta) {
+    public void render(double time, double delta) {
         glClear(GL_COLOR_BUFFER_BIT);
         glDisable(GL_DEPTH_TEST);
 
-        // render transition effect, if active
+        // render3d transition effect, if active
         if (RootLayer.getState() == RootLayer.State.BATTLE_INTRO) {
             ShaderMap.use("quad");
             Uniform.varFloat("colorMult", colorMult,colorMult,colorMult);
@@ -79,7 +79,7 @@ public class Postprocess implements Scene {
 
         Target framebuffer = Target.getCurrent();
         
-    // render 3D scene to dither FBO
+    // render3d 3D scene to dither FBO
     // this is used to create the combined FBO and used as the final pass of the 3D scene
         ditherScene[0].makeCurrent();
         glClear(GL_COLOR_BUFFER_BIT);
@@ -89,7 +89,7 @@ public class Postprocess implements Scene {
         TextureMap.bindFiltered("fbo_scene");
         MeshMap.render("quad");
         
-    // render UI scene to UI upscale scene - simple upscale to improve filtering effects
+    // render3d UI scene to UI upscale scene - simple upscale to improve filtering effects
     // same with dither scene
         uiUpscaleScene.makeCurrent();
         glClear(GL_COLOR_BUFFER_BIT);
@@ -106,7 +106,7 @@ public class Postprocess implements Scene {
         //if (dofCoef > 0)
             createDOFTexture("fbo_dither0");
         
-    // render scene and UI to the combineScene,
+    // render3d scene and UI to the combineScene,
     // which is used to create the bloom scene
         combineScene.makeCurrent();
         glClear(GL_COLOR_BUFFER_BIT);
@@ -120,7 +120,7 @@ public class Postprocess implements Scene {
     // create a bloom texture from the combined scene
         createBloomTexture("fbo_combine");
 
-    // render final mix shader to screen
+    // render3d final mix shader to screen
         framebuffer.makeCurrent();
         ShaderMap.use("quad_final");
         Uniform.varFloat("dofCoef", dofCoef);
@@ -145,7 +145,7 @@ public class Postprocess implements Scene {
      * @param texName The texture to apply bloom to.
      */
     public void createBloomTexture(String texName) {
-        // render scene FBO to HDR scene FBO
+        // render3d scene FBO to HDR scene FBO
         // this cuts off the darker part of the image so only
         // the bright part of the image is blurred for HDR effects
         hdrScene.makeCurrent();
@@ -200,7 +200,7 @@ public class Postprocess implements Scene {
         Uniform.varFloat("focalDepth", 0);
         TextureMap.bindFiltered(texName);
         glClear(GL_COLOR_BUFFER_BIT);
-        MeshMap.render("quad");
+        MeshMap.render3d("quad");
         */
 
     // FIRST PASS
@@ -220,7 +220,7 @@ public class Postprocess implements Scene {
         MeshMap.render("quad");
         
     // SECOND PASS
-        /*
+
         dofScene1.makeCurrent();
         ShaderMap.use("quad_horizBlur");
         Uniform.varFloat("blurSize", 1f/width*2);
@@ -234,7 +234,7 @@ public class Postprocess implements Scene {
         TextureMap.bindFiltered("fbo_dof1");
         glClear(GL_COLOR_BUFFER_BIT);
         MeshMap.render("quad");
-        */
+
     }
 
     @Override

@@ -8,6 +8,7 @@ texture_color.vert	texture_color.frag	texture_color
 texture.vert		texture_uiblur.frag	texture_uiblur
 
 color.vert		color.frag		color
+vertexcolor.vert	vertexcolor.frag	vertexcolor
 
 titlebg.vert		titlebg.frag		titlebg
 battle_bg.vert		battle_bg.frag		battle_bg

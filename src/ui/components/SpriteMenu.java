@@ -4,7 +4,7 @@ import mote4.util.matrix.ModelMatrix;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.builder.StaticMeshBuilder;
 import mote4.util.vertex.mesh.Mesh;
-import nullset.Vars;
+import main.Vars;
 import org.lwjgl.opengl.GL11;
 import ui.MenuMeshCreator;
 

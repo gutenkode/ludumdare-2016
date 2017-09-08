@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import rpgbattle.BattleManager;
 import rpgbattle.PlayerSkills;
 import rpgbattle.fighter.Fighter;
-import rpgsystem.DefaultTarget;
+import rpgsystem.BattleEffect;
 import rpgsystem.Skill;
 import rpgsystem.SkillModifier;
 import ui.BattleUIManager;
@@ -52,13 +52,8 @@ public class BattleSkillMenu implements SelectionMenuBehavior {
         else {
             if (BattleManager.getPlayer().canUseSkill(handler, skills.get(index))) {
                 currentSkill = skills.get(index);
-                boolean isMultiTarget =
-                        (PlayerSkills.getLinkedModifier(currentSkill) == SkillModifier.MOD_MULTI_TARGET)
-                        || currentSkill.defaultTarget == DefaultTarget.ALL_ENEMIES
-                        || currentSkill.defaultTarget == DefaultTarget.ALL_PLAYERS;
-                boolean isEnemyTarget =
-                           currentSkill.defaultTarget == DefaultTarget.ENEMY
-                        || currentSkill.defaultTarget == DefaultTarget.ALL_ENEMIES;
+                boolean isMultiTarget = (PlayerSkills.getLinkedModifier(currentSkill) == SkillModifier.MOD_MULTI_TARGET);
+                boolean isEnemyTarget = currentSkill.data.effect != BattleEffect.HEAL;
                 handler.openMenu(new EnemySelectionMenu(handler, this::skillCallback, isMultiTarget, isEnemyTarget, !isEnemyTarget));
             }
         }
@@ -66,7 +61,7 @@ public class BattleSkillMenu implements SelectionMenuBehavior {
     public void skillCallback(Fighter... f) {
         if (BattleManager.getPlayer().useSkill(handler, currentSkill, f)) {
             currentSkill = null;
-            PlayerStatBar.stopManaPreview();
+            PlayerStatBar.stopStatPreview();
             BattleUIManager.endPlayerTurn();
         }
     }
@@ -75,11 +70,14 @@ public class BattleSkillMenu implements SelectionMenuBehavior {
     public void onHighlight(int index) {
         handler.closeDialogue(); // remove "not enough mana" message
         if (index == options.length-1) {
-            PlayerStatBar.stopManaPreview();
+            PlayerStatBar.stopStatPreview();
             handler.closeFlavorText();
         } else {
-            PlayerStatBar.previewManaCost(skills.get(index).cost());
-            handler.showFlavorText(false, skills.get(index).getFullInfoString(), skills.get(index).spriteName);
+            if (skills.get(index).data.usesSP)
+                PlayerStatBar.previewStaminaCost(skills.get(index).data.cost(), false);
+            else
+                PlayerStatBar.previewManaCost(skills.get(index).data.cost());
+            handler.showFlavorText(true, skills.get(index).data.getFullInfoString(), skills.get(index).data.spriteName);
         }
     }
 
@@ -93,7 +91,7 @@ public class BattleSkillMenu implements SelectionMenuBehavior {
         handler.closeMenu();
     }
     @Override
-    public void onCloseCleanup() { PlayerStatBar.stopManaPreview(); }
+    public void onCloseCleanup() { PlayerStatBar.stopStatPreview(); }
 
     private void rebuildMenu() {
         skills = PlayerSkills.getEquippedSkills(); // only show equipped skills
@@ -101,6 +99,6 @@ public class BattleSkillMenu implements SelectionMenuBehavior {
         options = new String[skills.size()+1];
         options[options.length-1] = "Exit";
         for (int i = 0; i < options.length-1; i++)
-            options[i] = skills.get(i).name;
+            options[i] = skills.get(i).data.name;
     }
 }

@@ -63,10 +63,10 @@ post/noise		post_noise
 post/vignette		post_vignette
 post/scanlines		post_scanlines
 
-item/drink		item_drink
-item/grenade		item_grenade
-item/hypo		item_hypo
-item/potion		item_potion
+item/drink_old		item_drink
+item/grenade_old	item_grenade
+item/hypo_old		item_hypo
+item/potion_old		item_potion
 item/keycard1		item_keycard1
 item/keycard2		item_keycard2
 item/keycard3		item_keycard3

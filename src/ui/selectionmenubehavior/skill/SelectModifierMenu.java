@@ -51,7 +51,7 @@ public class SelectModifierMenu implements SelectionMenuBehavior {
         if (index == options.length-1) {
             handler.closeFlavorText();
         } else {
-            handler.showFlavorText(false, modifiers.get(index).getFullInfoString());
+            handler.showFlavorText(true, modifiers.get(index).getFullInfoString());
         }
     }
 

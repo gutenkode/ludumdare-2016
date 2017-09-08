@@ -10,8 +10,10 @@ public class RoomLink extends Entity {
 
     private int direction;
     private String roomName;
+    private final int x,y,w,h;
 
     public RoomLink(int x, int y, int w, int h, int dir, String room) {
+        this.x = x; this.y = y; this.w = w; this.h = h;
         posX = x+w/2f;
         hitboxW = w/2f+.01f;
         posY = y+h/2f;
@@ -59,5 +61,13 @@ public class RoomLink extends Entity {
     public void render(TransformationMatrix model) {}
 
     @Override
-    public String getName() { return "RoomLink"; }
+    public String getName() { return "RoomLink: "+roomName; }
+    @Override
+    public String getAttributeString() {
+        return super.getAttributeString()+"\nlinkedRoom:"+roomName;
+    }
+    @Override
+    public String serialize() {
+        return this.getClass().getSimpleName() +","+ x +","+ y +","+ w +","+ h +","+ direction +","+ roomName;
+    }
 }

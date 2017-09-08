@@ -1,7 +1,8 @@
 package ui.selectionmenubehavior;
 
 import mote4.scenegraph.Window;
-import nullset.Vars;
+import mote4.util.audio.AudioPlayback;
+import main.Vars;
 import ui.MenuHandler;
 
 /**
@@ -52,25 +53,33 @@ public class OptionsMenu implements SelectionMenuBehavior {
     public void onAction(int index) {
         switch(index) {
             case 0: // fullscreen
-                if (Window.isFullscreen())
-                    Window.setWindowedPercent(.75, 16/9.0);
-                else
-                    Window.setFullscreen();
+                if (System.getProperty("os.name").toLowerCase().contains("mac"))
+                    AudioPlayback.playSfx("sfx_menu_invalid");
+                else {
+                    if (Window.isFullscreen())
+                        Window.setWindowedPercent(.75, 16 / 9.0);
+                    else
+                        Window.setFullscreen();
+                    AudioPlayback.playSfx("sfx_menu_select");
+                }
                 break;
             case 1: // vsync
                 Window.setVsync(!Window.isVsyncEnabled());
                 refreshOptions();
                 handler.forceMenuRefocus();
+                AudioPlayback.playSfx("sfx_menu_select");
                 break;
             case 2: // supersample
                 Vars.setSSAA(!Vars.useSSAA());
                 refreshOptions();
                 handler.forceMenuRefocus();
+                AudioPlayback.playSfx("sfx_menu_select");
                 break;
             case 3: // filter
                 Vars.setFiltering(!Vars.useFiltering());
                 refreshOptions();
                 handler.forceMenuRefocus();
+                AudioPlayback.playSfx("sfx_menu_select");
                 break;
             default:
                 handler.closeMenu();
@@ -79,7 +88,25 @@ public class OptionsMenu implements SelectionMenuBehavior {
     }
 
     @Override
-    public void onHighlight(int index) {}
+    public void onHighlight(int index) {
+        switch(index) {
+            case 0: // fullscreen
+                handler.showFlavorText(false, "Toggle fullscreen.\nOn macOS, use the maximize button.");
+                break;
+            case 1: // vsync
+                handler.showFlavorText(false, "Toggle between vsync\nor locked 60fps.");
+                break;
+            case 2: // supersample
+                handler.showFlavorText(false, "Supersample Antialiasing\nHigh-quality antialiasing, smooths\nedges and increases detail.");
+                break;
+            case 3: // filter
+                handler.showFlavorText(false, "Toggle between linear and nearest\nneighbor filtering on the screen.");
+                break;
+            default:
+                handler.closeFlavorText();
+                break;
+        }
+    }
 
     @Override
     public void onFocus() {}
@@ -89,5 +116,7 @@ public class OptionsMenu implements SelectionMenuBehavior {
         handler.closeMenu();
     }
     @Override
-    public void onCloseCleanup() {}
+    public void onCloseCleanup() {
+        handler.closeFlavorText();
+    }
 }

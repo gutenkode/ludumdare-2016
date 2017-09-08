@@ -2,8 +2,12 @@ package rpgbattle.enemyBehavior;
 
 import mote4.util.matrix.ModelMatrix;
 import rpgbattle.BattleManager;
+import rpgbattle.battleAction.BattleAction;
+import rpgbattle.battleAction.BuffAction;
+import rpgbattle.battleAction.StatusAction;
 import rpgbattle.fighter.EnemyFighter;
-import rpgsystem.StatEffect;
+import rpgsystem.Element;
+import rpgsystem.StatusEffect;
 import ui.BattleUIManager;
 
 /**
@@ -12,58 +16,33 @@ import ui.BattleUIManager;
  */
 public class NoiseBehavior extends EnemyBehavior {
 
-    private int action;
-    private float deathCycle;
-
     public NoiseBehavior(EnemyFighter f) {
         super(f);
-        deathCycle = 1;
     }
 
     @Override
     public int initAct() {
-
-        if (fighter.stats.health < fighter.stats.maxHealth/2
+        if (fighter.stats.health < fighter.stats.maxHealth
                 && Math.random() > .5)
         {
             BattleUIManager.logMessage("The Noise lets out a piercing screech.");
-            action = 1;
+            useAttack(Element.PHYS, null, 2.0, 10);
+            BattleManager.addAction(new BuffAction(BattleManager.getPlayer(), BuffAction.Stat.DEF, -1));
         }
-        else if (!BattleManager.getPlayer().hasStatus(StatEffect.FATIGUE)
+        else if (!BattleManager.getPlayer().hasStatus(StatusEffect.FATIGUE)
                 && Math.random() > .85)
         {
             BattleUIManager.logMessage("The Noise casts an oppressive aura of static.");
-            action = 2;
+            BattleManager.addAction(new StatusAction(BattleManager.getPlayer(), StatusEffect.FATIGUE, 80));
         }
         else
         {
             BattleUIManager.logMessage("The Noise shivers wildly.");
-            action = 0;
+            useAttack(40);
         }
-
-        return 30;
+        return BattleAction.STD_INIT_DELAY;
     }
 
     @Override
-    public int act() {
-        switch (action) {
-            case 0:
-                useAttack();
-                break;
-            case 1:
-                useAttack(2.0);
-                break;
-            case 2:
-                BattleManager.getPlayer().inflictStatus(StatEffect.FATIGUE, 80);
-                break;
-        }
-
-        return 40;
-    }
-
-    @Override
-    public void runDeathAnimation(ModelMatrix model) {
-        model.scale(deathCycle, 1, 1);
-        deathCycle *= .9;
-    }
+    public int act() { return 0; }
 }

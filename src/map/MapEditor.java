@@ -1,7 +1,7 @@
 package map;
 
 import entities.Entity;
-import nullset.Vars;
+import main.Vars;
 
 import java.util.ArrayList;
 
@@ -20,7 +20,7 @@ public class MapEditor {
         entitiesRefreshed = false;
     }
     public void refreshEntities() {
-        entities = MapDataUtility.constructEntities(mapData.entities);
+        entities = MapDataUtility.deserializeEntities(mapData.entities);
         for (Entity e : entities)
             e.onRoomInit();
         entitiesRefreshed = true;
@@ -74,21 +74,14 @@ public class MapEditor {
 
     /**
      * Adds the specified entity to the map.
-     * The entity descriptor string will be added to the map, but if it is not
-     * recognized at load time it will not be constructed.
-     * @param vars
+     * The serialized entity descriptor string will be added to the map, but if it is not
+     * recognized at load time by the deserializer it will not be constructed.
+     * @param entity The entity to serialize and add to the map.
      */
-    public void addEntity(String... vars) {
-        StringBuilder sb = new StringBuilder();
-        int i = 0;
-        for (String s : vars) {
-            sb.append(s);
-            i++;
-            if (i < vars.length)
-                sb.append(",");
-        }
-        System.out.println("Adding entity to map: "+sb.toString());
-        mapData.addEntity(sb.toString());
+    public void addEntity(Entity entity) {
+        String serialized = entity.serialize();
+        System.out.println("Adding entity to map: "+serialized);
+        mapData.addEntity(serialized);
 
         entitiesRefreshed = false;
     }

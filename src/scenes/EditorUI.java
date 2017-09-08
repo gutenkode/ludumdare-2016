@@ -7,9 +7,9 @@ import mote4.util.shader.ShaderMap;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.mesh.MeshMap;
-import nullset.Vars;
-import nullset.Input;
-import nullset.RootLayer;
+import main.Vars;
+import main.Input;
+import main.RootLayer;
 import terminal.TerminalSession;
 import terminal.filesystem.DefaultFilesystem;
 import ui.EditorUIManager;
@@ -35,7 +35,7 @@ public class EditorUI implements Scene {
     }
 
     @Override
-    public void update(double delta) {
+    public void update(double time, double delta) {
 
         if (Input.currentLock() != Input.Lock.TERMINAL)
         {
@@ -55,7 +55,7 @@ public class EditorUI implements Scene {
     }
 
     @Override
-    public void render(double delta) {
+    public void render(double time, double delta) {
         glDisable(GL_DEPTH_TEST);
         //glClear(GL_COLOR_BUFFER_BIT);
 

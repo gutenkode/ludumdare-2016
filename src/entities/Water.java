@@ -69,4 +69,8 @@ public class Water extends Entity {
 
     @Override
     public String getName() { return "Water"; }
+    @Override
+    public String serialize() {
+        return getName()+","+tileHeight();
+    }
 }

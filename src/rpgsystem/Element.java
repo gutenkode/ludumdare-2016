@@ -6,20 +6,31 @@ package rpgsystem;
  * @author Peter
  */
 public enum Element {
-    PHYS(0, new float[] {.2f,.1f,.1f}),
-    FIRE(1, new float[] {1,.3f,0}),
-    ELEC(2, new float[] {1,1,0}),
-    ICE(3,  new float[] {.65f,.65f,1}),
-    FORCE(4, new float[] {0,.9f,.1f}),
-    ACID(5, new float[] {1,0,.9f}),
-    RUIN(6, new float[] {.6f,.5f,.5f}),
-    RADIANT(7, new float[] {.9f,.9f,1}),
-    EXPLOSIVE(8, new float[] {1,.6f,.1f});
+    PHYS(new float[] {.2f,.1f,.1f}),
+    BOMB(new float[] {1,.6f,.1f}),
 
-    public final int index;
+    FIRE(new float[] {1,.3f,0}),
+    ELEC(new float[] {1,1,0}),
+    ICE(new float[] {.65f,.65f,1}),
+
+    ACID(new float[] {1,0,.9f}),
+    DARK(new float[] {.6f,.5f,.5f}),
+    LIGHT(new float[] {.9f,.9f,1});
+
     public final float[] color;
-    Element(int i, float[] c) {
-        index = i;
+    Element(float[] c) {
         color = c;
     }
+
+    /**
+     * Resistances to elemental types.
+     */
+    public enum Resistance {
+        N,      // normal damage
+        RES,    // resist - less damage
+        WEAK,   // weak - more damage
+        NULL    // null - no damage
+    }
 }
+
+

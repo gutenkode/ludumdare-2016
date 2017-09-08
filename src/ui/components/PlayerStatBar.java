@@ -8,11 +8,11 @@ import mote4.util.texture.TextureMap;
 import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.builder.StaticMeshBuilder;
 import mote4.util.vertex.mesh.Mesh;
-import nullset.Vars;
+import main.Vars;
 import org.lwjgl.opengl.GL11;
 import rpgbattle.BattleManager;
 import rpgbattle.fighter.FighterStats;
-import rpgsystem.StatEffect;
+import rpgsystem.StatusEffect;
 import ui.MenuMeshCreator;
 
 /**
@@ -27,10 +27,10 @@ public class PlayerStatBar {
     private static Mesh borderMesh, statusIconMesh, barMesh;
     private static Mesh[] textMesh;
     
-    private static double manaPreviewCycle;
-    private static boolean manaPreview, manaPreviewTooHigh; 
+    private static double statPreviewCycle;
+    private static boolean manaPreview, staminaPreview, statPreviewTooHigh;
     private static float healthRender, staminaRender, manaRender;
-    private static int manaCostPreview,
+    private static int statCostPreview,
                        lastHealthText, lastStaminaText, lastManaText;
 
     static {
@@ -63,13 +63,24 @@ public class PlayerStatBar {
      * @param cost 
      */
     public static void previewManaCost(int cost) {
-        manaCostPreview = cost;
-        manaPreview = true;
+        statCostPreview = cost;
+        manaPreview = true; staminaPreview = false;
         // if the cost prediction is bigger than the available mana
-        manaPreviewTooHigh = cost > BattleManager.getPlayer().stats.mana;
+        statPreviewTooHigh = cost > BattleManager.getPlayer().stats.mana;
     }
-    public static void stopManaPreview() {
+    public static void previewStaminaCost(int cost) { previewStaminaCost(cost, false); }
+    public static void previewStaminaCost(int cost, boolean enableTooHighColor) {
+        statCostPreview = cost;
+        staminaPreview = true; manaPreview = false;
+        // if the cost prediction is bigger than the available stamina
+        if (enableTooHighColor)
+            statPreviewTooHigh = cost > BattleManager.getPlayer().stats.stamina;
+        else
+            statPreviewTooHigh = false;
+    }
+    public static void stopStatPreview() {
         manaPreview = false;
+        staminaPreview = false;
     }
 
     /**
@@ -84,6 +95,7 @@ public class PlayerStatBar {
         ModelMatrix model = trans.model;
         
         // ew...
+        BattleManager.getPlayer().updateShake();
         float playerShake = BattleManager.getPlayer().shakeValue();
         FighterStats st = BattleManager.getPlayer().stats;
         int lastHealth = BattleManager.getPlayer().lastHealth();
@@ -91,7 +103,7 @@ public class PlayerStatBar {
         int lastMana = BattleManager.getPlayer().lastMana();
         
         // offset to correct location, add pixel shift with playerShake
-        manaPreviewCycle += .15;
+        statPreviewCycle += .15;
         model.setIdentity();
         model.translate(x-80+(int)playerShake, y+ Vars.UI_SCALE);
         model.makeCurrent();
@@ -104,7 +116,7 @@ public class PlayerStatBar {
         boolean renderLastStamina = Math.abs(staminaRender-st.stamina) < .1;
         boolean renderLastMana = Math.abs(manaRender-st.mana) < .1;
         // these checks prevent healthRender from rounding to 99 if the value is 100
-        // since the render values are used for the small numbers next to each bar
+        // since the render3d values are used for the small numbers next to each bar
         if (renderLastHealth)
             healthRender = st.health;
         if (renderLastStamina)
@@ -147,19 +159,33 @@ public class PlayerStatBar {
         renderBar(0, 0, healthRender/st.maxHealth, model);
         renderBar(1, 7, staminaRender/st.maxStamina, model);
         renderBar(2, 14, manaRender/st.maxMana, model);
-        // glowing preview of mana cost for a skill
+
+        // glowing preview of stat cost for a skill
         if (manaPreview) {
             // glowing bar portion
-            Uniform.varFloat("colorMult", 1, 1, 1, (float)(Math.sin(manaPreviewCycle)+1)/2+.7f);
-            if (manaPreviewTooHigh)
+            Uniform.varFloat("colorMult", 1, 1, 1, (float)(Math.sin(statPreviewCycle)+1)/2+.7f);
+            if (statPreviewTooHigh)
                 renderBar(0, 14, manaRender/st.maxMana, model);
             else
                 renderBar(5, 14, manaRender/st.maxMana, model);
             // remaining bar
             Uniform.varFloat("colorMult", 1, 1, 1, 1);
-            float percent = (manaRender-manaCostPreview)/st.maxMana;
+            float percent = (manaRender- statCostPreview)/st.maxMana;
             percent = Math.max(0,percent);
             renderBar(2, 14, percent, model);
+        }
+        if (staminaPreview) {
+            // glowing bar portion
+            Uniform.varFloat("colorMult", 1, 1, 1, (float)(Math.sin(statPreviewCycle)+1)/2+.7f);
+            if (statPreviewTooHigh)
+                renderBar(0, 7, staminaRender/st.maxStamina, model);
+            else
+                renderBar(5, 7, staminaRender/st.maxStamina, model);
+            // remaining bar
+            Uniform.varFloat("colorMult", 1, 1, 1, 1);
+            float percent = (staminaRender- statCostPreview)/st.maxStamina;
+            percent = Math.max(0,percent);
+            renderBar(1, 7, percent, model);
         }
         
     // RENDER STAT BAR TEXT
@@ -196,7 +222,7 @@ public class PlayerStatBar {
         
         model.translate(79, -13);
         model.makeCurrent();
-        for (StatEffect s : BattleManager.getPlayer().statEffects) {
+        for (StatusEffect s : BattleManager.getPlayer().statusEffects) {
             TextureMap.bindUnfiltered(s.spriteName);
             statusIconMesh.render();
             
@@ -220,6 +246,6 @@ public class PlayerStatBar {
         model.translate(posX, posY);
         model.makeCurrent();
 
-        BattleManager.getPlayer().updateAnim();
+        BattleManager.getPlayer().renderAnim();
     }
 }

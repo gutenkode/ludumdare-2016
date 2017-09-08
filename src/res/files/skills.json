@@ -1,0 +1,122 @@
+{
+  "SKILL_PHYS": {
+    "skillName": "Slash",
+    "description": "Weak physical attack.\nHigh crit rate/Low accuracy",
+    "sprite": "skill_fire",
+    "effect": "ATTACK",
+    "animation": "FIRE",
+    "element": "PHYS",
+    "power": 30,
+    "accuracy": 70,
+    "cost": 25,
+    "critrate": 50
+  },
+  "SKILL_FIRE": {
+    "skillName": "Fireball",
+    "description": "Weak fire attack.",
+    "sprite": "skill_fire",
+    "effect": "ATTACK",
+    "animation": "FIRE",
+    "element": "FIRE",
+    "power": 35,
+    "accuracy": 100,
+    "cost": 5,
+    "critrate": 0
+  },
+  "SKILL_FIRE2": {
+    "skillName": "Firestorm",
+    "description": "Strong fire attack.",
+    "sprite": "skill_fire",
+    "effect": "ATTACK",
+    "animation": "FIRE",
+    "element": "FIRE",
+    "power": 65,
+    "accuracy": 100,
+    "cost": 20,
+    "critrate": 0
+  },
+  "SKILL_ELEC": {
+    "skillName": "Shock",
+    "description": "Weak electric attack.\nHigh power/Low accuracy",
+    "sprite": "skill_bolt",
+    "effect": "ATTACK",
+    "animation": "ELEC",
+    "element": "ELEC",
+    "power": 45,
+    "accuracy": 80,
+    "cost": 7,
+    "critrate": 0
+  },
+  "SKILL_ICE": {
+    "skillName": "Freeze",
+    "description": "Weak ice attack.\nLow power/High crit rate",
+    "sprite": "skill_ice",
+    "effect": "ATTACK",
+    "animation": "ICE",
+    "element": "ICE",
+    "power": 25,
+    "accuracy": 100,
+    "cost": 7,
+    "critrate": 45
+  },
+  "SKILL_DARK": {
+    "skillName": "Ruin",
+    "description": "Weak dark attack.\nCuts health by percentage.",
+    "sprite": "skill_dark",
+    "effect": "ATTACK_DARK",
+    "animation": "FIRE",
+    "element": "DARK",
+    "power": 40,
+    "accuracy": 100,
+    "cost": 9,
+    "critrate": 0
+  },
+  "SKILL_LIGHT": {
+    "skillName": "Expel",
+    "description": "Weak light attack.\nLow chance of instant death.",
+    "sprite": "skill_dark",
+    "effect": "ATTACK_LIGHT",
+    "animation": "FIRE",
+    "element": "LIGHT",
+    "power": 0,
+    "accuracy": 25,
+    "cost": 9,
+    "critrate": 0
+  },
+  "SKILL_HEAL": {
+    "skillName": "Heal",
+    "description": "Restores some health.",
+    "sprite": "skill_heal",
+    "effect": "HEAL",
+    "animation": "STATUS",
+    "element": "LIGHT",
+    "power": 50,
+    "accuracy": 0,
+    "cost": 5,
+    "critrate": 0
+  },
+  "SKILL_DEFENSE": {
+    "skillName": "Light Wall",
+    "description": "Boosts defense.",
+    "sprite": "skill_defup",
+    "effect": "DEF_UP",
+    "animation": "STATUS",
+    "element": "LIGHT",
+    "power": 50,
+    "accuracy": 0,
+    "cost": 10,
+    "critrate": 0
+  },
+  "SKILL_POISON": {
+    "skillName": "Poison Needle",
+    "description": "Inflicts poison.",
+    "sprite": "skill_poison",
+    "effect": "POISON",
+    "animation": "STATUS",
+    "element": "ACID",
+    "power": 0,
+    "accuracy": 80,
+    "cost": 8,
+    "critrate": 0
+  }
+}

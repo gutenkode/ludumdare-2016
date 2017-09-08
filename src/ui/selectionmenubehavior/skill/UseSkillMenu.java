@@ -1,6 +1,8 @@
 package ui.selectionmenubehavior.skill;
 
 import java.util.ArrayList;
+
+import mote4.util.audio.AudioPlayback;
 import rpgbattle.PlayerSkills;
 import rpgsystem.Skill;
 import ui.MenuHandler;
@@ -51,7 +53,7 @@ public class UseSkillMenu implements SelectionMenuBehavior {
         if (index == options.length-1) {
             handler.closeFlavorText();
         } else {
-            handler.showFlavorText(false, skills.get(index).getFullInfoString(), skills.get(index).spriteName);
+            handler.showFlavorText(true, skills.get(index).data.getFullInfoString(), skills.get(index).data.spriteName);
         }
     }
 
@@ -73,6 +75,6 @@ public class UseSkillMenu implements SelectionMenuBehavior {
         options = new String[skills.size()+1];
         options[options.length-1] = "Exit";
         for (int i = 0; i < options.length-1; i++)
-            options[i] = skills.get(i).name;
+            options[i] = skills.get(i).data.name;
     }
 }

@@ -63,7 +63,7 @@ public class Timeline {
         // only create a new set of entities if they
         // have not already been created in this timeline
         if (!entityStates.containsKey(md))
-            entityStates.put(md, MapDataUtility.constructEntities(md.entities));
+            entityStates.put(md, MapDataUtility.deserializeEntities(md.entities));
     }
     public MapData getMapData() { return mapData; }
 }

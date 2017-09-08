@@ -1,16 +1,16 @@
 package rpgbattle.fighter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 
+import mote4.util.audio.AudioPlayback;
 import rpgbattle.BattleManager;
-import rpgbattle.PlayerSkills;
+import rpgbattle.battleAction.BattleAction;
 import rpgbattle.fighter.Fighter.Toast.ToastType;
 import rpgsystem.Element;
 import rpgsystem.Item;
 import rpgsystem.Skill;
-import rpgsystem.SkillModifier;
-import rpgsystem.StatEffect;
+import rpgsystem.StatusEffect;
+import scenes.Battle;
 import ui.BattleUIManager;
 import ui.MenuHandler;
 
@@ -20,29 +20,26 @@ import ui.MenuHandler;
  */
 public class PlayerFighter extends Fighter {
 
-    private int delay;
-    private final int attackDelay = 45, skillDelay = 55, itemDelay = 55, runDelay = 45; // delay times for different actions
+    private int delay; // used for timing actions during battle
     
     public PlayerFighter() {
-
-        double[] emult = new double[Element.values().length];
-        Arrays.fill(emult, 1);
+        // an empty map will default to normal resistance for all elements
+        HashMap<Element, Element.Resistance> emult = new HashMap<>();
         stats = new FighterStats(this,
-                100,80,80,
-                20,10,10,
-                0.2,0.05,
+                100,100,100,
+                10,10,10,
                 emult);
     }
     
     @Override
     public int initAct() {
         BattleUIManager.startPlayerTurn();
-        //BattleUIManager.logMessage("It's your turn.");
+        BattleUIManager.logMessage("It's your turn.");
         int startDelay = 30;
         delay = -1;
         
         // stamina regen
-        if (statEffects.contains(StatEffect.FATIGUE)) {
+        if (statusEffects.contains(StatusEffect.FATIGUE)) {
             addToast(ToastType.STAMINA.color+"FATIGUE -"+(stats.attack()/2));
             drainStamina(stats.attack()/2);
             startDelay += 30;
@@ -56,35 +53,46 @@ public class PlayerFighter extends Fighter {
     @Override
     public int act() {
         return delay;
-        /*
-        if (turnUsed) {
-            delay--;
-            if (delay <= 0)
-                return true;
-        }
-        return false;*/
     }
     
     @Override
     public void damage(Element e, int stat, int atkPower, int accuracy, boolean crit) {
         if (calculateHit(accuracy)) {
-            int dmg = calculateDamage(e,stat*atkPower,crit);
+            int dmg = calculateDamage(e, stat, atkPower,crit);
 
             if (dmg != 0) {
                 // actually do health subtraction
                 lastHealth = stats.health;
-                stats.health -= (int)dmg;
+                stats.health -= dmg;
                 stats.health = Math.max(0, stats.health);
                 addToast("-" + dmg);
                 shakeVel = dmg;
             }
         } else {
             addToast("MISS");
+            AudioPlayback.playSfx("sfx_skill_miss");
         }
     }
     @Override
-    public void cutHealth(Element e, double percent, int accuracy) {
-        if (calculateHit(accuracy)) {
+    public void darkDamage(Element e, double percent, int accuracy) {
+        if (calculateHit(accuracy))
+        {
+            Element.Resistance res = stats.elementResistance(e);
+            switch (res) {
+                case WEAK:
+                    addToast("WEAK");
+                    percent *= 1.5;
+                    break;
+                case RES:
+                    addToast("RESIST...");
+                    percent *= 0.5;
+                    break;
+                case NULL:
+                    addToast("NULL");
+                    percent = 0;
+                    break;
+            }
+
             int dmg = (int)(stats.health*percent);
 
             if (dmg != 0) {
@@ -95,6 +103,30 @@ public class PlayerFighter extends Fighter {
                 addToast("-" + dmg);
                 shakeVel = dmg;
             }
+        } else {
+            addToast("MISS");
+        }
+    }
+    @Override
+    public void lightDamage(Element e, int accuracy) {
+        Element.Resistance res = stats.elementResistance(e);
+        switch (res) {
+            case WEAK:
+                addToast("WEAK");
+                accuracy *= 1.5;
+                break;
+            case RES:
+                addToast("RESIST...");
+                accuracy *= 0.5;
+                break;
+            case NULL:
+                addToast("NULL");
+                accuracy = 0;
+                break;
+        }
+        if (calculateHit(accuracy)) {
+            lastHealth = stats.health;
+            stats.health = 0;
         } else {
             addToast("MISS");
         }
@@ -165,100 +197,204 @@ public class PlayerFighter extends Fighter {
         stats.mana -= amount;
         stats.mana = Math.max(0, stats.mana);
     }
-    // functions called from RootBattleMenu or submenus
+
+    ///////// Functions called from RootBattleMenu or its submenus
     
     public boolean useAttack(MenuHandler handler, Fighter... targets) {
         BattleUIManager.logMessage("You attack!");
-        targets[0].damage(Element.PHYS, stats.attack(), getAttackPower(), 100, false);
-        
-        lastStamina = stats.stamina;
-        stats.stamina -= stats.attack()/2;
-        stats.stamina = Math.max(0, stats.stamina);
-        addToast(ToastType.STAMINA, "-"+stats.attack());
-        
-        delay = attackDelay;
+        for (int i = 0; i < targets.length; i++) {
+            int delay = 10; // multi-target moves will hit in a staggered pattern
+            if (i == targets.length-1)
+                delay = BattleAction.STD_ACTION_DELAY;
+            BattleManager.addAction(new PlayerAttack(targets[i], delay, this));
+        }
+        delay = BattleAction.STD_INIT_DELAY/2;
         return true;
     }
     public int getAttackPower() {
-        return (int)(10*
-                Math.min(1,
-                .25+(stats.stamina/(float)stats.maxStamina)
-                ));
+        return (int)(stats.attack() * getAttackPowerPercent());
+    }
+    public double getAttackPowerPercent() {
+        // returns a value 0.3 to 1.0,
+        // based on the amount of remaining stamina
+        return Math.min(1,.3+.7*(stats.stamina/(double)stats.maxStamina));
+    }
+    /**
+     * The amount of stamina that a standard attack will use.
+     * @return
+     */
+    public int getAttackStaminaCost() {
+        return stats.attack();
     }
     public boolean canUseSkill(MenuHandler handler, Skill skill) {
-        if (skill.cost() > stats.mana) {
-            handler.showDialogue("You don't have enough mana!",skill.spriteName);
-            return false;
+        if (skill.data.usesSP) {
+            //if (skill.data.cost() > stats.stamina) {
+            if (stats.stamina <= 0) {
+                // stamina skills can be used until stamina is zero
+                handler.showDialogue("You don't have enough stamina!", skill.data.spriteName);
+                return false;
+            }
+        } else {
+            if (skill.data.cost() > stats.mana) {
+                // magic skills cannot be used unless there's enough MP to cover the cost
+                handler.showDialogue("You don't have enough mana!", skill.data.spriteName);
+                return false;
+            }
         }
         return true;
     }
     public boolean useSkill(MenuHandler handler, Skill skill, Fighter... targets) {
         if (!canUseSkill(handler, skill))
             return false;
-        
-        lastMana = stats.mana;
-        stats.mana -= skill.cost();
-        addToast(ToastType.MANA, "-"+skill.cost());
-        /*
-        if (PlayerSkills.getLinkedModifier(skill) == SkillModifier.MOD_MULTI_TARGET) {
-            Fighter[] targets = new Fighter[BattleManager.getEnemies().size()];
-            for (int i = 0; i < targets.length; i++)
-                targets[i] = BattleManager.getEnemies().get(i);
-            skill.useBattle(handler,  stats.magic, targets);
-        } else {
-            Fighter target;
-            switch (skill.defaultTarget) {
-                case PLAYER:
-                    target = this;
-                    break;
-                case ENEMY:
-                    target = BattleManager.getEnemies().get(0);
-                    break;
-                default:
-                    target = null;
-                    break;
-            }
-            skill.useBattle(handler,  stats.magic, target);
-        }*/
-        for (Fighter f : targets)
-            skill.useBattle(handler,  stats.magic(), f);
+        BattleUIManager.logMessage("You cast "+skill.data.name+"!");
 
-        delay = skillDelay;
+        for (int i = 0; i < targets.length; i++) {
+            int delay = 10; // multi-target moves will hit in a staggered pattern
+            if (i == targets.length-1)
+                delay = BattleAction.STD_ACTION_DELAY;
+            BattleManager.addAction(new PlayerSkill(skill, handler, targets[i], delay, this, i==0)); // only the first move will drain the stat
+        }
+
+        delay = BattleAction.STD_INIT_DELAY;
         return true;
     }
     public boolean useItem(MenuHandler handler, Item item, Fighter... targets) {
-        boolean turnUsed = false;
-        for (Fighter f : targets)
-            if (item.useBattle(handler, f)) {
-                turnUsed = true;
-                delay = itemDelay;
-            }
+        if (!item.checkCanUseInBattle(handler, targets[0]))
+            return false;
+        BattleUIManager.logMessage(item.useString);
 
-        return turnUsed;
-    }
-    public boolean useRun(MenuHandler handler) {
-        BattleUIManager.logMessage("You escape safely!");
-        BattleManager.runFromBattle();
-
-        delay = runDelay;
+        for (int i = 0; i < targets.length; i++) {
+            int delay = 10; // multi-target moves will hit in a staggered pattern
+            if (i == targets.length-1)
+                delay = BattleAction.STD_ACTION_DELAY;
+            BattleManager.addAction(new PlayerItem(item, handler, targets[i], delay));
+        }
+        delay = BattleAction.STD_INIT_DELAY;
         return true;
     }
-    
-    public boolean canUseSkill(Skill s) {
-        return s.cost() <= stats.mana;
+    public double getRunPercent() {
+        return (stats.stamina/(float)stats.maxStamina)*.5+.25;
+    }
+    public boolean useRun(MenuHandler handler) {
+        BattleUIManager.logMessage("You try to escape...");
+        boolean successful = Math.random() < getRunPercent();
+        BattleManager.addAction(new PlayerRun(successful));
+        delay = BattleAction.STD_INIT_DELAY + BattleAction.STD_ACTION_DELAY;
+        return true;
     }
 
     @Override
-    protected String getStatusEffectString(StatEffect e) {
+    protected String getStatusEffectString(StatusEffect e) {
         switch (e) {
             case POISON:
                 return "You are now poisoned!";
             case FATIGUE:
                 return "You are now fatigued!";
-            case DEF_UP:
-                return "Your defense increased!";
             default:
                 return "You are now [" + e.name() + "]!";
+        }
+    }
+}
+
+/////////// BattleActions for the player
+
+class PlayerAttack extends BattleAction {
+
+    private Fighter target;
+    private int delay;
+    private PlayerFighter p;
+
+    public PlayerAttack(Fighter target, int delay, PlayerFighter p) {
+        this.target = target;
+        this.delay = delay;
+        this.p = p;
+    }
+    @Override
+    public int act() {
+        AudioPlayback.playSfx("sfx_skill_normalhit");
+        target.damage(Element.PHYS, p.stats.attack(), p.getAttackPower(), 100, false);
+
+        p.lastStamina = p.stats.stamina;
+        p.stats.stamina -= p.getAttackStaminaCost();
+        p.stats.stamina = Math.max(0, p.stats.stamina);
+        //p.addToast(ToastType.STAMINA, "-"+p.stats.attack());
+
+        return delay;
+    }
+}
+class PlayerSkill extends BattleAction {
+
+    private Fighter target;
+    private int delay;
+    private PlayerFighter p;
+    private Skill skill;
+    private MenuHandler handler;
+    private boolean drainStat;
+
+    public PlayerSkill(Skill skill, MenuHandler handler, Fighter target, int delay, PlayerFighter p, boolean drainStat) {
+        this.target = target;
+        this.delay = delay;
+        this.p = p;
+        this.skill = skill;
+        this.handler = handler;
+        this.drainStat = drainStat;
+    }
+
+    @Override
+    public int act() {
+        if (skill.data.usesSP) {
+            if (drainStat) {
+                p.lastStamina = p.stats.stamina;
+                p.stats.stamina -= skill.data.cost();
+                p.stats.stamina = Math.max(0, p.stats.stamina);
+            }
+            //p.addToast(ToastType.STAMINA, "-" + skill.data.cost());
+            skill.useBattle(handler,  p.stats.attack(), target);
+        } else {
+            if (drainStat) {
+                p.lastMana = p.stats.mana;
+                p.stats.mana -= skill.data.cost();
+                p.stats.mana = Math.max(0, p.stats.mana);
+            }
+            //p.addToast(ToastType.MANA, "-" + skill.data.cost());
+            skill.useBattle(handler,  p.stats.magic(), target);
+        }
+        return delay;
+    }
+}
+class PlayerItem extends BattleAction {
+
+    private Item item;
+    private int delay;
+    private MenuHandler handler;
+    private Fighter target;
+
+    public PlayerItem(Item item, MenuHandler handler, Fighter target, int delay) {
+        this.item = item;
+        this.delay = delay;
+        this.handler = handler;
+        this.target = target;
+    }
+    @Override
+    public int act() {
+        item.useBattle(handler, target);
+        return delay;
+    }
+}
+class PlayerRun extends BattleAction {
+    private boolean successful;
+    public PlayerRun(boolean successful) {
+        this.successful = successful;
+    }
+    @Override
+    public int act() {
+        if (successful) {
+            BattleUIManager.logMessage("You got away!");
+            BattleManager.runFromBattle();
+            return STD_ACTION_DELAY;
+        } else {
+            BattleUIManager.logMessage("You couldn't get away!");
+            return STD_ACTION_DELAY;
         }
     }
 }

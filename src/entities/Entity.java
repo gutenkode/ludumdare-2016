@@ -24,6 +24,16 @@ public abstract class Entity {
     public float hitboxH() { return hitboxH; }
     public final int tileHeight() { return tileHeight; }
     public abstract String getName();
+    public String getAttributeString() {
+        return "x:"+posX()+", y:"+posY()+", height:"+tileHeight()+
+               "\nhitboxH:"+hitboxW()+", hitboxH:"+hitboxH();
+    }
+    /**
+     * Get a string representing this entity,
+     * to be used for storing it in a level file.
+     * @return
+     */
+    public abstract String serialize();
     
     /**
      * Whether this entity should be treated as a solid object.

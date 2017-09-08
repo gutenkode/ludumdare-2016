@@ -1,6 +1,8 @@
 package ui.selectionmenubehavior.skill;
 
 import java.util.ArrayList;
+
+import mote4.util.audio.AudioPlayback;
 import rpgbattle.PlayerSkills;
 import rpgsystem.Skill;
 import ui.MenuHandler;
@@ -16,7 +18,7 @@ public class EquipSkillMenu implements SelectionMenuBehavior {
     
     private String title = "SKILLS";
     private String[] options;
-    private ArrayList<Skill> skills;
+    private Skill[] skills;
     
     public EquipSkillMenu(MenuHandler h) {
         handler = h;
@@ -42,7 +44,8 @@ public class EquipSkillMenu implements SelectionMenuBehavior {
         if (index == options.length-1)
             handler.closeMenu();
         else {
-            PlayerSkills.toggleEquipped(skills.get(index));
+            AudioPlayback.playSfx("sfx_menu_equip");
+            PlayerSkills.toggleEquipped(skills[index]);
             handler.forceMenuRefocus();
         }
     }
@@ -52,7 +55,7 @@ public class EquipSkillMenu implements SelectionMenuBehavior {
         if (index == options.length-1) {
             handler.closeFlavorText();
         } else {
-            handler.showFlavorText(false, skills.get(index).getFullInfoString(), skills.get(index).spriteName);
+            handler.showFlavorText(true, skills[index].data.getFullInfoString(), skills[index].data.spriteName);
         }
     }
 
@@ -69,14 +72,23 @@ public class EquipSkillMenu implements SelectionMenuBehavior {
     public void onCloseCleanup() {}
 
     private void rebuildMenu() {
-        skills = PlayerSkills.getAvailableSkills(); // only show skills the player has
+        skills = new Skill[PlayerSkills.getAvailableSkills().size()];
         
-        options = new String[skills.size()+1];
+        options = new String[PlayerSkills.getAvailableSkills().size()+1];
         options[options.length-1] = "Exit";
-        for (int i = 0; i < options.length-1; i++)
-            if (PlayerSkills.isSkillEquipped(skills.get(i)))
-                options[i] = ">"+skills.get(i).name;
-            else
-                options[i] = skills.get(i).name;
+
+        int i = 0;
+        for (Skill s : PlayerSkills.getEquippedSkills()) {
+            options[i] = ">"+s.data.name;
+            skills[i] = s;
+            i++;
+        }
+        for (Skill s : PlayerSkills.getAvailableSkills()) {
+            if (!PlayerSkills.isSkillEquipped(s)) {
+                options[i] = s.data.name;
+                skills[i] = s;
+                i++;
+            }
+        }
     }
 }

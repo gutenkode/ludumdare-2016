@@ -1,13 +1,13 @@
 package entities;
 
 import map.MapManager;
+import mote4.util.audio.AudioPlayback;
 import mote4.util.matrix.TransformationMatrix;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
-import mote4.util.vector.Vector2f;
 import mote4.util.vertex.builder.StaticMeshBuilder;
 import mote4.util.vertex.mesh.Mesh;
-import nullset.RootLayer;
+import org.joml.Vector2f;
 import org.lwjgl.opengl.GL11;
 import rpgbattle.BattleManager;
 import rpgbattle.EnemyData;
@@ -83,14 +83,14 @@ public class Enemy extends Entity {
             // of the player, if the player is close enough
             Vector2f vec = new Vector2f((float)(posX-MapManager.getPlayer().posX), (float)(posY-MapManager.getPlayer().posY));
             if (vec.length() < 2) {
-                vec.normalise();
+                vec.normalize();
                 velX -= vec.x;
                 velY -= vec.y;
             } else {
                 // else, move towards next patrol node
                 vec = new Vector2f((posX-patrol[patrolIndex][0]), (posY-patrol[patrolIndex][1]));
                 if (vec.length() > .1) { // if the enemy is not already close enough to the node
-                    vec.normalise();
+                    vec.normalize();
                     velX -= vec.x;
                     velY -= vec.y;
                 }
@@ -131,11 +131,10 @@ public class Enemy extends Entity {
             String[] enemies = new String[numEnemies];
             Arrays.fill(enemies,enemyName);
 
-            // BattleManager -> load enemies for battle
-            BattleManager.initEnemies(enemies); // list multiple enemies here
+            AudioPlayback.playMusic("mus_"+EnemyData.getBattleMusic(enemyName), true);
 
-            // RootScene -> go to battle
-            RootLayer.transitionToBattle();
+            // BattleManager -> load enemies for battle
+            BattleManager.startBattle(enemies); // can list multiple enemies here
 
             // MapManager -> delete this entity
             MapManager.removeEntity(this);
@@ -144,4 +143,8 @@ public class Enemy extends Entity {
 
     @Override
     public String getName() { return "Enemy: "+enemyName; }
+    @Override
+    public String serialize() {
+        return this.getClass().getSimpleName() +","+ (int)(patrol[0][0]-.5) +","+ (int)(patrol[0][1]-.5) +","+ enemyName;
+    }
 }

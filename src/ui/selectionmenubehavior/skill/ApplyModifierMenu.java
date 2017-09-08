@@ -1,6 +1,8 @@
 package ui.selectionmenubehavior.skill;
 
 import java.util.ArrayList;
+
+import mote4.util.audio.AudioPlayback;
 import rpgbattle.PlayerSkills;
 import rpgsystem.Skill;
 import rpgsystem.SkillModifier;
@@ -45,6 +47,7 @@ public class ApplyModifierMenu implements SelectionMenuBehavior {
         if (index == options.length-1)
             handler.closeMenu();
         else {
+            AudioPlayback.playSfx("sfx_menu_equip");
             PlayerSkills.applyModifier(modifier, skills.get(index));
             handler.closeMenu();
         }
@@ -55,7 +58,7 @@ public class ApplyModifierMenu implements SelectionMenuBehavior {
         if (index == options.length-1) {
             handler.closeFlavorText();
         } else {
-            handler.showFlavorText(false, skills.get(index).getFullInfoString(), skills.get(index).spriteName);
+            handler.showFlavorText(true, skills.get(index).data.getFullInfoString(), skills.get(index).data.spriteName);
         }
     }
 
@@ -78,8 +81,8 @@ public class ApplyModifierMenu implements SelectionMenuBehavior {
         options[options.length-1] = "Exit";
         for (int i = 0; i < options.length-1; i++)
             if (PlayerSkills.getLinkedModifier(skills.get(i)) == modifier)
-                options[i] = ">"+skills.get(i).name;
+                options[i] = ">"+skills.get(i).data.name;
             else
-                options[i] = skills.get(i).name;
+                options[i] = skills.get(i).data.name;
     }
 }

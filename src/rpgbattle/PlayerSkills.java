@@ -1,10 +1,10 @@
 package rpgbattle;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import rpgsystem.Skill;
 import rpgsystem.SkillModifier;
+import ui.components.SkillCostMenu;
 
 /**
  * Manages the list of skills the player has equipped, and their modifiers.
@@ -18,7 +18,7 @@ public class PlayerSkills {
     private static final HashMap<SkillModifier,Skill> appliedModifiers2;
     
     static {
-        maxCapacity = -999;
+        maxCapacity = 60;
         availableSkills = new ArrayList<>();
         equippedSkills = new ArrayList<>();
         availableModifiers = new ArrayList<>();
@@ -28,8 +28,14 @@ public class PlayerSkills {
         // for now, the player has access to all skills and modifiers
         //availableSkills.addAll(Arrays.asList(Skill.values()));
         //availableModifiers.addAll(Arrays.asList(SkillModifier.values()));
-        availableSkills.add(Skill.SKILL_DEF_UP);
+        //availableSkills.add(Skill.SKILL_DEFENSE);
         availableSkills.add(Skill.SKILL_POISON);
+        availableSkills.add(Skill.SKILL_PHYS);
+        //availableSkills.add(Skill.SKILL_FIRE2);
+        //availableSkills.add(Skill.SKILL_LIGHT);
+
+        //for (SkillModifier m : SkillModifier.values())
+        //    availableModifiers.add(m);
         
         // ...and equip all skills by default
         equippedSkills.addAll(availableSkills);
@@ -37,11 +43,22 @@ public class PlayerSkills {
     
     public static int maxCapacity() { return maxCapacity; }
     public static int currentCapacity() {
-        return 0;
+        int capacity = 0;
+        // add up the cost of all applied skills and modifiers
+        for (Skill s : equippedSkills) {
+            capacity += s.data.equipCost();
+            SkillModifier m = getLinkedModifier(s);
+            if (m != null)
+                capacity += m.cost;
+        }
+        return capacity;
     }
     
-    public static void toggleEquipped(Skill s) {
+    public static boolean toggleEquipped(Skill s) {
         if (availableSkills.contains(s)) {
+
+            SkillCostMenu.setRedraw();
+
             // remove an applied modifier
             SkillModifier m = appliedModifiers1.get(s);
             appliedModifiers1.remove(s);
@@ -49,9 +66,16 @@ public class PlayerSkills {
             
             if (equippedSkills.contains(s)) {
                 equippedSkills.remove(s);
-            } else
-                equippedSkills.add(s);
+                return true;
+            } else {
+                if (currentCapacity()+s.data.equipCost() <= maxCapacity) {
+                    equippedSkills.add(s);
+                    return true;
+                } else
+                    return false;
+            }
         }
+        return false;
     }
     
     public static ArrayList<Skill> getAvailableSkills() { return availableSkills; }
@@ -65,7 +89,7 @@ public class PlayerSkills {
      * @param m
      * @param s 
      */
-    public static void applyModifier(SkillModifier m, Skill s) {
+    public static boolean applyModifier(SkillModifier m, Skill s) {
         if (availableSkills.contains(s) && availableModifiers.contains(m))
         {
             appliedModifiers1.remove(s);
@@ -75,6 +99,28 @@ public class PlayerSkills {
 
             appliedModifiers1.put(s, m);
             appliedModifiers2.put(m, s);
+
+            SkillCostMenu.setRedraw();
+
+            // modifiers add their own cost in addition to a potential increase in cost for the skill
+            if (currentCapacity() <= maxCapacity) // if we are still under capacity this is fine
+                return true;
+
+            removeModifier(m, s); // otherwise undo the modifier
+        }
+        return false;
+    }
+    public static void removeModifier(SkillModifier m) {
+        removeModifier(m, getLinkedSkill(m));
+    }
+    private static void removeModifier(SkillModifier m, Skill s) {
+        if (equippedSkills.contains(s) && availableModifiers.contains(m)) {
+            appliedModifiers1.remove(s);
+            appliedModifiers1.values().remove(m);
+            appliedModifiers2.remove(m);
+            appliedModifiers2.values().remove(s);
+
+            SkillCostMenu.setRedraw();
         }
     }
     public static boolean isSkillEquipped(Skill s) { return equippedSkills.contains(s); }
@@ -89,6 +135,7 @@ public class PlayerSkills {
     public static void addAvailableSkill(Skill s) {
         if (!availableSkills.contains(s))
             availableSkills.add(s);
+
     }
     /**
      * Add a new modifier to the list of available ones, if not already present.

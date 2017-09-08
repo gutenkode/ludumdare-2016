@@ -7,7 +7,7 @@ import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.builder.StaticMeshBuilder;
 import mote4.util.vertex.mesh.Mesh;
-import nullset.Input;
+import main.Input;
 import org.lwjgl.opengl.GL11;
 import rpgbattle.BattleManager;
 import scenes.Ingame;
@@ -21,6 +21,7 @@ public class Player extends Entity {
     private static Mesh mesh;
 
     private int restoreStaminaDelay;
+    private double manaRestore;
     private static int[][] dirMat = new int[][] {{5,4,3},
                                                  {6,0,2},
                                                  {7,0,1}};
@@ -123,8 +124,9 @@ public class Player extends Entity {
         if (Math.abs(targetDirection-direction) > 2)
             accel = 0; // don't move until the player sprite is facing "forward"
         else {
-            if (Input.isKeyDown(Input.Keys.SPRINT) &&
-                BattleManager.getPlayer().stats.stamina > 0) {
+            // you can currently still run at zero stamina
+            if (Input.isKeyDown(Input.Keys.SPRINT) ){// &&
+                //BattleManager.getPlayer().stats.stamina > 0) {
                 accel = runSpeed;
                 running = true;
             } else
@@ -136,11 +138,18 @@ public class Player extends Entity {
             chg = firstPersonMovement(accel);
         else
             chg = topDownMovement(accel);
+
+        // add up distance travelled to calculate mana restore
+        manaRestore += (Math.abs(chg[0])+Math.abs(chg[1]))/1.5;
+        if (manaRestore > 1) {
+            manaRestore--;
+            BattleManager.getPlayer().restoreMana(1);
+        }
         
         if (running && (chg[0] != 0 || chg[1] != 0)) {
             if (drainStaminaDelay <= 0) {
                 BattleManager.getPlayer().drainStamina(1);
-                drainStaminaDelay = 2;
+                drainStaminaDelay = 3;
             }
         }
         drainStaminaDelay--;
@@ -153,19 +162,25 @@ public class Player extends Entity {
             spriteFrameCycle += spriteChg*15;
             spriteFrameCycle %= spriteMapInd[1][(int)direction];
         }
-        
-        velX += chg[0];
-        velY += chg[1];
-        
-        posX += velX;
-        posY += velY;
-        
-        velX *= .75f;
-        velY *= .75f;
+
+        if (Input.currentLock() != Input.Lock.ELEVATOR) {
+            // do not move while on an elevator
+            velX += chg[0];
+            velY += chg[1];
+
+            posX += velX;
+            posY += velY;
+
+            velX *= .75f;
+            velY *= .75f;
+        } else {
+            velX = 0;
+            velY = 0;
+        }
 
         // restore stamina
         if (restoreStaminaDelay <= 0) {
-            restoreStaminaDelay = 5;
+            restoreStaminaDelay = 8;
             BattleManager.getPlayer().restoreStamina(1);
         } else
             restoreStaminaDelay--;
@@ -343,4 +358,8 @@ public class Player extends Entity {
 
     @Override
     public String getName() { return "Player"; }
+    @Override
+    public String serialize() {
+        throw new UnsupportedOperationException();
+    }
 }

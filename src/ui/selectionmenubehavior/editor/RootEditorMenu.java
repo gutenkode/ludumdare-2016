@@ -44,8 +44,6 @@ public class RootEditorMenu implements SelectionMenuBehavior {
                 if (Editor.getMapEditor() != null)
                     handler.openMenu(new EntityListMenu(handler, Editor.getMapEditor().getEntities()));
                 break;
-            case "Room Links":
-                break;
             case "Options":
                 handler.openMenu(new OptionsMenu(handler));
                 break;

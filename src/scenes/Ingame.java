@@ -5,6 +5,7 @@ import mote4.scenegraph.Scene;
 import mote4.scenegraph.target.DepthBuffer;
 import mote4.scenegraph.target.DepthCubeBuffer;
 import mote4.scenegraph.target.Target;
+import mote4.util.audio.AudioPlayback;
 import mote4.util.matrix.CubeMapMatrix;
 import mote4.util.matrix.GenericMatrix;
 import mote4.util.matrix.Transform;
@@ -37,10 +38,10 @@ public class Ingame implements Scene {
 
     public Ingame() {
         trans = new Transform();
-        shadowView = new ViewMatrix();
         float shadowNearPlane = .1f;
         float shadowFarPlane = 10;
         shadowProj = new CubeMapMatrix("depthProj",shadowNearPlane,shadowFarPlane);
+        shadowView = new ViewMatrix();
         ShaderMap.use("ingame_map");
         Uniform.varFloat("shadowNearPlane",shadowNearPlane);
         Uniform.varFloat("shadowFarPlane",shadowFarPlane);
@@ -50,7 +51,7 @@ public class Ingame implements Scene {
     }
 
     @Override
-    public void update(double delta) {
+    public void update(double time, double delta) {
         // update entities
         MapManager.update();
 
@@ -91,6 +92,7 @@ public class Ingame implements Scene {
         }
         // shadow map camera view
         /*
+        // non-cubemap
         shadowProj.pop();
         shadowProj.push();
         //shadowProj.translate(.5f,0,-.25f); // offset for first person view
@@ -100,6 +102,7 @@ public class Ingame implements Scene {
                              -MapManager.getPlayer().posY(),
                              -MapManager.getPlayer().elevatorHeight()-1.1f);
         */
+        // cubemap
         shadowView.setIdentity();
         shadowView.translate(-MapManager.getPlayer().posX(),
                 -MapManager.getPlayer().posY()-MapManager.getPlayer().hitboxH(),
@@ -107,11 +110,11 @@ public class Ingame implements Scene {
     }
 
     @Override
-    public void render(double delta) {
+    public void render(double time, double delta) {
         glEnable(GL_DEPTH_TEST);
         Target t = Target.getCurrent();
     
-    // render depth data from camera perspective
+    // create depth data from camera perspective
         depthTexture.makeCurrent();
         //glClearColor(1,1,1,1); // for depth buffer values
         glClear(GL_DEPTH_BUFFER_BIT);

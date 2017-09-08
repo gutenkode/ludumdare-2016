@@ -17,9 +17,9 @@ public class TogglePlatform extends Entity {
     
     private static Mesh mesh;
     
-    private int index, rotation;
+    private final int index, rotation;
+    private final boolean inverted;
     private float position;
-    private boolean inverted;
     
     static {
         mesh = StaticMeshBuilder.constructVAO(GL11.GL_TRIANGLE_FAN, 
@@ -89,6 +89,10 @@ public class TogglePlatform extends Entity {
 
     @Override
     public String getName() { return "Toggle Platform"; }
+    @Override
+    public String getAttributeString() {
+        return super.getAttributeString()+"\nindex:"+index+", rotation:"+rotation+", inverted:"+inverted;
+    }
 
     @Override
     public boolean hasLight() { return true; }
@@ -108,5 +112,10 @@ public class TogglePlatform extends Entity {
             default:
                 return new float[] {0,0,0};
         }
+    }
+    @Override
+    public String serialize() {
+        return this.getClass().getSimpleName() +","+ (int)(posX-.5) +","+ (int)(posY-.5) +","+
+                tileHeight +","+ index +","+ rotation +","+ inverted;
     }
 }

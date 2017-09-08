@@ -104,5 +104,13 @@ public class ItemPickup extends Entity {
     }
 
     @Override
-    public String getName() { return "Item"; }
+    public String getName() { return "Item: "+item.pickupName(); }
+    @Override
+    public String getAttributeString() {
+        return super.getAttributeString()+"\nitem:"+item.pickupName();
+    }
+    @Override
+    public String serialize() {
+        return this.getClass().getSimpleName() +","+ (int)(posX-.5) +","+ (int)(posY-.5) +","+ item.toString();
+    }
 }

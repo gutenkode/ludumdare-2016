@@ -2,6 +2,7 @@ package ui.selectionmenubehavior.editor;
 
 import entities.Entity;
 import scenes.Editor;
+import ui.EditorUIManager;
 import ui.MenuHandler;
 import ui.selectionmenubehavior.SelectionMenuBehavior;
 
@@ -56,8 +57,11 @@ public class EntityListMenu implements SelectionMenuBehavior {
         if (index < entities.size()) {
             Entity e = entities.get(index);
             Editor.lookAt(e);
-        } else
+            handler.showFlavorText(false, "Attributes:\n"+e.getAttributeString()+"\n\nSerialized:\n"+e.serialize());
+        } else {
             Editor.lookAt(null);
+            handler.closeFlavorText();
+        }
     }
 
     @Override

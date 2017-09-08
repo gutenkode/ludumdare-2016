@@ -1,5 +1,6 @@
 package ui.selectionmenubehavior.ingame;
 
+import mote4.util.audio.AudioPlayback;
 import rpgsystem.Item;
 import ui.MenuHandler;
 import ui.selectionmenubehavior.ConfirmMenu;
@@ -15,7 +16,7 @@ public class ItemActionMenu implements SelectionMenuBehavior {
     
     private Item item;
     private String title;
-    private String[] options = {"Use","Examine","Discard","Exit"};
+    private String[] options = {"Use","Discard","Exit"};
 
     public ItemActionMenu(Item i, MenuHandler h) {
         item = i;
@@ -44,14 +45,13 @@ public class ItemActionMenu implements SelectionMenuBehavior {
             case "Use":
                 item.useIngame(handler);
                 break;
-            case "Examine":
-                handler.showDialogue("Can't examine.",item.spriteName);
-                break;
             case "Discard":
-                if (item.canDiscard)
+                if (item.itemType == Item.ItemType.CONSUMABLE)
                     handler.openMenu(new ConfirmMenu(handler, "DISCARD?", this::discardCallback));
-                else
-                    handler.showDialogue("You can't discard this item.",item.spriteName);
+                else {
+                    AudioPlayback.playSfx("sfx_menu_invalid");
+                    handler.showDialogue("You can't discard this item.", item.spriteName);
+                }
                 break;
             case "Exit":
                 handler.closeMenu();

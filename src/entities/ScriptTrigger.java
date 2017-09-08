@@ -13,15 +13,15 @@ public class ScriptTrigger extends Entity {
     
     private boolean triggered = false;
     private int retriggerCooldown = 0;
-    private String scriptName;
-    private final int x, y;
+    private final String scriptName;
+    private final int x, y, width, height;
     
     public ScriptTrigger(int x, int y, int width, int height, String scriptName) {
         hitboxW = width/2f +.01f; // +.01f is to get rid of any edge cases
         hitboxH = height/2f +.01f;
         posX = x+hitboxW;
         posY = y+hitboxH;
-        this.x = x; this.y = y;
+        this.x = x; this.y = y; this.width = width; this.height = height;
         this.scriptName = scriptName;
     }
     
@@ -55,5 +55,13 @@ public class ScriptTrigger extends Entity {
     public void reset() { triggered = false; }
 
     @Override
-    public String getName() { return "Script"; }
+    public String getName() { return "Script: "+scriptName; }
+    @Override
+    public String getAttributeString() {
+        return super.getAttributeString()+"\nscript:"+scriptName;
+    }
+    @Override
+    public String serialize() {
+        return this.getClass().getSimpleName() +","+ x +","+ y +","+ width +","+ height +","+ scriptName;
+    }
 }

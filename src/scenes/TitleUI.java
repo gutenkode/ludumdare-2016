@@ -22,12 +22,12 @@ public class TitleUI implements Scene {
     }
 
     @Override
-    public void update(double delta) {
+    public void update(double time, double delta) {
         TitleUIManager.update();
     }
 
     @Override
-    public void render(double delta) {
+    public void render(double time, double delta) {
         glDisable(GL_DEPTH_TEST);
         //glClear(GL_COLOR_BUFFER_BIT);
 

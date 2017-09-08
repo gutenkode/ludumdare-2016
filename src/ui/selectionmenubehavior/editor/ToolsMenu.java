@@ -1,7 +1,7 @@
 package ui.selectionmenubehavior.editor;
 
 import map.MapLoader;
-import nullset.RootLayer;
+import main.RootLayer;
 import scenes.Editor;
 import ui.EditorUIManager;
 import ui.MenuHandler;
@@ -60,7 +60,7 @@ public class ToolsMenu implements SelectionMenuBehavior {
             case "Quit Editor":
                 Editor.unloadMap();
                 EditorUIManager.closeAllMenus();
-                RootLayer.setState(RootLayer.State.TITLE);
+                RootLayer.loadTitle();
                 break;
             case "Exit":
                 handler.closeMenu();

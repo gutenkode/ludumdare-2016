@@ -1,0 +1,33 @@
+sfx_menu_hover		p4/menu/Hover.wav
+sfx_menu_select		p4/menu/Select.wav
+sfx_menu_cancel		-
+sfx_menu_invalid	p4/menu/Invalid.wav
+sfx_menu_equip		p4/menu/Equip.wav
+
+sfx_menu_playerturn	p4/menu/BattleMenu.wav
+sfx_menu_open_main	p4/menu/MenuOpen.wav
+sfx_menu_close_main	p4/menu/MenuExit.wav
+sfx_menu_open_pane	p4/menu/MenuFlip.wav
+sfx_menu_close_pane	p4/menu/MenuClose.wav
+
+sfx_battle_start	p4/battle/BattleBegin.wav
+
+sfx_skill_phys		smtiv/heavygun.wav
+sfx_skill_bomb		smtiv/explosion.wav
+sfx_skill_fire		smtiv/fire.wav
+sfx_skill_elec		smtiv/electric.wav
+sfx_skill_ice		smtiv/reflect.wav
+sfx_skill_acid		smtiv/acid.wav
+sfx_skill_dark		smtiv/buzz2.wav
+sfx_skill_light		smtiv/light.wav
+
+sfx_skill_normalhit	smtiv/singlehit.wav
+sfx_skill_status	smtiv/buzz1.wav
+sfx_skill_heal		smtiv/heal.wav
+sfx_skill_buff		smtiv/buff.wav
+sfx_skill_debuff	smtiv/buff.wav
+sfx_skill_miss		smtiv/miss.wav
+
+mus_field		music/QuakeParallelDimensions.ogg
+mus_battle_normal	music/NocturneAmalaBattle.ogg
+mus_battle_boss		music/DevilSummonerBoss.ogg

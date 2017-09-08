@@ -2,8 +2,11 @@ package rpgbattle.enemyBehavior;
 
 import mote4.util.matrix.ModelMatrix;
 import rpgbattle.BattleManager;
+import rpgbattle.battleAction.AttackAction;
+import rpgbattle.battleAction.BattleAction;
 import rpgbattle.fighter.EnemyFighter;
 import rpgsystem.Element;
+import ui.components.BattleAnimation;
 
 /**
  * Contains enemy behavior for battles.  Determines when enemies use which attacks.
@@ -25,40 +28,34 @@ public abstract class EnemyBehavior {
      * Use a basic attack, with this fighter's base power and crit rate.
      */
     public void useAttack() {
+        useAttack(BattleAction.STD_ACTION_DELAY);
+    }
+    public void useAttack(int delay) {
         int power = (int)(Math.random()*5)+7;
-        boolean crit = Math.random() < fighter.stats.critrate();
-        BattleManager.getPlayer().damage(Element.PHYS, fighter.stats.attack(), power, 100, crit);
+        BattleManager.addAction(new AttackAction(BattleManager.getPlayer(), fighter.stats.attack(), power, delay));
     }
 
     /**
      * Use a basic attack, but scale the base attack stat.
      * @param attackMult Scale for attack stat, 1 is regular power, 2 is double power, etc.
      */
-    public void useAttack(double attackMult) {
-        int power = 10;
-        boolean crit = Math.random() < fighter.stats.critrate();
-        BattleManager.getPlayer().damage(Element.PHYS, (int)(fighter.stats.attack()*attackMult), power, 100, crit);
+    public void useAttack(Element e, BattleAnimation an, double attackMult, int delay) {
+        int power = (int)(10*attackMult);
+        BattleManager.addAction(new AttackAction(BattleManager.getPlayer(), e, an, fighter.stats.attack(), power, 100, false, delay));
     }
     
     /**
      * Called when the enemy turn starts.  This is the same frame as the 
      * "turn start" flash, and this method should print to the log the action
      * that is about to happen.
-     * This method should not perform any attacks or actions!
+     * This method should generally also create any BattleActions needed.
      * @return Delay time, in frames, before calling act()
      */
     public abstract int initAct();
 
     /**
-     * The action decided on in initAct() should be performed when this is called.
+     * Called repeatedly while -1 is returned, until a number >= 0 is returned.
      * @return Delay time, in frames, before ending the turn for this enemy.
      */
     public abstract int act();
-    
-    /**
-     * Will process the model matrix to apply any animations upon death for
-     * this enemy.
-     * @param model
-     */
-    public abstract void runDeathAnimation(ModelMatrix model);
 }

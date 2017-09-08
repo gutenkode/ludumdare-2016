@@ -15,28 +15,26 @@ import static org.lwjgl.opengl.GL11.*;
 public class Title implements Scene {
 
     private Transform trans;
-    private float cycle;
 
     public Title() {
         trans = new Transform();
     }
 
     @Override
-    public void update(double delta) {
+    public void update(double time, double delta) {
         trans.model.rotate((float)delta*.05f, 0,0,1);
         trans.model.rotate((float)delta*.21f, 0,1,0);
         trans.model.rotate((float)delta*.12f, 1,0,0);
-        cycle += .00175;
     }
 
     @Override
-    public void render(double delta) {
+    public void render(double time, double delta) {
         glClearColor(0, 0, 0, 0);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
         glDisable(GL_DEPTH_TEST);
         ShaderMap.use("quad_titlebg");
-        Uniform.varFloat("offset",cycle);
+        Uniform.varFloat("offset",(float)(time*.00175));
         TextureMap.bindFiltered("ui_titlebg");
         MeshMap.render("quad");
 
@@ -63,7 +61,5 @@ public class Title implements Scene {
     }
 
     @Override
-    public void destroy() {
-
-    }
+    public void destroy() {}
 }
