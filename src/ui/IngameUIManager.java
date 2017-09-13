@@ -1,6 +1,7 @@
 package ui;
 
 import entities.ScriptTrigger;
+import mote4.scenegraph.Window;
 import mote4.util.audio.AudioPlayback;
 import main.RootLayer;
 import ui.components.*;
@@ -16,6 +17,7 @@ import main.Input;
 import rpgbattle.BattleManager;
 import ui.components.selectionMenu.SelectionMenu;
 import ui.components.selectionMenu.SingleSelectionMenu;
+import ui.components.selectionMenu.TabbedSelectionMenu;
 import ui.script.ScriptReader;
 import ui.selectionmenubehavior.ingame.RootIngameMenu;
 import ui.selectionmenubehavior.SelectionMenuBehavior;
@@ -33,7 +35,7 @@ public class IngameUIManager implements MenuHandler {
     private static ScriptTrigger trigger; // a reference to the current script trigger is kept in order to tell it whether to reset
     
     private static ScrollingText logMessage; // simple string that appears to announce events in the overworld
-    private static int logMessageTimeout = 0;
+    private static double logMessageTimeout = 0;
 
     private static boolean gamePaused = false,
                            scriptPlaying = false,
@@ -103,7 +105,8 @@ public class IngameUIManager implements MenuHandler {
         trans.makeCurrent();
         
         if (logMessageTimeout > 0) {
-            logMessageTimeout--;
+            if (logMessage.isDone()) // when the text is done printing, display for a set amount of time
+                logMessageTimeout -= Window.delta();
             // does not set model to identity as this is the first potentially rendered item
             model.translate(80, RootLayer.height()-80);
             model.makeCurrent();
@@ -226,8 +229,8 @@ public class IngameUIManager implements MenuHandler {
     public static void logMessage(String message) {
         if (logMessage != null)
             logMessage.destroy();
-        logMessage = new ScrollingText(message, "font_1", 0, 0, Vars.UI_SCALE, Vars.UI_SCALE, 1);
-        logMessageTimeout = 100;
+        logMessage = new ScrollingText(message, "font_1", 0, 0, Vars.UI_SCALE, Vars.UI_SCALE, 50);
+        logMessageTimeout = 1; // time to display after text is done printing, in seconds
     }
     public static void playScript(ScriptTrigger t, String scriptName) {
         trigger = t;
@@ -246,6 +249,14 @@ public class IngameUIManager implements MenuHandler {
     @Override
     public void openMenu(SelectionMenuBehavior b) {
         SelectionMenu sm = new SingleSelectionMenu(b);
+        if (!selectionMenus.empty())
+            AudioPlayback.playSfx("sfx_menu_open_pane");
+        selectionMenus.push(sm);
+        sm.onFocus();
+    }
+    @Override
+    public void openTabbedMenu(SelectionMenuBehavior... b) {
+        SelectionMenu sm = new TabbedSelectionMenu(b);
         if (!selectionMenus.empty())
             AudioPlayback.playSfx("sfx_menu_open_pane");
         selectionMenus.push(sm);

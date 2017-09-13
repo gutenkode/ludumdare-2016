@@ -13,6 +13,7 @@ import rpgsystem.StatusEffect;
 import scenes.Battle;
 import ui.BattleUIManager;
 import ui.MenuHandler;
+import ui.components.PlayerStatBar;
 
 /**
  * Contains logic for player actions in a battle.
@@ -131,6 +132,7 @@ public class PlayerFighter extends Fighter {
             addToast("MISS");
         }
     }
+
     @Override
     public boolean restoreHealth(int amount) {
         if (stats.health == stats.maxHealth)

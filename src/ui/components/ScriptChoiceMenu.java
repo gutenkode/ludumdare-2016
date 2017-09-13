@@ -1,5 +1,6 @@
 package ui.components;
 
+import mote4.scenegraph.Window;
 import mote4.util.audio.AudioPlayback;
 import mote4.util.matrix.ModelMatrix;
 import mote4.util.texture.TextureMap;
@@ -73,7 +74,7 @@ public class ScriptChoiceMenu {
      * @return The index of the player's selection, -1 otherwise.
      */
     public static int update() {
-        cursorAnimation += .05f;
+        cursorAnimation += Window.delta() * 2;
         cursorAnimation %= 1;
         
         if (Input.isKeyNew(Input.Keys.DOWN)) {

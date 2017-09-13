@@ -1,5 +1,6 @@
 package ui.components.selectionMenu;
 
+import mote4.scenegraph.Window;
 import mote4.util.audio.AudioPlayback;
 import mote4.util.matrix.ModelMatrix;
 import mote4.util.texture.TextureMap;
@@ -35,18 +36,20 @@ public class SingleSelectionMenu implements SelectionMenu {
     }
 
     private SelectionMenuBehavior b;
-    private Mesh border;//, text;
+    private Mesh border;
     private ScrollingText[] textList;
     private int cursorPos,
-            borderW, borderH,
+            borderW, borderH, lastW, lastH,
             renderBorderW, renderBorderH;
     private float cursorAnimation;
+    private double menuExpandStartTime;
+    private final double MENU_EXPAND_TIME_SECS = 0.2;
 
     public SingleSelectionMenu(SelectionMenuBehavior b) {
         this.b = b;
         cursorPos = 0;
-        renderBorderW = 0;
-        renderBorderH = 0;
+        renderBorderW = borderW = 0;
+        renderBorderH = borderH = 0;
     }
 
     /**
@@ -82,7 +85,7 @@ public class SingleSelectionMenu implements SelectionMenu {
         float maxWidth = FontUtils.getStringWidth("["+b.getTitle()+"]");
 
         // dynamic text initialization
-        int speed = 1;
+        double charsPerSec = 50;
         if (textList == null || textList.length != b.getNumElements()+1) {
             if (textList != null)
                 for (ScrollingText s : textList)
@@ -92,30 +95,31 @@ public class SingleSelectionMenu implements SelectionMenu {
         if (textList[0] == null || !textList[0].getFullStr().equals("["+b.getTitle()+"]")) {
             if (textList[0] != null)
                 textList[0].destroy();
-            textList[0] = new ScrollingText("["+b.getTitle()+"]", "font_1", Vars.UI_SCALE/3, Vars.UI_SCALE/4, Vars.UI_SCALE, Vars.UI_SCALE, speed);
+            textList[0] = new ScrollingText("["+b.getTitle()+"]", "font_1", Vars.UI_SCALE/3, Vars.UI_SCALE/4, Vars.UI_SCALE, Vars.UI_SCALE, charsPerSec);
         }
         for (int i = 0; i < b.getNumElements(); i++) {
             if (textList[i+1] == null || !textList[i+1].getFullStr().equals("   "+b.getElementName(i))) {
                 if (textList[i+1] != null)
                     textList[i+1].destroy();
-                textList[i+1] = new ScrollingText("   " + b.getElementName(i), "font_1", Vars.UI_SCALE/3, Vars.UI_SCALE/4 + Vars.UI_SCALE * (i+1), Vars.UI_SCALE, Vars.UI_SCALE, speed);
+                textList[i+1] = new ScrollingText("   " + b.getElementName(i), "font_1", Vars.UI_SCALE/3, Vars.UI_SCALE/4 + Vars.UI_SCALE * (i+1), Vars.UI_SCALE, Vars.UI_SCALE, charsPerSec);
             }
             float tempWidth = FontUtils.getStringWidth("   "+b.getElementName(i));
             maxWidth = Math.max(maxWidth, tempWidth);
         }
 
+        menuExpandStartTime = Window.time();
+        lastW = borderW;
+        lastH = borderH;
         borderW = (int)(Vars.UI_SCALE*maxWidth)- Vars.UI_SCALE;
         borderH = (b.getNumElements())* Vars.UI_SCALE- Vars.UI_SCALE/2;
         if (border != null)
             border.destroy();
-        border = MenuMeshCreator.create(Vars.UI_SCALE, Vars.UI_SCALE, renderBorderW, renderBorderH, Vars.UI_SCALE);
     }
 
     @Override
     public void update() {
-        redrawBorder();
-
-        cursorAnimation += .05f;
+        // only animate the cursor on the active window
+        cursorAnimation += Window.delta() * 2;
         cursorAnimation %= 1;
 
         if (Input.isKeyNew(Input.Keys.DOWN)) {
@@ -136,23 +140,14 @@ public class SingleSelectionMenu implements SelectionMenu {
         }
     }
     private void redrawBorder() {
-        // the text box will expand out from size 0,0
-        boolean redraw = false;
-        if (renderBorderH > borderH) {
-            renderBorderH -= (renderBorderH-borderH)/2;
-            redraw = true;
-        } else if (renderBorderH < borderH) {
-            renderBorderH += (borderH-renderBorderH)/2;
-            redraw = true;
-        }
-        if (renderBorderW > borderW) {
-            renderBorderW -= (renderBorderW-borderW)/3;
-            redraw = true;
-        } else if (renderBorderW < borderW) {
-            renderBorderW += (borderW-renderBorderW)/3;
-            redraw = true;
-        }
-        if (redraw) {
+        double currentTime = Window.time();
+        if (currentTime <= (menuExpandStartTime + MENU_EXPAND_TIME_SECS) ||
+                (renderBorderH != borderH && renderBorderW != borderW))
+        {
+            double step = Vars.smoothStep(menuExpandStartTime, menuExpandStartTime + MENU_EXPAND_TIME_SECS, currentTime);
+            renderBorderW = (int)Vars.lerp(lastW, borderW, step);
+            renderBorderH = (int)Vars.lerp(lastH, borderH, step);
+
             if (border != null)
                 border.destroy();
             border = MenuMeshCreator.create(Vars.UI_SCALE, Vars.UI_SCALE, renderBorderW, renderBorderH, Vars.UI_SCALE);
@@ -161,6 +156,10 @@ public class SingleSelectionMenu implements SelectionMenu {
 
     @Override
     public void render(ModelMatrix model) {
+        // update the box expand animation
+        redrawBorder();
+
+        model.makeCurrent();
         TextureMap.bindUnfiltered("ui_scalablemenu");
         border.render();
         TextureMap.bindUnfiltered("font_1");

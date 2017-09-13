@@ -10,6 +10,7 @@ import main.Input;
 import main.RootLayer;
 import ui.components.selectionMenu.SelectionMenu;
 import ui.components.selectionMenu.SingleSelectionMenu;
+import ui.components.selectionMenu.TabbedSelectionMenu;
 import ui.selectionmenubehavior.SelectionMenuBehavior;
 import ui.selectionmenubehavior.TitleMenu;
 
@@ -57,6 +58,14 @@ public class TitleUIManager implements MenuHandler {
     @Override
     public void openMenu(SelectionMenuBehavior b) {
         SelectionMenu sm = new SingleSelectionMenu(b);
+        if (!selectionMenus.empty())
+            AudioPlayback.playSfx("sfx_menu_open_pane");
+        selectionMenus.push(sm);
+        sm.onFocus();
+    }
+    @Override
+    public void openTabbedMenu(SelectionMenuBehavior... b) {
+        SelectionMenu sm = new TabbedSelectionMenu(b);
         if (!selectionMenus.empty())
             AudioPlayback.playSfx("sfx_menu_open_pane");
         selectionMenus.push(sm);

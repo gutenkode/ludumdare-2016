@@ -6,6 +6,7 @@ package rpgsystem;
  */
 public enum BattleEffect {
     ATTACK,
+    ATTACK_ALL,
     ATTACK_DARK,
     ATTACK_LIGHT,
     HEAL,

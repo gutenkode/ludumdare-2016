@@ -24,7 +24,7 @@ public class Postprocess implements Scene {
     private float colorMult;
 
     private static final int NUM_BLOOM_FBOS = 6;
-    private Random random;
+    //private Random random;
     private static int width, height;
     private static float dofCoef, dofCoefTarget;
     private static FBO combineScene, uiUpscaleScene,
@@ -33,7 +33,7 @@ public class Postprocess implements Scene {
     private static FBO[][] bloomScene;
     
     public Postprocess() {
-        random = new Random();
+        //random = new Random();
         colorMult = 1;
         dofCoef = dofCoefTarget = 0;
         bloomScene = new FBO[NUM_BLOOM_FBOS][2];
@@ -46,7 +46,7 @@ public class Postprocess implements Scene {
         // call the specified callback when the fade is complete
         // then unfade
         if (fadeToBlack) {
-            colorMult *= 0.8;
+            colorMult -= (colorMult*.2) * (delta*60);
             if (colorMult < 0.01) {
                 fadeToBlack = false;
                 callbackFunction.run();
@@ -54,7 +54,7 @@ public class Postprocess implements Scene {
             }
         } else {
             if (colorMult < 1)
-                colorMult *= 1.2;
+                colorMult += (colorMult*.2) * (delta*60);
             else
                 colorMult = 1;
         }

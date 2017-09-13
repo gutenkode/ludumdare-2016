@@ -83,6 +83,8 @@ public class PlayerStatBar {
         staminaPreview = false;
     }
 
+    public static float getRenderHealth() { return healthRender; }
+
     /**
      * Renders the player's stat box, detailing how much of each stat the player has,
      * as well as any status conditions the player currently has.

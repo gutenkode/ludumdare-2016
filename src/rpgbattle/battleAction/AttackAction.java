@@ -15,8 +15,8 @@ public class AttackAction extends BattleAction {
     private int delay;
 
     private Fighter target;
-    private Element e;
-    private BattleAnimation an;
+    private Element element;
+    private BattleAnimation animation;
     private int attack, power, accuracy;
     private boolean crit;
     private String sfxName;
@@ -29,8 +29,8 @@ public class AttackAction extends BattleAction {
         sfxName = "sfx_skill_normalhit";
     }
     public AttackAction(Fighter target, Element e, BattleAnimation an, int attack, int power, int accuracy, boolean crit, int delay) {
-        this.e = e;
-        this.an = an;
+        element = e;
+        animation = an;
         this.attack = attack;
         this.power = power;
         this.accuracy = accuracy;
@@ -42,10 +42,10 @@ public class AttackAction extends BattleAction {
 
     @Override
     public int act() {
-        target.damage(e, attack, power, accuracy, crit);
+        target.damage(element, attack, power, accuracy, crit);
         AudioPlayback.playSfx(sfxName);
-        if (an != null)
-            BattleManager.getPlayer().addAnim(an);
+        if (animation != null)
+            BattleManager.getPlayer().addAnim(animation);
         return delay;
     }
 }

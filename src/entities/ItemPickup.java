@@ -1,6 +1,7 @@
 package entities;
 
 import map.MapManager;
+import mote4.scenegraph.Window;
 import mote4.util.matrix.TransformationMatrix;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
@@ -72,11 +73,11 @@ public class ItemPickup extends Entity {
     @Override
     public void update() {
         if (collected) {
-            addSpeed += .03;
+            addSpeed += Window.delta()*2;
             if (addSpeed > 1)
                 MapManager.removeEntity(this);
         }
-        cycle += .05f;//+addSpeed*.35;
+        cycle += Window.delta()*3;
     }
     
     @Override

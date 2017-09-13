@@ -1,6 +1,7 @@
 package entities;
 
 import map.MapManager;
+import mote4.scenegraph.Window;
 import mote4.util.matrix.TransformationMatrix;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
@@ -20,8 +21,7 @@ public class Elevator extends Entity {
     
     private boolean state, inputLockActive = false;
     private float height, cycle,
-                floatTileHeight,
-                lightCycle = 0;
+                floatTileHeight;
     private int baseTileHeight, maxHeight,
                 triggerCooldown = 0; // to only trigger when the player first gets on
     
@@ -49,7 +49,7 @@ public class Elevator extends Entity {
     
     @Override
     public void onRoomInit() {
-        lightCycle = (int)(posX*4+posY*8);
+        //lightCycle = (int)(posX*4+posY*8);
         baseTileHeight = MapManager.getTileHeight((int)posX, (int)posY);
         if (state) {
             cycle = 1;
@@ -79,7 +79,7 @@ public class Elevator extends Entity {
         triggerCooldown--;
         if (state) {
             if (cycle < 1)
-                cycle += .04/maxHeight;
+                cycle += (Window.delta()*2.5)/maxHeight;
             else {
                 cycle = 1;
                 if (inputLockActive)
@@ -88,7 +88,7 @@ public class Elevator extends Entity {
             }
         } else {
             if (cycle > 0)
-                cycle -= .04/maxHeight;
+                cycle -= (Window.delta()*2.5)/maxHeight;
             else {
                 cycle = 0;
                 if (inputLockActive)
@@ -100,9 +100,6 @@ public class Elevator extends Entity {
         height = (float)Vars.smoothStep(cycle);
         floatTileHeight = baseTileHeight+Math.max(.075f, maxHeight*height);
         tileHeight = Math.round(floatTileHeight);
-
-        lightCycle += .075;
-        //lightCycle %= 100;
     }
     
     @Override
@@ -111,7 +108,7 @@ public class Elevator extends Entity {
         model.makeCurrent();
         
         Uniform.varFloat("spriteInfo", 3,1,0);
-        Uniform.varFloat("emissiveMult", (float)(Math.sin(lightCycle)+2)/2);
+        Uniform.varFloat("emissiveMult", (float)(Math.sin(Window.time() * 2.5)+2)/2);
         Uniform.varFloat("spriteInfoEmissive", 3,1, 2);
         TextureMap.bindUnfiltered("entity_elevator");
         mesh.render();

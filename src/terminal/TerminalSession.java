@@ -21,7 +21,7 @@ import terminal.filesystem.program.Program;
  */
 public class TerminalSession {
     
-    public static final int MAX_LINES = 20, WRITE_SPEED = 5, WIDTH = 9, HEIGHT = 14;
+    public static final int MAX_LINES = 20, WRITE_SPEED = 5*60, WIDTH = 9, HEIGHT = 14;
     private static final String METRIC = "monospace";
     
     private ArrayList<ScrollingText> writtenLines;

@@ -46,7 +46,7 @@ public class LogMenu {
         //    buildString.append(log[i]).append("\n");
         
         //FontUtils.useMetric("font_1");
-        text[NUM_LINES-1] = new ScrollingText(s, "font_1", Vars.UI_SCALE/2, Vars.UI_SCALE/2, Vars.UI_SCALE, Vars.UI_SCALE, 2);
+        text[NUM_LINES-1] = new ScrollingText(s, "font_1", Vars.UI_SCALE/2, Vars.UI_SCALE/2, Vars.UI_SCALE, Vars.UI_SCALE, 60*2);
     }
     
     public static void render(ModelMatrix model) {

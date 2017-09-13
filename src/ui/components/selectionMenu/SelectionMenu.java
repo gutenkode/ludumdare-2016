@@ -3,9 +3,9 @@ package ui.components.selectionMenu;
 import mote4.util.matrix.ModelMatrix;
 
 /**
- * A SelectionMenu is the core component of the player's UI.  It displays a list
- * of options the player can choose from.  This can be used for pause menus and
- * item selection menus.
+ * A SelectionMenu is the core component of the player's UI; it displays a list
+ * of options the player can choose from.  This can be used for pause menus,
+ * item selection menus, etc.
  * @author Peter
  */
 public interface SelectionMenu {

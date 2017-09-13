@@ -77,7 +77,7 @@ public class ScriptReader {
         } else if (s.startsWith("$INVCHECK")) {
             // if the player has the specified item, jump to a tag
             String[] list = s.split(" ");
-            for (Item i : Inventory.get())
+            for (Item i : Inventory.get().keySet())
                 if (i.name().equals(list[1]))
                     gotoTag(list[2]);
             advance(eh); // call advance again

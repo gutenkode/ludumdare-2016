@@ -31,6 +31,17 @@ public class Vars {
     public static boolean useFiltering() { return filterScreen; }
 
     /**
+     * Linearly interpolate between two values.
+     * @param a
+     * @param b
+     * @param i
+     * @return
+     */
+    public static double lerp(double a, double b, double i) {
+        double step = clamp(0,1,i);
+        return a*(1-step)+b*step;
+    }
+    /**
      * Calculates a smooth step value based on timestamps.
      * @param startTime
      * @param endTime
@@ -48,7 +59,8 @@ public class Vars {
      * @return
      */
     public static double smoothStep(double i) {
-        return clamp(0,1,(Math.sin(i*Math.PI -Math.PI/2)+1)/2);
+        double step = clamp(0,1,i);
+        return clamp(0,1,(Math.sin(step*Math.PI -Math.PI/2)+1)/2);
     }
     /**
      * Clamps a value between a min and max.

@@ -1,6 +1,7 @@
 package entities;
 
 import map.MapManager;
+import mote4.scenegraph.Window;
 import mote4.util.matrix.TransformationMatrix;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
@@ -22,7 +23,8 @@ public class KeyDoor extends Entity {
     
     private float rot, openVal = 0;
     private int tileX, tileY, keycardLevel, dir;
-    private int delay = 0, alertCycle = 0;
+    private double delay = 0;
+    private int alertCycle = 0;
     private boolean doorUnlocked = false, flicker, alertActive, playerInRange;
     
     static {
@@ -132,7 +134,7 @@ public class KeyDoor extends Entity {
 
         if (alertActive) {
             openVal = 0;
-            delay--;
+            delay -= Window.delta()*60;
             if (delay <= 0) {
                 delay = 6;
                 alertCycle++;
@@ -141,10 +143,14 @@ public class KeyDoor extends Entity {
         } else {
             if (doorUnlocked) {
                 if (openVal < 1)
-                    openVal += .05;
+                    openVal += Window.delta()*3;
+                else
+                    openVal = 1;
             } else {
                 if (openVal > 0)
-                    openVal -= .05;
+                    openVal -= Window.delta()*3;
+                else
+                    openVal = 0;
             }
         }
 

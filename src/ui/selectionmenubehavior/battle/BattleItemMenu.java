@@ -1,6 +1,8 @@
 package ui.selectionmenubehavior.battle;
 
 import java.util.ArrayList;
+import java.util.Map;
+
 import rpgbattle.BattleManager;
 import rpgbattle.fighter.Fighter;
 import rpgsystem.BattleEffect;
@@ -50,9 +52,14 @@ public class BattleItemMenu implements SelectionMenuBehavior {
         else {
             currentItem = items.get(index);
             boolean targetEnemies = false;
+            boolean multiTarget = false;
             if (currentItem.battleEffect == BattleEffect.ATTACK)
                 targetEnemies = true;
-            handler.openMenu(new EnemySelectionMenu(handler, this::itemCallback, false, targetEnemies, !targetEnemies));
+            else if (currentItem.battleEffect == BattleEffect.ATTACK_ALL) {
+                targetEnemies = true;
+                multiTarget = true;
+            }
+            handler.openMenu(new EnemySelectionMenu(handler, this::itemCallback, multiTarget, targetEnemies, !targetEnemies));
         }
     }
     public void itemCallback(Fighter... f) {
@@ -84,15 +91,21 @@ public class BattleItemMenu implements SelectionMenuBehavior {
     public void onCloseCleanup() {}
 
     private void rebuildMenu() {
-        ArrayList<Item> allItems = Inventory.get();
+        Map<Item, Integer> allItems = Inventory.get();
         items = new ArrayList<>();
         // only list items that can be used in battle
-        for (Item i : allItems)
+        for (Item i : allItems.keySet())
             if (i.battleEffect != BattleEffect.NONE)
                 items.add(i);
+
         options = new String[items.size()+1];
         options[options.length-1] = "Exit";
-        for (int i = 0; i < options.length-1; i++)
-            options[i] = items.get(i).name;
+        for (int i = 0; i < options.length-1; i++) {
+            Item item = items.get(i);
+            options[i] = item.name;
+            int numItem = allItems.get(item);
+            if (numItem > 1)
+                options[i] += "  ...  x"+numItem;
+        }
     }
 }

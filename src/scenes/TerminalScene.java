@@ -21,8 +21,8 @@ public class TerminalScene implements Scene {
     private String lastInput;
     private Transform trans;
     private int backspaceDelay, // frames to wait while holding down backspace before auto-delete is enabled
-                backspaceCooldown, // don't delete a character every single frame
-                cursorCooldown; // frame delay for blinking the cursor
+                backspaceCooldown; // don't delete a character every single frame
+    private double cursorCooldown; // frame delay for blinking the cursor
     private boolean showCursor = false;
     
     private static boolean closeTerminal;
@@ -45,7 +45,7 @@ public class TerminalScene implements Scene {
                     cursorCooldown = 6;
                 updateWriteLine();
             } else
-                cursorCooldown--;
+                cursorCooldown -= delta*60;
             
             if (session.inputActive())
             {

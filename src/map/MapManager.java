@@ -195,10 +195,9 @@ public class MapManager {
      * lighting shaders and textures.
      * @param trans Transform for the scene, includes camera information.
      *              It is passed in since it must be bound to multiple shaders.
-     * @param shadowProj Bound as "depthProj" in the shader, the projection used for the shadow view.
      * @param flashlightDir Flashlight angle, in spherical coordinates.
      */
-    public static void render(Transform trans, CubeMapMatrix shadowProj, float[] flashlightDir) {
+    public static void render(Transform trans, float[] flashlightDir) {
         float[] lightVector = new float[3];
         lightVector[0] = -(float)Math.sin(flashlightDir[0]);
         lightVector[1] = -(float)Math.cos(flashlightDir[0]);
@@ -207,7 +206,6 @@ public class MapManager {
     // render3d static map mesh
         ShaderMap.use("ingame_map");
         TextureMap.bindUnfiltered("tileset_1");
-        //shadowProj.makeCurrent();
         Uniform.varFloat("flashlightAngle", lightVector);
         Uniform.varFloat("lightPos", player.posX(),
                                                     player.posY()+player.hitboxH(),
@@ -218,7 +216,6 @@ public class MapManager {
         
     // render3d entity tilesheets
         ShaderMap.use("spritesheet_light");
-        //shadowProj.makeCurrent();
         Uniform.varFloat("flashlightAngle", lightVector);
         Uniform.varFloat("lightPos", player.posX(),
                                                     player.posY()+player.hitboxH(),
@@ -247,8 +244,8 @@ public class MapManager {
         */
     }
     /**
-     * Renders meshes with only data needed for constructing the depth texture
-     * for shadow mapping.
+     * Renders meshes with only elements needed for constructing
+     * the depth texture for shadow mapping.
      * @param shadowProj Projection for the shadow camera.
      */
     public static void renderForShadow(CubeMapMatrix shadowProj, ViewMatrix shadowView) {

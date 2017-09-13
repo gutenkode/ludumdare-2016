@@ -1,5 +1,7 @@
 package ui.components.selectionMenu;
 
+import main.Input;
+import mote4.util.audio.AudioPlayback;
 import mote4.util.matrix.ModelMatrix;
 import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.mesh.Mesh;
@@ -8,101 +10,77 @@ import main.Vars;
 import ui.MenuMeshCreator;
 import ui.selectionmenubehavior.SelectionMenuBehavior;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Contains multiple behaviors, arranged as tabs in one menu pane.
- * Useful for menus with separate categories, like types of items.
+ * Useful for menus with separate categories, like different types of items.
  * Created by Peter on 6/30/17.
  */
 public class TabbedSelectionMenu implements SelectionMenu {
 
-    private SelectionMenuBehavior[] b;
-    private Mesh border;
-    private ScrollingText[] textList;
-    private int cursorPos, currentTab,
-            borderW, borderH,
-            renderBorderW, renderBorderH;
-    private float cursorAnimation;
+    private List<SingleSelectionMenu> menus;
+    private float[] heights;
+    private int currentMenu;
 
-    public TabbedSelectionMenu(SelectionMenuBehavior... b) {
-        this.b = b;
-        cursorPos = 0;
-        currentTab = 0;
-        renderBorderW = 0;
-        renderBorderH = 0;
+    public TabbedSelectionMenu(SelectionMenuBehavior... behaviors) {
+        currentMenu = 0;
+        menus = new ArrayList<>();
+        for (SelectionMenuBehavior b : behaviors)
+            menus.add(new SingleSelectionMenu(b));
+        menus.forEach(menu -> menu.onFocus());
+        heights = new float[menus.size()];
     }
 
-    @Override
-    public void setCursorPos(int i) {
-        cursorPos = i;
+    public void setCursorPos(int i) { menus.get(currentMenu).setCursorPos(i); }
+    public int cursorPos()  { return menus.get(currentMenu).cursorPos(); }
 
-        cursorPos %= this.b[currentTab].getNumElements();
+    public int width() { return menus.get(currentMenu).width() + currentMenu*Vars.UI_SCALE; }
+    public int height() { return menus.get(currentMenu).height(); }
 
-        if (cursorPos < 0)
-            cursorPos = this.b[currentTab].getNumElements()-1;
+    public void onFocus() { menus.get(currentMenu).onFocus(); }
 
-        this.b[currentTab].onHighlight(cursorPos);
-    }
-    @Override
-    public int cursorPos() { return cursorPos; }
-    @Override
-    public int width() { return renderBorderW; }
-    @Override
-    public int height() { return renderBorderH; }
-
-    @Override
-    public void onFocus() {
-        b[currentTab].onFocus();
-        b[currentTab].onHighlight(cursorPos);
-
-        FontUtils.useMetric("font_1");
-        float maxWidth = FontUtils.getStringWidth("["+b[currentTab].getTitle()+"]");
-
-        // dynamic text initialization
-        int speed = 1;
-        if (textList == null || textList.length != b[currentTab].getNumElements()+1) {
-            if (textList != null)
-                for (ScrollingText s : textList)
-                    s.destroy();
-            textList = new ScrollingText[b[currentTab].getNumElements() + 1];
-        }
-        if (textList[0] == null || !textList[0].getFullStr().equals("["+b[currentTab].getTitle()+"]")) {
-            if (textList[0] != null)
-                textList[0].destroy();
-            textList[0] = new ScrollingText("["+b[currentTab].getTitle()+"]", "font_1", Vars.UI_SCALE/3, Vars.UI_SCALE/4, Vars.UI_SCALE, Vars.UI_SCALE, speed);
-        }
-        for (int i = 0; i < b[currentTab].getNumElements(); i++) {
-            if (textList[i+1] == null || !textList[i+1].getFullStr().equals("   "+b[currentTab].getElementName(i))) {
-                if (textList[i+1] != null)
-                    textList[i+1].destroy();
-                textList[i+1] = new ScrollingText("   " + b[currentTab].getElementName(i), "font_1", Vars.UI_SCALE/3, Vars.UI_SCALE/4 + Vars.UI_SCALE * (i+1), Vars.UI_SCALE, Vars.UI_SCALE, speed);
-            }
-            float tempWidth = FontUtils.getStringWidth("   "+b[currentTab].getElementName(i));
-            maxWidth = Math.max(maxWidth, tempWidth);
-        }
-
-        borderW = (int)(Vars.UI_SCALE*maxWidth)- Vars.UI_SCALE;
-        borderH = (b[currentTab].getNumElements())* Vars.UI_SCALE- Vars.UI_SCALE/2;
-        if (border != null)
-            border.destroy();
-        border = MenuMeshCreator.create(Vars.UI_SCALE, Vars.UI_SCALE, renderBorderW, renderBorderH, Vars.UI_SCALE);
-    }
-
-    @Override
     public void update() {
+        for (int i = 0; i < heights.length; i++) {
+            if (i == currentMenu)
+                heights[i] += (Vars.UI_SCALE*.5f - heights[i])/10;
+            else
+                heights[i] -= heights[i]/10;
+        }
 
+        if (Input.isKeyNew(Input.Keys.RIGHT)) {
+            currentMenu++;
+            currentMenu %= menus.size();
+            menus.get(currentMenu).onFocus();
+            AudioPlayback.playSfx("sfx_menu_hover");
+        } else if (Input.isKeyNew(Input.Keys.LEFT)) {
+            currentMenu--;
+            if (currentMenu < 0)
+                currentMenu = menus.size()-1;
+            menus.get(currentMenu).onFocus();
+            AudioPlayback.playSfx("sfx_menu_hover");
+        }
+        menus.get(currentMenu).update();
     }
-
-    @Override
     public void render(ModelMatrix model) {
+        model.push();
+        int i = 0;
+        for (SingleSelectionMenu m : menus) {
+            if (currentMenu != i) {
+                model.push();
+                model.translate(0, heights[i]);
+                m.render(model);
+                model.pop();
+            }
+            model.translate(Vars.UI_SCALE,0);
+            i++;
+        }
+        model.pop();
 
+        model.translate(currentMenu*Vars.UI_SCALE, heights[currentMenu]);
+        menus.get(currentMenu).render(model);
     }
 
-    @Override
-    public void destroy() {
-        for (SelectionMenuBehavior b : b)
-            b.onCloseCleanup();
-        border.destroy();
-        for (ScrollingText s : textList)
-            s.destroy();
-    }
+    public void destroy() { menus.forEach(menu -> menu.destroy()); }
 }

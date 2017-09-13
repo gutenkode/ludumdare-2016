@@ -42,7 +42,7 @@ public class SkillCostMenu {
 
         FontUtils.useMetric("font_1");
         //text = FontUtils.createString(s, Const.UI_SCALE/2, Const.UI_SCALE/2, Const.UI_SCALE, Const.UI_SCALE);
-        text = new ScrollingText(s, "font_1", Vars.UI_SCALE/2, 1+PlayerSkills.maxCapacity()*scaleH, Vars.UI_SCALE, Vars.UI_SCALE, 3);
+        text = new ScrollingText(s, "font_1", Vars.UI_SCALE/2, 1+PlayerSkills.maxCapacity()*scaleH, Vars.UI_SCALE, Vars.UI_SCALE, 60*3);
 
         String[] lines = s.split("\n");
         float maxWidth = 0;

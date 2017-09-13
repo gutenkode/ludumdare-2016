@@ -1,6 +1,7 @@
 package entities;
 
 import map.MapManager;
+import mote4.scenegraph.Window;
 import mote4.util.matrix.TransformationMatrix;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
@@ -39,7 +40,7 @@ public class Water extends Entity {
     
     @Override
     public void update() {
-        offset += .001;
+        offset += Window.delta()*.1;
         offset %= 2;
 
         posX = (int)MapManager.getPlayer().posX;
@@ -50,7 +51,7 @@ public class Water extends Entity {
     public void render(TransformationMatrix model) {
         float addHeight = (float)Math.sin(offset*Math.PI)*.1f;
 
-        model.translate((float)posX+offset, (float)posY+offset/2, tileHeight+addHeight);
+        model.translate(posX+offset, posY+offset/2, tileHeight+addHeight);
         model.makeCurrent();
         
         Uniform.varFloat("spriteInfo", 1,1,1);

@@ -1,6 +1,7 @@
 package entities;
 
 import map.MapManager;
+import mote4.scenegraph.Window;
 import mote4.util.matrix.TransformationMatrix;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
@@ -18,7 +19,8 @@ import terminal.filesystem.DefaultFilesystem;
 public class Terminal extends Entity {
     
     private static Mesh mesh;
-    private int index, delay;
+    private int index;
+    private double delay;
     private TerminalSession session; // the terminal session associated with this terminal
     
     static {
@@ -70,7 +72,7 @@ public class Terminal extends Entity {
 
     @Override
     public void update() {
-        delay--;
+        delay -= Window.delta()*60;
         if (delay <= 0) {
             index++;
             index %= 2;

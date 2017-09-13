@@ -1,6 +1,7 @@
 package entities;
 
 import map.MapManager;
+import mote4.scenegraph.Window;
 import mote4.util.matrix.TransformationMatrix;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
@@ -43,7 +44,7 @@ public class LaserGrid extends Entity {
     
     @Override
     public void update() {
-        cycle += 1;
+        cycle += Window.delta()*60;
         cycle %= Math.PI*2;
     }
     

@@ -1,5 +1,7 @@
 package terminal.filesystem.program;
 import java.util.ArrayList;
+import java.util.Set;
+
 import map.MapLevelManager;
 import terminal.TerminalSession;
 import rpgsystem.Item;
@@ -131,10 +133,10 @@ public class VillageProgram extends Program {
                 break;
             case "what can i send":
                 session.clear();
-                ArrayList<Item> inv = Inventory.get();
+                Set<Item> inv = Inventory.get().keySet();
                 int[] arr = new int[100];
-                for (int i = 0; i < inv.size(); i++){
-                    String str = inv.get(i).name;
+                for (Item i : inv) {
+                    String str = i.name;
                     /*if (str.equals("Lv1 Keycard") || str.equals("Lv2 Keycard") || str.equals("Lv3 Keycard") || str.equals("Lv4 Keycard") || str.equals("Lv5 Keycard")){
                         arr[Integer.parseInt(str.substring(2,3))] += 1;
                     }*/

@@ -1,5 +1,6 @@
 package ui.selectionmenubehavior.ingame;
 
+import rpgsystem.Item;
 import ui.MenuHandler;
 import ui.selectionmenubehavior.OptionsMenu;
 import ui.selectionmenubehavior.SelectionMenuBehavior;
@@ -41,7 +42,10 @@ public class RootIngameMenu implements SelectionMenuBehavior {
     public void onAction(int index) {
         switch (getElementName(index)) {
             case "Items":
-                handler.openMenu(new IngameItemMenu(handler));
+                handler.openTabbedMenu(
+                        new IngameItemMenu(handler,"CONSUMABLE", Item.ItemType.CONSUMABLE),
+                        new IngameItemMenu(handler,"KEY", Item.ItemType.KEY)
+                );
                 break;
             case "Skills":
                 handler.openMenu(new RootSkillMenu(handler));

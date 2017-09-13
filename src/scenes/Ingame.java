@@ -22,11 +22,10 @@ import static org.lwjgl.opengl.GL11.*;
 public class Ingame implements Scene {
     
     private static final DepthCubeBuffer depthTexture;
-
     public static final boolean firstPerson = false;
     
     static {
-        depthTexture = new DepthCubeBuffer(1024);
+        depthTexture = new DepthCubeBuffer(1024); // shadow resolution
         depthTexture.addToTextureMap("fbo_depth");
         MapManager.initShaders();
     }
@@ -124,7 +123,7 @@ public class Ingame implements Scene {
         t.makeCurrent();
         glClearColor(0, 0, 0, 0); // for regular rendering
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-        MapManager.render(trans, shadowProj, flashlightDir);
+        MapManager.render(trans, flashlightDir);
     }
     
     @Override

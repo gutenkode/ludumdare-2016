@@ -53,7 +53,7 @@ public abstract class Fighter {
      * Runs an accuracy check for an attack against this Fighter.
      * Returns true the % of time the attack should hit.
      * @param accuracy Accuracy as an int from 0-100.
-     * @return 
+     * @return
      */
     final boolean calculateHit(int accuracy) {
         double rand = Math.random();
@@ -110,7 +110,7 @@ public abstract class Fighter {
                 dmg = 0;
                 break;
         }
-        
+
         // slight randomness, add/subtract up to a 20th of total damage
         dmg += (Math.random()*dmg*.1)-(dmg*.05);
 
@@ -124,7 +124,7 @@ public abstract class Fighter {
 
         // flash the sprite the color of the elemental attack
         flash(element.color);
-        
+
         return (int)dmg;
     }
     /**
@@ -140,7 +140,7 @@ public abstract class Fighter {
             addToast(ToastType.POISON, "POISON -" + (lastHealth - stats.health)); // if health was capped at 1hp, actual damage might be different from dmg
         }
     }
-    
+
     public boolean isDead() { return stats.health <= 0; }
     
     public void inflictStatus(StatusEffect e, int accuracy) {
@@ -280,6 +280,7 @@ public abstract class Fighter {
         }
         Uniform.varFloat("colorMult", 1,1,1,1);
     }
+    public boolean hasToastsLeft() { return !toast.isEmpty(); }
     public static class Toast {
         public enum ToastType {
             DAMAGE("@{1,1,1,1}"),

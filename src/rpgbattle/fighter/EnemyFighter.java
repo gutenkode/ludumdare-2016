@@ -134,6 +134,7 @@ public class EnemyFighter extends Fighter {
             AudioPlayback.playSfx("sfx_skill_miss");
         }
     }
+
     @Override
     public boolean restoreHealth(int amount) {
         if (stats.health == stats.maxHealth)

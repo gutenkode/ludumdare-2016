@@ -21,6 +21,7 @@ import ui.components.ScriptChoiceMenu;
 import ui.components.selectionMenu.SelectionMenu;
 import ui.components.SpriteMenu;
 import ui.components.selectionMenu.SingleSelectionMenu;
+import ui.components.selectionMenu.TabbedSelectionMenu;
 import ui.script.ScriptReader;
 import ui.selectionmenubehavior.battle.RootBattleMenu;
 import ui.selectionmenubehavior.SelectionMenuBehavior;
@@ -34,8 +35,7 @@ public class BattleUIManager implements MenuHandler {
     private static final BattleUIManager manager;
     private static final Stack<SelectionMenu> selectionMenus;
     private static ScriptReader currentScript;
-    //private static ArrayList<EnemySprite> enemySprites; // sprites for all enemies to be drawn
-    private static ArrayList<EnemyFighter> enemies; // stored to easily refresh enemy sprites on display resize
+    private static ArrayList<EnemyFighter> enemies;
     
     private static boolean playerTurn = false,
                            scriptPlaying = false,
@@ -171,34 +171,19 @@ public class BattleUIManager implements MenuHandler {
     
     /**
      * Initialize sprites for rendering enemies.
+     * This sets up the UI for a new battle.
      * @param f
      */
     public static void initEnemies(ArrayList<EnemyFighter> f) {
         // enemySprites do not have a destroy() method
         enemies = f;
-        refreshEnemies();
         LogMenu.clear();
     }
 
-    /**
-     * Initialize the positions of the sprite objects for enemies in a battle.
-     */
-    public static void refreshEnemies() {
-        if (enemies != null) {
-            int startX = RootLayer.width()/2-(96*(BattleManager.getEnemies().size()-1));
-            int startY = RootLayer.height()/2;
-            for (EnemyFighter f : enemies) {
-                //f.getSprite().setPos(0, 0);
-                //f.getSprite().setPos(startX, startY);
-                startX += 96*2;
-            }
-        }
-    }
     public static void startPlayerTurn() {
         if (playerTurn)
             return;
-        
-        //Input.pushLock(Input.Lock.MENU);
+
         playerTurn = true;
         manager.openMenu(new RootBattleMenu(manager));
         AudioPlayback.playSfx("sfx_menu_playerturn");
@@ -232,6 +217,14 @@ public class BattleUIManager implements MenuHandler {
     @Override
     public void openMenu(SelectionMenuBehavior b) {
         SelectionMenu sm = new SingleSelectionMenu(b);
+        if (!selectionMenus.empty())
+            AudioPlayback.playSfx("sfx_menu_open_pane");
+        selectionMenus.push(sm);
+        sm.onFocus();
+    }
+    @Override
+    public void openTabbedMenu(SelectionMenuBehavior... b) {
+        SelectionMenu sm = new TabbedSelectionMenu(b);
         if (!selectionMenus.empty())
             AudioPlayback.playSfx("sfx_menu_open_pane");
         selectionMenus.push(sm);

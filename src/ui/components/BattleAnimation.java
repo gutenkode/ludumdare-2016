@@ -1,5 +1,6 @@
 package ui.components;
 
+import mote4.scenegraph.Window;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
 
@@ -10,25 +11,25 @@ import mote4.util.texture.TextureMap;
  */
 public class BattleAnimation {
     public enum Type {
-        ICE("anim_ice", 5,7, .5f),
-        FIRE("anim_fire", 5,4, .5f),
-        ELEC("anim_elec", 5,6, .5f),
-        STATUS("anim_status", 5,5, .35f);
+        ICE("anim_ice", 5,7, 30),
+        FIRE("anim_fire", 5,4, 30),
+        ELEC("anim_elec", 5,6, 30),
+        STATUS("anim_status", 5,5, 20);
 
         public final String SPRITE_NAME;
         public final int WIDTH, HEIGHT;
-        public final float FRAME_ADD;
+        public final float FPS;
         Type(String sn, int w, int h, float f) {
             SPRITE_NAME = sn;
             WIDTH = w;
             HEIGHT = h;
-            FRAME_ADD = f;
+            FPS = f;
         }
     }
 
     public final Type TYPE;
     private float index;
-    private int delay;
+    private double delay;
 
     public BattleAnimation(Type t) {
         TYPE = t;
@@ -38,7 +39,7 @@ public class BattleAnimation {
 
     public boolean render() {
         if (delay > 0) {
-            delay--;
+            delay -= Window.delta()*60;
             return false;
         }
 
@@ -46,7 +47,7 @@ public class BattleAnimation {
         Uniform.varFloat("spriteInfo", TYPE.WIDTH,TYPE.HEIGHT, (int)index);
         EnemySprite.sprite.render();
 
-        index += TYPE.FRAME_ADD;
+        index += TYPE.FPS * Window.delta();
         return index >= TYPE.WIDTH*TYPE.HEIGHT;
     }
 }

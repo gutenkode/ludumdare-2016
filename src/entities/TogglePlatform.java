@@ -1,6 +1,7 @@
 package entities;
 
 import map.MapManager;
+import mote4.scenegraph.Window;
 import mote4.util.matrix.TransformationMatrix;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
@@ -60,18 +61,22 @@ public class TogglePlatform extends Entity {
     @Override
     public void update() {
         if (!MapManager.getTimelineState().getMapState(index) ^ inverted) {
-            if (position < .9375)
-                position += .0625;
+            if (position < 1)
+                position += Window.delta()*3.5;
+            else
+                position = 1;
         } else {
             if (position > 0)
-                position -= .0625;
+                position -= Window.delta()*3.5;
+            else
+                position = 0;
         }
     }
 
     @Override
     public void render(TransformationMatrix model) {
         model.setIdentity();
-        model.translate((float)posX-.5f, (float)posY-.5f+.075f*position, tileHeight);
+        model.translate(posX-.5f, (float)posY-.5f+.075f*position, tileHeight);
         // rotate to flip towards a certain wall
         //model.rotate((float)Math.PI/2*rotation, 0, 0, 1);
         // flip down if deactivated

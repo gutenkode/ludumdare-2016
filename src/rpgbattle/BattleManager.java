@@ -1,5 +1,6 @@
 package rpgbattle;
 
+import entities.Enemy;
 import mote4.util.audio.AudioPlayback;
 import main.RootLayer;
 import rpgbattle.battleAction.BattleAction;
@@ -23,7 +24,7 @@ public class BattleManager {
     
     private static ArrayList<Fighter> fighters; // all fighters, currently just the enemy list + the player
     private static Fighter currentFighter;
-    private static ArrayList<EnemyFighter> enemies; // all enemy fighters
+    private static ArrayList<EnemyFighter> enemies, removeEnemies; // all enemy fighters
     private static int stateDelay;
     private static BattleState currentState;
     private static final PlayerFighter playerFighter;
@@ -56,6 +57,7 @@ public class BattleManager {
 
         fighters = new ArrayList<>();
         enemies = new ArrayList<>();
+        removeEnemies = new ArrayList<>();
         
         fighters.add(playerFighter);
         
@@ -78,6 +80,7 @@ public class BattleManager {
     }
     
     public static void update() {
+        removeDeadEnemies();
         int val;
         if (stateDelay > 0) // global delay for advancing to the next state
             stateDelay--;
@@ -88,7 +91,7 @@ public class BattleManager {
                     currentState = BattleState.START_TURN;
                     break;
                 case START_TURN:
-                    if (enemies.isEmpty() && currentFighter == playerFighter) {
+                    if (currentFighter == playerFighter && areAllEnemiesDead()) {
                         // win state
                         currentState = BattleState.END_BATTLE;
                         stateDelay = 100;
@@ -102,9 +105,9 @@ public class BattleManager {
                     break;
                 case FIGHTER_TURN:
                     /*
-                     call act() on the current fighter until it returns
-                     a value to be the delay until the next state
-                     generally speaking, BattleActions should be added
+                     Call act() on the current fighter until it returns
+                     a value to be the delay until the next state.
+                     Generally speaking, BattleActions should be added
                      to the queue during this step.
                      */
                     val = currentFighter.act();
@@ -119,7 +122,7 @@ public class BattleManager {
                         currentState = BattleState.END_TURN;
                     else {
                         val = actions.peek().act();
-                        if (val != -1) {
+                        if (val != -1) { // if we have a delay from an action, apply it
                             stateDelay = val;
                             actions.poll();
                         }
@@ -128,7 +131,7 @@ public class BattleManager {
                 case END_TURN:
                     // poison damage happens at the end of a turn
                     if (currentFighter.statusEffects.contains(StatusEffect.POISON)) {
-                        if (currentFighter.equals(playerFighter) && enemies.isEmpty()) {
+                        if (currentFighter.equals(playerFighter) && areAllEnemiesDead()) {
                             // player doesn't take poison damage at the end of their turn if all enemies are dead
                         } else {
                             currentFighter.poisonDamage();
@@ -137,15 +140,12 @@ public class BattleManager {
                     }
 
                     if (playerFighter.stats.health <= 0) {
-                        // the player ran out of HP, game over
+                        // the player ran out of HP, game over...
                         BattleUIManager.logMessage("You lost...");
                         currentState = BattleState.PLAYER_LOOSE;
                     } else {
                         // advance to the next fighter in the list
-                        int ind = fighters.indexOf(currentFighter);
-                        ind++;
-                        ind %= fighters.size();
-                        currentFighter = fighters.get(ind);
+                        advanceToNextFighter();
 
                         currentState = BattleState.START_TURN;
                     }
@@ -156,8 +156,37 @@ public class BattleManager {
                     playerFighter.stats.resetBuffs();  // reset stats after battle
                     break;
                 case PLAYER_LOOSE:
-                    // do nothing
+                    // do nothing for now
                     break;
+            }
+        }
+    }
+    private static void advanceToNextFighter() {
+        do {
+            int ind = fighters.indexOf(currentFighter);
+            ind++;
+            ind %= fighters.size();
+            currentFighter = fighters.get(ind);
+            // skip any dead fighters, but to prevent infinite loops don't skip the player
+        } while (currentFighter.isDead() && currentFighter != playerFighter);
+    }
+    public static boolean areAllEnemiesDead() {
+        for (EnemyFighter f : enemies)
+            if (!f.isDead())
+                return false;
+        return true;
+    }
+    public static void removeDeadEnemies() {
+        // remove enemies that have finished their animations
+        for (int i = 0; i < removeEnemies.size(); i++) {
+            EnemyFighter f = removeEnemies.get(i);
+            if (!f.isDead())
+                throw new IllegalStateException();
+            if (!f.hasAnimationsLeft() && !f.hasToastsLeft()) {
+                removeEnemies.remove(i);
+                enemies.remove(f);
+                fighters.remove(f);
+                i--;
             }
         }
     }
@@ -173,11 +202,9 @@ public class BattleManager {
         if (enemies.contains(f)) 
         {
             if (f == currentFighter) {
-                throw new IllegalStateException(); // TODO remove this, maybe
+                advanceToNextFighter();
             }
-            
-            enemies.remove(f);
-            fighters.remove(f);
+            removeEnemies.add(f);
         }
     }
     /**

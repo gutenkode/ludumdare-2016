@@ -1,6 +1,7 @@
 package entities;
 
 import map.MapManager;
+import mote4.scenegraph.Window;
 import mote4.util.audio.AudioPlayback;
 import mote4.util.matrix.TransformationMatrix;
 import mote4.util.shader.Uniform;
@@ -71,7 +72,7 @@ public class Enemy extends Entity {
             Math.abs(posY - patrol[patrolIndex][1]) < .125)
         {
             // wait at the node until the delay is 0
-            patrolDelay -= .1;
+            patrolDelay -= Window.delta()*6;
             if (patrolDelay <= 0) {
                 // load the next patrol node
                 patrolIndex++;
@@ -114,7 +115,7 @@ public class Enemy extends Entity {
     
     @Override
     public void render(TransformationMatrix model) {
-        model.translate((float)posX-.5f, (float)posY, tileHeight);
+        model.translate(posX-.5f, posY, tileHeight);
         model.makeCurrent();
         Uniform.varFloat("spriteInfo", 1,1,0);
         TextureMap.bindUnfiltered(spriteName);

@@ -1,5 +1,6 @@
 package ui.components;
 
+import mote4.scenegraph.Window;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.mesh.Mesh;
@@ -14,11 +15,13 @@ import ui.MenuMeshCreator;
 public class FlavorTextMenu {
     
     private static Mesh border, text;
-    private static int width, height,
+    private static int width = 0, height = 0, lastWidth, lastHeight,
                        renderWidth = 0, renderHeight = 0;
+    private static double menuExpandStartTime;
+    private static final double MENU_EXPAND_TIME_SECS = 0.2;
     
-    public static int width() { return width; }
-    public static int height() { return height; }
+    public static int width() { return renderWidth; }
+    public static int height() { return renderHeight; }
     
     public static void setText(String s) {
         if (border != null)
@@ -28,16 +31,19 @@ public class FlavorTextMenu {
         
         FontUtils.useMetric("font_1");
         //text = FontUtils.createString(s, Const.UI_SCALE/2, Const.UI_SCALE/2, Const.UI_SCALE, Const.UI_SCALE);
-        text = new ScrollingText(s, "font_1", Vars.UI_SCALE/2, Vars.UI_SCALE/2, Vars.UI_SCALE, Vars.UI_SCALE, 3);
+        text = new ScrollingText(s, "font_1", Vars.UI_SCALE/2, Vars.UI_SCALE/2, Vars.UI_SCALE, Vars.UI_SCALE, 60*3);
 
         String[] lines = s.split("\n");
         float maxWidth = 0;
         for (String s1 : lines)
             maxWidth = Math.max(maxWidth, FontUtils.getStringWidth(s1));
 
+        menuExpandStartTime = Window.time();
+        renderHeight = lastHeight = height;
+        renderWidth = lastWidth = width;
         height = (lines.length-1)* Vars.UI_SCALE;
         width = (int)(Vars.UI_SCALE*maxWidth)- Vars.UI_SCALE;
-        border = MenuMeshCreator.create(Vars.UI_SCALE, Vars.UI_SCALE, renderWidth, renderHeight, Vars.UI_SCALE);
+        //border = MenuMeshCreator.create(Vars.UI_SCALE, Vars.UI_SCALE, lastWidth, lastHeight, Vars.UI_SCALE);
     }
     
     public static void render() {
@@ -49,23 +55,14 @@ public class FlavorTextMenu {
         text.render();
     }
     private static void redrawBorder() {
-        // the text box will expand out from size 0,0
-        boolean redraw = false;
-        if (renderHeight > height) {
-            renderHeight -= (renderHeight-height)/2;
-            redraw = true;
-        } else if (renderHeight < height) {
-            renderHeight += (height-renderHeight)/2;
-            redraw = true;
-        }
-        if (renderWidth > width) {
-            renderWidth -= (renderWidth-width)/3;
-            redraw = true;
-        } else if (renderWidth < width) {
-            renderWidth += (width-renderWidth)/3;
-            redraw = true;
-        }
-        if (redraw) {
+        double currentTime = Window.time();
+        if (currentTime <= (menuExpandStartTime + MENU_EXPAND_TIME_SECS) ||
+                (renderHeight != height && renderWidth != width))
+        {
+            double step = Vars.smoothStep(menuExpandStartTime, menuExpandStartTime + MENU_EXPAND_TIME_SECS, currentTime);
+            renderWidth = (int)Vars.lerp(lastWidth, width, step);
+            renderHeight = (int)Vars.lerp(lastHeight, height, step);
+
             if (border != null)
                 border.destroy();
             border = MenuMeshCreator.create(Vars.UI_SCALE, Vars.UI_SCALE, renderWidth, renderHeight, Vars.UI_SCALE);

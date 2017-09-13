@@ -12,6 +12,7 @@ import main.RootLayer;
 import ui.components.FlavorTextMenu;
 import ui.components.selectionMenu.SelectionMenu;
 import ui.components.selectionMenu.SingleSelectionMenu;
+import ui.components.selectionMenu.TabbedSelectionMenu;
 import ui.selectionmenubehavior.editor.RootEditorMenu;
 import ui.selectionmenubehavior.SelectionMenuBehavior;
 
@@ -110,6 +111,15 @@ public class EditorUIManager implements MenuHandler {
         if (selectionMenus.empty())
             Input.pushLock(Input.Lock.MENU);
         SelectionMenu sm = new SingleSelectionMenu(b);
+        selectionMenus.push(sm);
+        sm.onFocus();
+    }
+    @Override
+    public void openTabbedMenu(SelectionMenuBehavior... b) {
+        closeFlavorText();
+        if (selectionMenus.empty())
+            Input.pushLock(Input.Lock.MENU);
+        SelectionMenu sm = new TabbedSelectionMenu(b);
         selectionMenus.push(sm);
         sm.onFocus();
     }

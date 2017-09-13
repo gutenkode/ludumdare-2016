@@ -20,7 +20,7 @@ public enum Item implements Pickupable {
         "A keycard with the text\n\"Level 1\" written on it.",
         "item_keycard1", null, null, NONE, KEY),
     KEYCARD2("Lv2 Keycard",
-        "A keycard with the text\n\"Level 2\" writtenon it.",
+        "A keycard with the text\n\"Level 2\" written on it.",
         "item_keycard2", null, null, NONE, KEY),
     KEYCARD3("Lv3 Keycard",
         "A keycard with the text\n\"Level 3\" written on it.",
@@ -30,21 +30,21 @@ public enum Item implements Pickupable {
         "item_keycard4", null, null, NONE, KEY),
 
     POTION("Potion",
-            "A small purple flask.\nRestores "+HEALTH_HEAL+" health.",
+            "A small purple flask.\nRestores "+Const.HEALTH_HEAL+" health.",
             "item_potion", "You drink the potion.", "Your health is full!",
             HEAL, CONSUMABLE),
     ENERGY_DRINK("Energy Drink",
-            "Linked to several heart conditions.\nRestores \"+STAMINA_HEAL+\" stamina.",
+            "Linked to several heart conditions.\nRestores "+Const.STAMINA_HEAL+" stamina.",
             "item_drink", "You down the whole can.", "Your stamina is full!",
             HEAL, CONSUMABLE),
     MANA_HYPO("Mana Hypo",
-            "A syringe filled with a glowing blue liquid.\nRestores \"+MANA_HEAL+\" mana.",
+            "A syringe filled with a glowing blue liquid.\nRestores "+Const.MANA_HEAL+" mana.",
             "item_hypo", "You inject the contents of the hypo.", "Your mana is full!",
             HEAL, CONSUMABLE),
     GRENADE("Grenade",
-            "An explosive weapon.\nDeals high damage to enemies.",
+            "An explosive weapon.\nDeals high damage to all enemies.",
             "item_grenade", "You throw the grenade!", "You can't use this right now.",
-            ATTACK, CONSUMABLE);
+            ATTACK_ALL, CONSUMABLE);
 
     public final String name, desc, spriteName, useString, noUseString;
     public final ItemType itemType;
@@ -59,8 +59,13 @@ public enum Item implements Pickupable {
         battleEffect = t;
     }
 
-    private static final int HEALTH_HEAL = 75, STAMINA_HEAL = 100, MANA_HEAL = 50, BOMB_POWER = 100;
-
+    private static class Const {
+        public static final int
+                HEALTH_HEAL = 75,
+                STAMINA_HEAL = 100,
+                MANA_HEAL = 50,
+                BOMB_POWER = 100;
+    }
     public enum ItemType {
         CONSUMABLE,
         KEY;
@@ -81,7 +86,7 @@ public enum Item implements Pickupable {
                 return false;
                 
             case POTION:
-                if (BattleManager.getPlayer().restoreHealth(HEALTH_HEAL)) {
+                if (BattleManager.getPlayer().restoreHealth(Const.HEALTH_HEAL)) {
                     discard();
                     handler.closeMenu();
                     handler.showDialogue(this.useString);
@@ -93,7 +98,7 @@ public enum Item implements Pickupable {
                 return false;
 
             case ENERGY_DRINK:
-                if (BattleManager.getPlayer().restoreStamina(STAMINA_HEAL)) {
+                if (BattleManager.getPlayer().restoreStamina(Const.STAMINA_HEAL)) {
                     discard();
                     handler.closeMenu();
                     handler.showDialogue(this.useString);
@@ -105,7 +110,7 @@ public enum Item implements Pickupable {
                 return false;
 
             case MANA_HYPO:
-                if (BattleManager.getPlayer().restoreMana(MANA_HEAL)) {
+                if (BattleManager.getPlayer().restoreMana(Const.MANA_HEAL)) {
                     discard();
                     handler.closeMenu();
                     handler.showDialogue(this.useString);
@@ -131,7 +136,7 @@ public enum Item implements Pickupable {
     public boolean useBattle(MenuHandler handler, Fighter fighter) {
         switch (this) {
             case POTION:
-                if (fighter.restoreHealth(HEALTH_HEAL)) {
+                if (fighter.restoreHealth(Const.HEALTH_HEAL)) {
                     AudioPlayback.playSfx("sfx_skill_heal");
                     discard();
                     return true;
@@ -139,14 +144,14 @@ public enum Item implements Pickupable {
                 throw new IllegalStateException("Attempted to use item in battle that cannot be used.");
 
             case GRENADE:
-                fighter.damage(Element.BOMB, BOMB_POWER, 10, 100, false);
+                fighter.damage(Element.BOMB, Const.BOMB_POWER, 10, 100, false);
                 fighter.addAnim(new BattleAnimation(BattleAnimation.Type.FIRE));
                 AudioPlayback.playSfx("sfx_skill_bomb");
                 discard();
                 return true;
 
             case ENERGY_DRINK:
-                if (fighter.restoreStamina(STAMINA_HEAL)) {
+                if (fighter.restoreStamina(Const.STAMINA_HEAL)) {
                     AudioPlayback.playSfx("sfx_skill_heal");
                     discard();
                     return true;
@@ -154,7 +159,7 @@ public enum Item implements Pickupable {
                 throw new IllegalStateException("Attempted to use item in battle that cannot be used.");
 
             case MANA_HYPO:
-                if (fighter.restoreMana(MANA_HEAL)) {
+                if (fighter.restoreMana(Const.MANA_HEAL)) {
                     AudioPlayback.playSfx("sfx_skill_heal");
                     discard();
                     return true;
@@ -164,10 +169,6 @@ public enum Item implements Pickupable {
             default:
                 throw new IllegalStateException("Attempted to use item in battle that cannot be used.");
         }
-    }
-    public void discard() {
-        if (itemType == CONSUMABLE)
-            Inventory.get().remove(this);
     }
     public boolean checkCanUseInBattle(MenuHandler handler, Fighter f) {
         switch (this) {
@@ -199,6 +200,10 @@ public enum Item implements Pickupable {
                 AudioPlayback.playSfx("sfx_menu_invalid");
                 return false;
         }
+    }
+    public void discard() {
+        if (itemType == CONSUMABLE)
+            Inventory.removeItem(this);
     }
 
     @Override

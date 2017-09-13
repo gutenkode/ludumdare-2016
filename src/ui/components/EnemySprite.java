@@ -1,5 +1,6 @@
 package ui.components;
 
+import mote4.scenegraph.Window;
 import mote4.util.matrix.ModelMatrix;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
@@ -46,7 +47,8 @@ public class EnemySprite {
     private EnemyFighter fighter;
     private float lastHealth, renderHealth;
 
-    private int currentFrame, currentFrameDelay;
+    private int currentFrame;
+    private double currentFrameDelay;
     private float[] spriteInfo;
 
     public EnemySprite(EnemyFighter f) {
@@ -75,6 +77,7 @@ public class EnemySprite {
     }
     public float getPosX() { return posX; }
     public float getPosY() { return posY; }
+    public float getRenderhealth() { return renderHealth; }
 
     /**
      * A constant pulsing glow, to indicate that this enemy is currently selected.
@@ -231,13 +234,13 @@ public class EnemySprite {
      * @return
      */
     private void updateSpriteInfo() {
-        currentFrameDelay--;
+        currentFrameDelay -= Window.delta()*60;
         if (currentFrameDelay <= 0) {
             currentFrame++;
             currentFrame %= fighter.frameDelay.length;
             currentFrameDelay = fighter.frameDelay[currentFrame];
             spriteInfo[2] = currentFrame;
         }
-        glowCycle += .15;
+        glowCycle += Window.delta()*9;
     }
 }

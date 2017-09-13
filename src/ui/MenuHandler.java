@@ -10,6 +10,7 @@ import ui.selectionmenubehavior.SelectionMenuBehavior;
 public interface MenuHandler 
 {
     public void openMenu(SelectionMenuBehavior sm);
+    public void openTabbedMenu(SelectionMenuBehavior... sm);
     public void setMenuCursorPos(int i);
     /**
      * Calls onFocus() again for the current menu, potentially changing the displayed text.

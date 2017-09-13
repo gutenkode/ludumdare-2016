@@ -39,7 +39,6 @@ public class BattleUI implements Scene {
     public void framebufferResized(int width, int height) {
         // origin in top left
         trans.projection.setOrthographic(0, 0, width, height, -1, 1);
-        BattleUIManager.refreshEnemies();
     }
 
     @Override

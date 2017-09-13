@@ -1,6 +1,7 @@
 package entities;
 
 import map.MapManager;
+import mote4.scenegraph.Window;
 import mote4.util.matrix.TransformationMatrix;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
@@ -56,9 +57,9 @@ public class ToggleButton extends Entity {
         if (cooldown > 0) {
             cooldown--;
             if (brightness < 1)
-                brightness += .125;
+                brightness += Window.delta()*7;
         } else if (brightness > 0)
-            brightness -= .125;
+            brightness -= Window.delta()*7;
     }
 
     @Override

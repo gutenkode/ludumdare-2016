@@ -27,7 +27,7 @@ public class DialogueMenu {
             text.destroy();
         
         //FontUtils.useMetric("font_1");
-        text = new ScrollingText(s, "font_1", Vars.UI_SCALE/2, Vars.UI_SCALE/2, Vars.UI_SCALE, Vars.UI_SCALE, 2);
+        text = new ScrollingText(s, "font_1", Vars.UI_SCALE/2, Vars.UI_SCALE/2, Vars.UI_SCALE, Vars.UI_SCALE, 60*2);
     }
     
     public static void render() {
