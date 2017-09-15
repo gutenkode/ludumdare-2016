@@ -60,13 +60,27 @@ public class IngameUIManager implements MenuHandler {
     }
     
     public static void update() {
+        double delta = (Window.delta()*60);
         if (gamePaused) 
         {
             selectionMenus.peek().update();
+            // make flavor text box float to y position
+            if (showFlavorText) {
+                float yOffset;
+                if (lockFlavorText)
+                    yOffset = 0;
+                else
+                    yOffset = selectionMenus.peek().cursorPos()+.75f;
+                yOffset *= Vars.UI_SCALE;
+
+                flavorTextRenderYOffset -= (flavorTextRenderYOffset-yOffset)/3 * delta;
+            }
         }
         else if (scriptPlaying)
         {
+            // update script logic here
             if (showScriptChoice) {
+                // update script choice
                 int choice = ScriptChoiceMenu.update();
                 if (choice != -1) {
                     currentScript.parseChoice(choice, manager);
@@ -74,20 +88,25 @@ public class IngameUIManager implements MenuHandler {
                 }
             } 
             else if (Input.isKeyNew(Input.Keys.YES)) {
+                // advance script dialogue
                 currentScript.advance(manager);
                 AudioPlayback.playSfx("sfx_menu_open_pane");
             }
         }
 
         if (showDialogue)
-            dialogueSlide /= 1.5;
+            dialogueSlide -= dialogueSlide * .3 * delta;
         else
-            dialogueSlide += (1-dialogueSlide)/3;
+            dialogueSlide += (1-dialogueSlide) * .3 * delta;
 
         if (gamePaused || !BattleManager.getPlayer().areStatsFull())
-            statBarSlide /= 1.5;
+            statBarSlide -= statBarSlide * .3 * delta;
         else
-            statBarSlide += (1-statBarSlide)/3;
+            statBarSlide += (1-statBarSlide) *.3 * delta;
+
+        // when log text is done printing, display for an amount of time
+        if (logMessageTimeout > 0 && logMessage.isDone())
+                logMessageTimeout -= Window.delta();
     }
     public static void render(Transform trans) {
         //trans.model.setIdentity();
@@ -103,17 +122,16 @@ public class IngameUIManager implements MenuHandler {
         trans.view.setIdentity();
         trans.model.setIdentity();
         trans.makeCurrent();
-        
+
+        // render log message
         if (logMessageTimeout > 0) {
-            if (logMessage.isDone()) // when the text is done printing, display for a set amount of time
-                logMessageTimeout -= Window.delta();
             // does not set model to identity as this is the first potentially rendered item
             model.translate(80, RootLayer.height()-80);
             model.makeCurrent();
             TextureMap.bindUnfiltered("font_1");
             logMessage.render();
         }
-        // dialogue box needs to play exit animation after a script ends
+        // dialogue box needs to play exit animation after a script ends, so it is here
         if (dialogueSlide < .95) {
             model.setIdentity();
             // the dialogue box will auto-align with the bottom of the screen
@@ -124,84 +142,75 @@ public class IngameUIManager implements MenuHandler {
             model.makeCurrent();
             DialogueMenu.render();
         }
-        if (scriptPlaying || gamePaused)
+        if (scriptPlaying)
         {
-            if (scriptPlaying)
+            // talking sprite
+            // no smooth in/out animation, but not too noticeable next to dialogue bar
+            model.setIdentity();
+            model.translate(RootLayer.width()/2+DialogueMenu.BORDER_W/2+ Vars.UI_SCALE,
+                    RootLayer.height()-40-3* Vars.UI_SCALE);
+            model.makeCurrent();
+            SpriteMenu.render(model);
+
+            // script choice dialogue
+            // TODO needs a simple animation
+            if (showScriptChoice)
             {
-                // sprite
-                // no smooth in/out animation, but not too noticeable next to dialogue bar
                 model.setIdentity();
-                model.translate(RootLayer.width()/2+DialogueMenu.BORDER_W/2+ Vars.UI_SCALE,
-                        RootLayer.height()-40-3* Vars.UI_SCALE);
+                model.translate(10+RootLayer.width()/2-DialogueMenu.BORDER_W/2- Vars.UI_SCALE,
+                        RootLayer.height()-32-5* Vars.UI_SCALE-ScriptChoiceMenu.height());
                 model.makeCurrent();
-                SpriteMenu.render(model);
-
-                // script choice dialogue
-                // !!!! needs a simple animation
-                if (showScriptChoice) {
-                    model.setIdentity();
-                    model.translate(10+RootLayer.width()/2-DialogueMenu.BORDER_W/2- Vars.UI_SCALE,
-                            RootLayer.height()-32-5* Vars.UI_SCALE-ScriptChoiceMenu.height());
-                    model.makeCurrent();
-                    ScriptChoiceMenu.render(model);
-                }
-            }
-            if (gamePaused)
-            {
-                // when exiting the final menu and unpausing the game, the closing animation will still play
-                model.setIdentity();
-                for (SelectionMenu sm : selectionMenus) {
-                    model.translate(Vars.UI_SCALE/2, Vars.UI_SCALE/2);
-                    model.makeCurrent();
-                    model.push();
-                    sm.render(model);
-                    model.pop();
-                }
-                // flavor text and preview sprite still pop in/out, but resize and move dynamically
-                if (showFlavorText) 
-                {
-                    float yOffset;
-                    if (lockFlavorText)
-                        yOffset = 0;
-                    else
-                        yOffset = selectionMenus.peek().cursorPos()+.75f;
-                    yOffset *= Vars.UI_SCALE;
-
-                    flavorTextRenderYOffset -= (flavorTextRenderYOffset-yOffset)/2;
-
-                    model.translate(selectionMenus.peek().width()+ Vars.UI_SCALE*2,flavorTextRenderYOffset);
-                    model.makeCurrent();
-                    FlavorTextMenu.render();
-
-                    // the sprite's position is relative to the flavor text box, model is not reset
-                    if (showSprite) 
-                    {
-                        model.translate(0, Vars.UI_SCALE*2+FlavorTextMenu.height()-1);
-                        model.makeCurrent();
-                        SpriteMenu.render(model);
-                    }
-                }
-                if (showSkillCostMenu) {
-                    model.setIdentity();
-                    float x = RootLayer.width()-SkillCostMenu.width()-Vars.UI_SCALE*3;
-                    float y = Vars.UI_SCALE;
-                    model.translate(x,y);
-                    model.makeCurrent();
-                    SkillCostMenu.render();
-                    ShaderMap.use("vertexcolor");
-                    model.translate(2,2);
-                    trans.makeCurrent();
-                    SkillCostMenu.renderBars();
-                    ShaderMap.use("texture");
-                    trans.makeCurrent();
-                    SkillCostMenu.renderBarText();
-                }
+                ScriptChoiceMenu.render(model);
             }
         }
-        // when a menu is closed it will play an exit animation before being completely destroyed
-        // it is visual only and has no affect on menu logic
+        if (gamePaused)
+        {
+            // when exiting the final menu and unpausing the game, the closing animation will still play,
+            // since it is rendered after this if block
+            model.setIdentity();
+            for (SelectionMenu sm : selectionMenus) {
+                model.translate(Vars.UI_SCALE/2, Vars.UI_SCALE/2);
+                model.makeCurrent();
+                model.push();
+                sm.render(model);
+                model.pop();
+            }
+            // flavor text and preview sprite
+            if (showFlavorText)
+            {
+                model.translate(selectionMenus.peek().width()+ Vars.UI_SCALE*2,flavorTextRenderYOffset);
+                model.makeCurrent();
+                FlavorTextMenu.render();
+
+                // the sprite's position is relative to the flavor text box, so model is not reset
+                if (showSprite)
+                {
+                    model.translate(0, Vars.UI_SCALE*2+FlavorTextMenu.height());
+                    model.makeCurrent();
+                    SpriteMenu.render(model);
+                }
+            }
+            if (showSkillCostMenu)
+            {
+                model.setIdentity();
+                float x = RootLayer.width()-SkillCostMenu.width()-Vars.UI_SCALE*3;
+                float y = Vars.UI_SCALE;
+                model.translate(x,y);
+                model.makeCurrent();
+                SkillCostMenu.render();
+                ShaderMap.use("vertexcolor");
+                model.translate(2,2);
+                trans.makeCurrent();
+                SkillCostMenu.renderBars();
+                ShaderMap.use("texture");
+                trans.makeCurrent();
+                SkillCostMenu.renderBarText();
+            }
+        }
+        // when a menu is closed, it will play an exit animation before being completely destroyed
+        // it is visual only and has no effect on menu logic
         if (closingMenu != null) {
-            menuCloseTransition += 3+menuCloseTransition*.5;
+            menuCloseTransition += (3+menuCloseTransition*.5) * (Window.delta()*60);
             if (menuCloseTransition > closingMenu.height()+ Vars.UI_SCALE/2*(selectionMenus.size()+1)) {
                 closingMenu.destroy();
                 closingMenu = null;

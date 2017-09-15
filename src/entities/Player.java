@@ -20,7 +20,7 @@ public class Player extends Entity {
     
     private static Mesh mesh;
 
-    private int restoreStaminaDelay;
+    private double restoreStaminaDelay, drainStaminaDelay;
     private double manaRestore;
     private static int[][] dirMat = new int[][] {{5,4,3},
                                                  {6,0,2},
@@ -52,7 +52,7 @@ public class Player extends Entity {
     private double[] camera = new double[2];
     private double[] lastCursorPos = new double[2];
     
-    private int targetDirection = 0, drainStaminaDelay;
+    private int targetDirection = 0;
     private int[][] spriteMapInd = new int[][] {
                                     {0,1,2,3,4,3,2,1}, // corresponding tilesheet row to direction index
                                     {10,11,11,10,10,10,11,11}}; // number of frames in animation
@@ -104,8 +104,8 @@ public class Player extends Entity {
     
     @Override
     public void update() {
+        double delta = Window.delta()*60;
         setTileHeight();
-        
         setSpriteDirection();
 
         if (Input.currentLock() == Input.Lock.PLAYER) {
@@ -132,6 +132,7 @@ public class Player extends Entity {
             } else
                 accel = walkSpeed;
         }
+        accel *= delta; // scale acceleration by delta time
 
         float[] chg;
         if (Ingame.firstPerson)
@@ -152,7 +153,7 @@ public class Player extends Entity {
                 drainStaminaDelay = 3;
             }
         }
-        drainStaminaDelay--;
+        drainStaminaDelay -= delta;
         
         // walking animation
         float spriteChg = Math.abs(chg[0])+Math.abs(chg[1]);
@@ -171,8 +172,8 @@ public class Player extends Entity {
             posX += velX;
             posY += velY;
 
-            velX *= .75f;
-            velY *= .75f;
+            velX -= (velX*.25)*delta; // dampen velocity based on delta
+            velY -= (velY*.25)*delta;
         } else {
             velX = 0;
             velY = 0;
@@ -183,7 +184,7 @@ public class Player extends Entity {
             restoreStaminaDelay = 8;
             BattleManager.getPlayer().restoreStamina(1);
         } else
-            restoreStaminaDelay--;
+            restoreStaminaDelay -= delta;
     }
     private float[] topDownMovement(float accel) {
         float chgX = 0;

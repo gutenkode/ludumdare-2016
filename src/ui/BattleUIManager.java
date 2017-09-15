@@ -3,6 +3,7 @@ package ui;
 import java.util.ArrayList;
 import java.util.Stack;
 
+import mote4.scenegraph.Window;
 import mote4.util.audio.AudioPlayback;
 import mote4.util.matrix.ModelMatrix;
 import mote4.util.matrix.Transform;
@@ -44,6 +45,7 @@ public class BattleUIManager implements MenuHandler {
                            lockFlavorText = false,
                            showSprite = false,
                            showScriptChoice = false;
+    private static float flavorTextRenderYOffset;
     
     static {
         manager = new BattleUIManager();
@@ -56,6 +58,17 @@ public class BattleUIManager implements MenuHandler {
         if (playerTurn) 
         {
             selectionMenus.peek().update();
+
+            if (showFlavorText) {
+                float yOffset;
+                if (lockFlavorText)
+                    yOffset = 0;
+                else
+                    yOffset = selectionMenus.peek().cursorPos()+.75f;
+                yOffset *= Vars.UI_SCALE;
+
+                flavorTextRenderYOffset -= (flavorTextRenderYOffset-yOffset)/3 *(Window.delta()*60);
+            }
         }
         else if (scriptPlaying)
         {
@@ -146,13 +159,7 @@ public class BattleUIManager implements MenuHandler {
             
             if (showFlavorText) 
             {
-                float yOffset;
-                if (lockFlavorText)
-                    yOffset = 0;
-                else
-                    yOffset = selectionMenus.peek().cursorPos()+.75f;
-                yOffset *= Vars.UI_SCALE;
-                model.translate(selectionMenus.peek().width()+ Vars.UI_SCALE*2,yOffset);
+                model.translate(selectionMenus.peek().width()+ Vars.UI_SCALE*2,flavorTextRenderYOffset);
                 model.makeCurrent();
                 FlavorTextMenu.render();
                 

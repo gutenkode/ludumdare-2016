@@ -157,12 +157,12 @@ public class Battle implements Scene {
         mouse[0] -= .5;
         mouse[1] -= .5;
         */
-
+        double d = delta*60;
         // camera pan
-        cameraPan[4] -= (cameraPan[4]-cameraPan[0])/10;
-        cameraPan[5] -= (cameraPan[5]-cameraPan[1])/10;
-        cameraPan[6] -= (cameraPan[6]-cameraPan[2])/15;
-        cameraPan[7] -= (cameraPan[7]-cameraPan[3])/15;
+        cameraPan[4] -= d*(cameraPan[4]-cameraPan[0])/10;
+        cameraPan[5] -= d*(cameraPan[5]-cameraPan[1])/10;
+        cameraPan[6] -= d*(cameraPan[6]-cameraPan[2])/15;
+        cameraPan[7] -= d*(cameraPan[7]-cameraPan[3])/15;
     }
 
     @Override

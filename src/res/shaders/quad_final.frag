@@ -12,45 +12,72 @@ uniform sampler2D tex_dof;
 uniform sampler2D tex_dofvalue;
 //uniform sampler2D tex_noise;
 uniform sampler2D tex_vignette;
-//uniform sampler2D tex_scanlines;
-uniform float aspectRatio = 16.0/9.0,
-			  dofCoef = 0.0;
-//uniform vec2 rand;
+uniform sampler2D tex_scanlines;
+uniform float //aspectRatio = 16.0/9.0,
+			  dofCoef = 0.0,
+			  bloomCoef = 0.5;
+uniform vec2 texSize = vec2(256.0);
 uniform vec3 colorMult = vec3(1.0);
+
+vec4 quilezTexture(sampler2D tex, vec2 p)
+{
+	// pulled from:
+	// iquilezles.org/www/articles/texture/texture.htm
+    p = p*texSize + 0.5;
+
+    vec2 i = floor(p);
+    vec2 f = p - i;
+	//f = smoothstep(0,1,f);
+    f = f*f*f*(f*(f*6.0-15.0)+10.0); // smoothstep
+    p = i + f;
+
+    p = (p - 0.5)/texSize;
+    return texture(tex, p);
+}
+
+vec4 crtTexture(sampler2D tex, vec2 p)
+{
+	vec4 result = quilezTexture(tex, p) * .45;
+	result += quilezTexture(tex, p+vec2(0.5/texSize.x,0)) * .25;
+	result += quilezTexture(tex, p-vec2(0.5/texSize.x,0)) * .25;
+	result += quilezTexture(tex, p+vec2(1.5/texSize.x,0)) * .15;
+	result += quilezTexture(tex, p-vec2(1.5/texSize.x,0)) * .15;
+	//result += quilezTexture(tex, p+vec2(2.5/texSize.x,0)) * .10;
+	//result += quilezTexture(tex, p-vec2(2.5/texSize.x,0)) * .10;
+
+	float blue = quilezTexture(tex, p-vec2(2/texSize.x,0)).b * .5;
+	result.b = max(result.b, blue);
+	return result;
+}
 
 void main()
 {
 	// the UI texture
-	vec4 ui = texture(tex_ui, texCoord);
+	vec4 ui_pixel = crtTexture(tex_ui, texCoord);
 
 	// blend 3D scene with blurred DOF scene
+	vec4 scene_pixel = crtTexture(tex_scene, texCoord);
 
-	vec4 v1 = texture(tex_scene, texCoord);
-	vec4 v2 = texture(tex_dof, texCoord);
-	float dofvalue = texture(tex_dofvalue, texCoord).r + dofCoef;
-	//dofvalue *=2;
-	dofvalue = clamp(dofvalue, 0,1);
-	//dofvalue = min(dofvalue, 1-ceil(ui.a)); // if there is UI here, use the full blurred texture
-	//FragColor = v1*(texCoord.y) + v2*(1-texCoord.y);
-	//dofvalue = 0.0; // 0 = blur, 1 = solid
-	FragColor = mix(v1, v2, dofvalue);
+	vec4 dof_pixel = texture(tex_dof, texCoord);
 
-	//FragColor = texture(tex_dof, texCoord);
+	float dof_value = texture(tex_dofvalue, texCoord).r + dofCoef;
+	dof_value = clamp(dof_value, 0.0,1.0); // 0 = full blur, 1 = no blur
+	// mix the scene with dof, based on the blur value
+	FragColor = mix(scene_pixel, dof_pixel, smoothstep(0,1,dof_value));
 
-	// put the non-blurred UI over all of it
-	FragColor = ui*(ui.a) + FragColor*(1-ui.a);
+	// put the non-blurred UI over the scene, mix based on alpha of the UI texture
+	FragColor = mix(FragColor, ui_pixel, smoothstep(0,1,ui_pixel.a));
+
+	// vignette, noise, scanlines, etc.
+	vec2 scanlineCoord = texCoord * vec2(1,texSize.y);
+	FragColor *= texture(tex_scanlines, scanlineCoord);
+	FragColor *= texture(tex_vignette, texCoord);
+	//FragColor.xyz *= mod(texCoord.y*texSize.y, 1.0); // mathematical scanlines
 
 	// bloom
-	FragColor += /*texture(tex_scanlines, texCoord) */ texture(tex_bloom, texCoord) * .5;
+	FragColor += texture(tex_bloom, texCoord) * bloomCoef;
 
-	// noise and vignette
-	//vec2 noiseCoord = (texCoord + rand) * vec2(aspectRatio,1);
-	//FragColor *= texture(tex_noise, noiseCoord*2);
-	FragColor *= texture(tex_vignette, texCoord);
-	//FragColor *= texture(tex_scanlines, texCoord*vec2(1,128));
-
-	FragColor.rgb *= colorMult; // used for fading in/out
-	//FragColor = vec4(vec3(dofvalue),1);
+	FragColor.rgb *= colorMult; // final global multiply, used for fading in/out
 
 	// gamma correction, 2.2 is normal
     //float gamma = 2.0;

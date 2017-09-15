@@ -2,6 +2,7 @@ package rpgbattle.fighter;
 
 import java.util.ArrayList;
 
+import mote4.scenegraph.Window;
 import mote4.util.audio.AudioPlayback;
 import mote4.util.matrix.ModelMatrix;
 import mote4.util.shader.Uniform;
@@ -205,16 +206,16 @@ public abstract class Fighter {
      * Update and return the flash effect values.
      * @return
      */
-    public float[] updateFlash() {
+    public float[] updateFlash(double delta) {
         if (flashState > 0) {
             if (flashState % 2 == 0) {
                 // even, increase
-                flashIndex += flashSpeed;
+                flashIndex += flashSpeed *(delta*60);
                 if (flashIndex >= 1)
                     flashState--;
             } else {
                 // odd, decrease
-                flashIndex -= flashSpeed;
+                flashIndex -= flashSpeed *(delta*60);
                 if (flashIndex <= 0) {
                     flashState--;
                     flash[0] = flash[1] = flash[2] = 0;
@@ -244,11 +245,11 @@ public abstract class Fighter {
      * Updates the shake effect value.
      * @return
      */
-    public void updateShake() {
-        shake += shakeVel;
-        shakeVel -= shake/3;
-        shake *= .85;
-        shakeVel *= .8;
+    public void updateShake(double delta) {
+        shake += shakeVel *(delta*60);
+        shakeVel -= shake/3 *(delta*60);
+        shake -= (shake*.15) *(delta*60);
+        shakeVel -= (shakeVel*.2) *(delta*60);
     }
     public int shakeValue() { return (int)shake; }
     
@@ -292,7 +293,8 @@ public abstract class Fighter {
             ToastType(String c) { color = c; }
         }
         private final Mesh mesh;
-        private int delay, timeout, randX, randY;
+        private double delay, timeout;
+        private int randX, randY;
         private float centerOffset;
         Toast(String text, int d) {
             delay = d;
@@ -306,7 +308,7 @@ public abstract class Fighter {
         }
         public boolean render(ModelMatrix m) {
             if (delay > 0) {
-                delay--;
+                delay -= Window.delta()*60;
                 return false;
             }
             double val = 1.0-1.0/(timeout/20.0+1.0);
@@ -319,7 +321,7 @@ public abstract class Fighter {
             Uniform.varFloat("colorMult", 1,1,1,1);
             mesh.render();
             m.translate(1-randX+centerOffset, 1-randY+(float)val*40);
-            timeout++;
+            timeout += Window.delta()*60;
             if (timeout > 50) {
                 mesh.destroy();
                 return true;

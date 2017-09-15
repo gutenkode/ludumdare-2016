@@ -22,9 +22,9 @@ public class EnemySprite {
     public static final Mesh sprite, statusIconMesh, barMesh;
     private static final float barLength = 64;
     private Mesh statText;
-    private int atk, def, mag, showStatHealthChangeDelay;
+    private int atk, def, mag;
     private boolean glow, showStats;
-    private double glowCycle;
+    private double glowCycle, showStatHealthChangeDelay;
     
     static {
         sprite = StaticMeshBuilder.constructVAO(GL11.GL_TRIANGLE_FAN,
@@ -98,7 +98,7 @@ public class EnemySprite {
         TextureMap.bindUnfiltered(fighter.spriteName);
 
         model.setIdentity();
-        fighter.updateShake();
+        fighter.updateShake(Window.delta());
         model.translate(fighter.shakeValue()*.01f+posX, 0, posY);
         if (fighter.isDead())
             fighter.runDeathAnimation(model);
@@ -109,7 +109,7 @@ public class EnemySprite {
             float c = .75f-(float)((Math.sin(glowCycle)+1)/4.0);
             Uniform.varFloat("colorAdd", c*.9f,c*.8f,c*.2f);
         } else
-            Uniform.varFloat("colorAdd", fighter.updateFlash());
+            Uniform.varFloat("colorAdd", fighter.updateFlash(Window.delta()));
         updateSpriteInfo();
         Uniform.varFloat("spriteInfo", spriteInfo);
         sprite.render(); // currently locked to 96*2 by 96*2
@@ -135,11 +135,11 @@ public class EnemySprite {
         if (healthIsCurrent)
             lastHealth = healthPercent;
         else
-            showStatHealthChangeDelay = 30;
+            showStatHealthChangeDelay = .5; // in seconds
 
         if (showStats || !healthIsCurrent || showStatHealthChangeDelay > 0)
         {
-            showStatHealthChangeDelay--;
+            showStatHealthChangeDelay -= Window.delta();
 
             // health bar
             model.setIdentity();
@@ -147,7 +147,7 @@ public class EnemySprite {
             model.makeCurrent();
             TextureMap.bindUnfiltered("ui_statbars");
             renderBar(3, 0, 1, model);
-            renderHealth -= (renderHealth - healthPercent) / 10;
+            renderHealth -= (renderHealth - healthPercent) / 10 * (Window.delta()*60);
             renderBar(6, 0, lastHealth, model);
             renderBar(0, 0, renderHealth, model);
 

@@ -1,5 +1,6 @@
 package rpgbattle.fighter;
 
+import mote4.scenegraph.Window;
 import mote4.util.audio.AudioPlayback;
 import mote4.util.matrix.ModelMatrix;
 import rpgbattle.BattleManager;
@@ -155,7 +156,7 @@ public class EnemyFighter extends Fighter {
     public void runDeathAnimation(ModelMatrix model) {
         model.scale(deathScale,1,1);
         if (deathScale > 0) {
-            deathScale -= .035;
+            deathScale -= .035 * (Window.delta()*60);
             if (deathScale < 0)
                 deathScale = 0;
         }

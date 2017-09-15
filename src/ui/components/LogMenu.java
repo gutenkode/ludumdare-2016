@@ -16,7 +16,8 @@ public class LogMenu {
     private static Mesh border;
     private static ScrollingText[] text;
     private static int offset;
-    public static final int NUM_LINES = 4,
+    public static final int CHARS_PER_SECOND = 50,
+                            NUM_LINES = 4,
                             BORDER_W = 350, 
                             BORDER_H = Vars.UI_SCALE*(NUM_LINES-1);
     
@@ -46,7 +47,7 @@ public class LogMenu {
         //    buildString.append(log[i]).append("\n");
         
         //FontUtils.useMetric("font_1");
-        text[NUM_LINES-1] = new ScrollingText(s, "font_1", Vars.UI_SCALE/2, Vars.UI_SCALE/2, Vars.UI_SCALE, Vars.UI_SCALE, 60*2);
+        text[NUM_LINES-1] = new ScrollingText(s, "font_1", Vars.UI_SCALE/2, Vars.UI_SCALE/2, Vars.UI_SCALE, Vars.UI_SCALE, CHARS_PER_SECOND);
     }
     
     public static void render(ModelMatrix model) {

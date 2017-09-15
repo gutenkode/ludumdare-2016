@@ -1,5 +1,6 @@
 package ui.components;
 
+import mote4.scenegraph.Window;
 import mote4.util.matrix.ModelMatrix;
 import mote4.util.matrix.Transform;
 import mote4.util.shader.ShaderMap;
@@ -97,7 +98,7 @@ public class PlayerStatBar {
         ModelMatrix model = trans.model;
         
         // ew...
-        BattleManager.getPlayer().updateShake();
+        BattleManager.getPlayer().updateShake(Window.delta());
         float playerShake = BattleManager.getPlayer().shakeValue();
         FighterStats st = BattleManager.getPlayer().stats;
         int lastHealth = BattleManager.getPlayer().lastHealth();
@@ -105,15 +106,16 @@ public class PlayerStatBar {
         int lastMana = BattleManager.getPlayer().lastMana();
         
         // offset to correct location, add pixel shift with playerShake
-        statPreviewCycle += .15;
+        statPreviewCycle = Window.time()*9;
         model.setIdentity();
         model.translate(x-80+(int)playerShake, y+ Vars.UI_SCALE);
         model.makeCurrent();
         
         // smooth sliding of stat bars
-        healthRender -= (healthRender-st.health)/10;
-        staminaRender -= (staminaRender-st.stamina)/10;
-        manaRender -= (manaRender-st.mana)/10;
+        double d = Window.delta()*60;
+        healthRender -= (healthRender-st.health)/10 *d;
+        staminaRender -= (staminaRender-st.stamina)/10 *d;
+        manaRender -= (manaRender-st.mana)/10 *d;
         boolean renderLastHealth = Math.abs(healthRender-st.health) < .1;
         boolean renderLastStamina = Math.abs(staminaRender-st.stamina) < .1;
         boolean renderLastMana = Math.abs(manaRender-st.mana) < .1;
@@ -131,7 +133,7 @@ public class PlayerStatBar {
         ShaderMap.use("texture_uiblur");
         trans.makeCurrent();
         
-        Uniform.varFloat("colorAdd", BattleManager.getPlayer().updateFlash());
+        Uniform.varFloat("colorAdd", BattleManager.getPlayer().updateFlash(Window.delta()));
         TextureMap.bindUnfiltered("ui_scalablemenu");
         borderMesh.render();
         Uniform.varFloat("colorAdd", 0,0,0);
@@ -165,29 +167,33 @@ public class PlayerStatBar {
         // glowing preview of stat cost for a skill
         if (manaPreview) {
             // glowing bar portion
-            Uniform.varFloat("colorMult", 1, 1, 1, (float)(Math.sin(statPreviewCycle)+1)/2+.7f);
+            float c = (float)(Math.sin(statPreviewCycle)+1)*.5f*.75f+.25f;
+            Uniform.varFloat("colorMult", c,c,c,1);
             if (statPreviewTooHigh)
                 renderBar(0, 14, manaRender/st.maxMana, model);
-            else
-                renderBar(5, 14, manaRender/st.maxMana, model);
-            // remaining bar
-            Uniform.varFloat("colorMult", 1, 1, 1, 1);
-            float percent = (manaRender- statCostPreview)/st.maxMana;
-            percent = Math.max(0,percent);
-            renderBar(2, 14, percent, model);
+            else {
+                renderBar(5, 14, manaRender / st.maxMana, model);
+                // remaining bar
+                Uniform.varFloat("colorMult", 1, 1, 1, 1);
+                float percent = (manaRender - statCostPreview) / st.maxMana;
+                percent = Math.max(0, percent);
+                renderBar(2, 14, percent, model);
+            }
         }
         if (staminaPreview) {
             // glowing bar portion
-            Uniform.varFloat("colorMult", 1, 1, 1, (float)(Math.sin(statPreviewCycle)+1)/2+.7f);
+            float c = (float)(Math.sin(statPreviewCycle)+1)*.5f*.75f+.25f;
+            Uniform.varFloat("colorMult", c,c,c,1);
             if (statPreviewTooHigh)
                 renderBar(0, 7, staminaRender/st.maxStamina, model);
-            else
-                renderBar(5, 7, staminaRender/st.maxStamina, model);
-            // remaining bar
-            Uniform.varFloat("colorMult", 1, 1, 1, 1);
-            float percent = (staminaRender- statCostPreview)/st.maxStamina;
-            percent = Math.max(0,percent);
-            renderBar(1, 7, percent, model);
+            else {
+                renderBar(5, 7, staminaRender / st.maxStamina, model);
+                // remaining bar
+                Uniform.varFloat("colorMult", 1, 1, 1, 1);
+                float percent = (staminaRender - statCostPreview) / st.maxStamina;
+                percent = Math.max(0, percent);
+                renderBar(1, 7, percent, model);
+            }
         }
         
     // RENDER STAT BAR TEXT

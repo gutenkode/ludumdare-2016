@@ -110,7 +110,7 @@ public class RootLayer extends Layer {
         if (uiFbo != null)
             uiFbo.destroy();
         int[] buffers = new int[] {-1, sceneFbo.getColorBufferID(1)};
-        uiFbo = new MultiColorFBO(renderWidth*renderScale,renderHeight*renderScale,false,false,buffers);
+        uiFbo = new MultiColorFBO(renderWidth,renderHeight,false,false,buffers);
         //uiFbo = new FBO(renderWidth,renderHeight,false,false,null);
         TextureMap.delete("fbo_ui");
         uiFbo.addToTextureMap("fbo_ui",0);

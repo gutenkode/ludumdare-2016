@@ -1,6 +1,7 @@
 package rpgbattle;
 
 import entities.Enemy;
+import mote4.scenegraph.Window;
 import mote4.util.audio.AudioPlayback;
 import main.RootLayer;
 import rpgbattle.battleAction.BattleAction;
@@ -25,7 +26,7 @@ public class BattleManager {
     private static ArrayList<Fighter> fighters; // all fighters, currently just the enemy list + the player
     private static Fighter currentFighter;
     private static ArrayList<EnemyFighter> enemies, removeEnemies; // all enemy fighters
-    private static int stateDelay;
+    private static double stateDelay;
     private static BattleState currentState;
     private static final PlayerFighter playerFighter;
     private static final Queue<BattleAction> actions;
@@ -83,7 +84,7 @@ public class BattleManager {
         removeDeadEnemies();
         int val;
         if (stateDelay > 0) // global delay for advancing to the next state
-            stateDelay--;
+            stateDelay -= Window.delta()*60;
         else {
             switch (currentState) {
                 case START_BATTLE:

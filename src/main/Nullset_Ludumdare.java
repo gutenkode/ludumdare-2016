@@ -60,7 +60,7 @@ public class Nullset_Ludumdare {
         rootLayer = new RootLayer();
         Window.addLayer(rootLayer);
         Window.addScene(new Postprocess()); // Postprocess is on the default layer and renders to the screen
-        Window.loop(999);
+        Window.loop(60);
     }
     
     private static void loadResources() {

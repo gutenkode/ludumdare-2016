@@ -59,7 +59,7 @@ object/pipe		obj_pipe
 #color/test		color_test
 color/white		color_white
 
-post/noise		post_noise
+#post/noise		post_noise
 post/vignette		post_vignette
 post/scanlines		post_scanlines
 
