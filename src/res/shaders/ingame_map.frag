@@ -23,6 +23,7 @@ uniform samplerCubeShadow shadowCubeMap;
 uniform vec4 colorMult = vec4(1.0);
 uniform vec4 colorAdd = vec4(0.0);
 uniform vec3 flashlightAngle = vec3(1,0,0);
+uniform vec2 mapSize = vec2(10.0);
 
 uniform vec3[16] eLightPos;
 uniform vec3[16] eLightColor;
@@ -39,38 +40,48 @@ float shadowCalculation(vec3 Vec)
     return (NormZComp + 1.0) * 0.5;
 }
 
-void main()
+void fadeEdges()
 {
-	// calcuate the normal for the surface with the bumpmap texture
+	FragColor.rgb = mix(vec3(0.0), FragColor.rgb, smoothstep(0,1, vertexPos.x));
+	FragColor.rgb = mix(vec3(0.0), FragColor.rgb, smoothstep(0,1, vertexPos.y));
+	FragColor.rgb = mix(vec3(0.0), FragColor.rgb, smoothstep(0,1, 1-(vertexPos.x-mapSize.x+1)));
+	FragColor.rgb = mix(vec3(0.0), FragColor.rgb, smoothstep(0,1, 1-(vertexPos.y-mapSize.y+1)));
+}
+
+vec3 findBumpNormal()
+{
+	// calcuate the normal for the surface based on its bumpmap
 	vec3 bumpNormal = vec3(texture(tex_bump, texCoord));
     bumpNormal = bumpNormal*2.0-1.0;
     bumpNormal = normalMatrix * bumpNormal;
     normalize(bumpNormal);
     //bumpNormal = normalMatrix * vec3(0,0,1); // debug, disable bumpmapping
+	return bumpNormal;
+}
 
-	// color texture component
-	FragColor = texture(tex_diffuse, texCoord);
-	// shade texture component
-    FragColor.rgb *= texture(tex_shade, shadeCoord).rgb;
-
-    // typical diffuse lighting calculation
-    vec3 L = normalize(lightPos - vertexPos);
-    float diffuseCoef = dot(bumpNormal,L);
-
-    // flashlight cone
-    float coneDiffuseCoef = diffuseCoef * pow(clamp(dot(L,flashlightAngle), 0,1),2)*2;
-
-    // distance from this fragment to the light source
-    float lengthVal = length(lightPos-vertexPos);
-    // light attenuation, farther away = less light
-    float lightDistCoef = 2.0/lengthVal;
-
+void writeDOF()
+{
 	// depth of field interpolation value
-	//float dofLength = length(lightPos.y-vertexPos.y);
-	DOFValue = vec4(0,0,0,1);//vec4(1.0-1.0/pow(dofLength,3.0),0,0,1);//vec4(fogDepth);
+	float dofLength = 0;//length(lightPos.y-vertexPos.y);
+	//dofLength = 1.0-1.0/pow(dofLength,3.0);
+	DOFValue = vec4(dofLength,0,0,1);
+}
+
+void main()
+{
+	FragColor = texture(tex_diffuse, texCoord); // color texture component
+    FragColor.rgb *= texture(tex_shade, shadeCoord).rgb; // shade texture component
+
+    // diffuse lighting calculation
+	vec3 bumpNormal = findBumpNormal();
+    float lengthVal = length(lightPos-vertexPos); // distance from this fragment to the light source
+	vec3 L = normalize(lightPos - vertexPos);
+    float diffuseCoef = dot(bumpNormal,L);
+    float coneDiffuseCoef = diffuseCoef * pow(clamp(dot(L,flashlightAngle), 0,1),2) * 2; // flashlight cone
+    float lightDistCoef = 2.0/lengthVal; // light attenuation, farther away = less light
 
 	// shadow rendering!
-    // bias is used to reduce weird artifacts in shadow, "shadow acne"
+    // bias is used to reduce weird artifacts in shadow, e.g. "shadow acne"
     float bias = 0.003*tan(acos(max(dot(bumpNormal,L),0)));
     bias = clamp(bias, 0, 0.01);
 	vec3 lightVec = vertexPos - lightPos;
@@ -97,10 +108,9 @@ void main()
 	light = clamp(light,vec3(0),vec3(1));
 	FragColor.rgb *= light;
 
-	// fade edges of the map
-	//FragColor.rgb = mix(vec3(0),FragColor.rgb,clamp(vertexPos.x,0,1));
-	//FragColor.rgb = mix(vec3(0),FragColor.rgb,clamp(vertexPos.y,0,1));
+	//fadeEdges();
 
     // final global color adjustement, colorMult takes precedence over colorAdd
 	FragColor = colorMult * (colorAdd + FragColor);
+	writeDOF();
 }

@@ -5,12 +5,15 @@ import mote4.scenegraph.Scene;
 import mote4.scenegraph.target.FBO;
 import mote4.scenegraph.target.Target;
 import mote4.util.shader.ShaderMap;
+import mote4.util.shader.ShaderUtils;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.mesh.MeshMap;
 import main.RootLayer;
 import main.Vars;
 
+import static mote4.util.shader.ShaderUtils.FRAGMENT;
+import static mote4.util.shader.ShaderUtils.VERTEX;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
@@ -22,20 +25,20 @@ public class Postprocess implements Scene {
     private static Runnable callbackFunction; // function to call when the fadeout is halfway done, e.g. all black
     private static boolean fadeToBlack = false;
     private float colorMult;
+    private static Vars.Filter lastFilterType = null;
 
-    private static final int NUM_BLOOM_FBOS = 3;
+    private static final int NUM_BLOOM_FBOS = 2;
     private static int width, height;
     private static float dofCoef, dofCoefTarget;
-    private static FBO combineScene, uiUpscaleScene,
+    private static FBO combineScene,
                        hdrScene, dofScene1, dofScene2;
-    private static FBO[] ditherScene;
+    private static FBO ditherScene;
     private static FBO[][] bloomScene;
     
     public Postprocess() {
         colorMult = 1;
         dofCoef = dofCoefTarget = 0;
         bloomScene = new FBO[NUM_BLOOM_FBOS][2];
-        ditherScene = new FBO[2];
     }
 
     @Override
@@ -57,7 +60,7 @@ public class Postprocess implements Scene {
                 colorMult = 1;
         }
         
-        dofCoef -= (dofCoef-dofCoefTarget)/10f; // TODO still framelocked
+        //dofCoef -= (dofCoef-dofCoefTarget)/10f; // TODO still framelocked
     }
 
     @Override
@@ -65,7 +68,7 @@ public class Postprocess implements Scene {
         glClear(GL_COLOR_BUFFER_BIT);
         glDisable(GL_DEPTH_TEST);
 
-        // render3d transition effect, if active
+        // render transition effect, if active
         if (RootLayer.getState() == RootLayer.State.BATTLE_INTRO) {
             ShaderMap.use("quad");
             Uniform.varFloat("colorMult", colorMult,colorMult,colorMult);
@@ -78,8 +81,8 @@ public class Postprocess implements Scene {
         Target framebuffer = Target.getCurrent();
         
     // render 3D scene to the dither FBO
-    // this is used to create the combined FBO and used as the final pass of the 3D scene
-        ditherScene[0].makeCurrent();
+    // the 3D scene might be upscaled, this enforces the correct resolution while also applying dithering
+        ditherScene.makeCurrent();
         glClear(GL_COLOR_BUFFER_BIT);
         
         ShaderMap.use("quad_dither");
@@ -87,33 +90,17 @@ public class Postprocess implements Scene {
         TextureMap.bindFiltered("fbo_scene");
         MeshMap.render("quad");
         
-    // render UI scene to UI upscale scene - simple upscale to improve filtering effects,
-    // same with dither scene
-        /*
-        uiUpscaleScene.makeCurrent();
-        glClear(GL_COLOR_BUFFER_BIT);
-        ShaderMap.use("quad");
-        TextureMap.bindUnfiltered("fbo_ui");
-        MeshMap.render("quad");
-
-        ditherScene[1].makeCurrent();
-        glClear(GL_COLOR_BUFFER_BIT);
-        TextureMap.bindUnfiltered("fbo_dither0");
-        MeshMap.render("quad");
-        */
     // create DOF scene from dithered scene, just a simple blur
-        //if (dofCoef > 0)
-            createDOFTexture("fbo_dither");
+        createDOFTexture("fbo_dither");
         
-    // render scene and UI to the combineScene,
-    // which is used to create the bloom scene
+    // render dithered 3D scene and UI to combineScene,
+    // which is rendered in the final step and used to create bloom
         combineScene.makeCurrent();
         glClear(GL_COLOR_BUFFER_BIT);
         
-        ShaderMap.use("quad");
-        TextureMap.bindFiltered("fbo_dither");
-        MeshMap.render("quad");
-        TextureMap.bindFiltered("fbo_ui");
+        ShaderMap.use("quad_combine");
+        Uniform.varFloat("dofCoef", dofCoef);
+        TextureMap.bindUnfiltered("fbo_dither");
         MeshMap.render("quad");
         
     // create a bloom texture from the combined scene
@@ -122,24 +109,19 @@ public class Postprocess implements Scene {
     // render final mix to screen
         framebuffer.makeCurrent();
         ShaderMap.use("quad_final");
-        Uniform.varFloat("dofCoef", dofCoef);
 
         //Uniform.varFloat("bloomCoef", .5f);
         Uniform.varFloat("colorMult", colorMult,colorMult,colorMult); // for fading in/out
         //Uniform.varFloat("rand", random.nextFloat(), random.nextFloat()); // random position for static
 
-        /*
-        if (Vars.useFiltering())
-            TextureMap.bindFiltered("fbo_dither"); // upscaled/dithered scene, binds to "tex_scene"
-        else
-            TextureMap.bindUnfiltered("fbo_dither");
-        */
-        if (Vars.useFiltering()) {
-            Uniform.samplerAndTextureFiltered("tex_scene", 9, "fbo_dither"); // dithered 3D scene
-            Uniform.samplerAndTextureFiltered("tex_ui", 4, "fbo_ui"); // upscaled UI
+        if (Vars.currentFilter() != Vars.Filter.NEAREST) {
+            TextureMap.bindFiltered("fbo_combine");
+            //Uniform.samplerAndTextureFiltered("tex_scene", 9, "fbo_dither"); // dithered 3D scene
+            //Uniform.samplerAndTextureFiltered("tex_ui", 4, "fbo_ui"); // upscaled UI
         } else {
-            Uniform.samplerAndTextureUnfiltered("tex_scene", 9, "fbo_dither"); // dithered 3D scene
-            Uniform.samplerAndTextureUnfiltered("tex_ui", 4, "fbo_ui"); // upscaled UI
+            TextureMap.bindUnfiltered("fbo_combine");
+            //Uniform.samplerAndTextureUnfiltered("tex_scene", 9, "fbo_dither"); // dithered 3D scene
+            //Uniform.samplerAndTextureUnfiltered("tex_ui", 4, "fbo_ui"); // upscaled UI
         }
         // all other uniform values are set in initFinalPassShader() since they are static
         MeshMap.render("quad");
@@ -261,27 +243,12 @@ public class Postprocess implements Scene {
         TextureMap.delete("fbo_combine");
         combineScene.addToTextureMap("fbo_combine");
 
-        // ditherScene1 and uiUpscaleScene are double the resolution of the scene,
-        // to improve texture filtering effects
-
-        if (ditherScene[0] != null)
-            ditherScene[0].destroy();
-        ditherScene[0] = new FBO(width,height,false,false,null);
+        if (ditherScene != null)
+            ditherScene.destroy();
+        ditherScene = new FBO(width,height,false,false,null);
         TextureMap.delete("fbo_dither");
-        ditherScene[0].addToTextureMap("fbo_dither");
-        /*
-        if (ditherScene[1] != null)
-            ditherScene[1].destroy();
-        ditherScene[1] = new FBO(width*2,height*2,false,false,null);
-        TextureMap.delete("fbo_dither1");
-        ditherScene[1].addToTextureMap("fbo_dither1");
+        ditherScene.addToTextureMap("fbo_dither");
 
-        if (uiUpscaleScene != null)
-            uiUpscaleScene.destroy();
-        uiUpscaleScene = new FBO(width*2,height*2,false,false,null);
-        TextureMap.delete("fbo_ui_upscale");
-        uiUpscaleScene.addToTextureMap("fbo_ui_upscale");
-        */
         if (hdrScene != null)
             hdrScene.destroy();
         hdrScene = new FBO(width,height,false,false,null);
@@ -300,7 +267,7 @@ public class Postprocess implements Scene {
             bloomScene[i][0].addToTextureMap("fbo_bloom"+(i+1)+"_0");
             bloomScene[i][1].addToTextureMap("fbo_bloom"+(i+1)+"_1");
         }
-        
+
         if (dofScene1 != null)
             dofScene1.destroy();
         dofScene1 = new FBO(width,height,false,false,null);
@@ -312,10 +279,7 @@ public class Postprocess implements Scene {
         dofScene2 = new FBO(width,height,false,false,null);
         TextureMap.delete("fbo_dof2");
         dofScene2.addToTextureMap("fbo_dof2");
-        
-        ShaderMap.use("quad_final");
-        Uniform.varFloat("aspectRatio", (float)width/height);
-        
+
         initFinalPassShader();
     }
 
@@ -323,28 +287,43 @@ public class Postprocess implements Scene {
      * Sets all non-changing uniform values for the final pass shader.
      */
     public static void initFinalPassShader() {
-        ShaderMap.use("quad_final");
-
-        if (Vars.useFiltering()) {
-            Uniform.samplerAndTextureFiltered("tex_scene", 9, "fbo_dither"); // dithered 3D scene
-            Uniform.samplerAndTextureFiltered("tex_ui", 4, "fbo_ui"); // upscaled UI
-        } else {
-            Uniform.samplerAndTextureUnfiltered("tex_scene", 9, "fbo_dither"); // dithered 3D scene
-            Uniform.samplerAndTextureUnfiltered("tex_ui", 4, "fbo_ui"); // upscaled UI
+        // if the shader hasn't been compiled yet or the current filter doesn't match the compiled one,
+        // delete and recompile the final pass shader
+        if (ShaderMap.get("quad_final") == -1 || Vars.currentFilter() != lastFilterType) {
+            lastFilterType = Vars.currentFilter();
+            ShaderMap.delete("quad_final");
+            String vertSrc = ShaderUtils.loadSource("quad.vert");
+            String fragSrc = ShaderUtils.loadSource("quad_final.frag");
+            if (lastFilterType != Vars.Filter.CRT)
+                fragSrc = fragSrc.replace("#define CRT", "");
+            if (lastFilterType != Vars.Filter.QUILEZ)
+                fragSrc = fragSrc.replace("#define QUILEZ", "");
+            int vertShader = ShaderUtils.compileShaderFromSource(vertSrc, VERTEX);
+            int fragShader = ShaderUtils.compileShaderFromSource(fragSrc, FRAGMENT);
+            ShaderUtils.addProgram(new int[]{vertShader, fragShader}, "quad_final");
         }
-        Uniform.samplerAndTextureFiltered("tex_bloom", 5, "fbo_hdr"); // bloom scene
-        Uniform.samplerAndTextureFiltered("tex_dof", 6, "fbo_dof2"); // scene blur
-        Uniform.samplerAndTextureUnfiltered("tex_dofvalue", 7, "fbo_dofvalue"); // scene blur mix data
-        //Uniform.samplerAndTextureFiltered("tex_noise", -1, "post_noise"); // postprocess
-        Uniform.samplerAndTextureFiltered("tex_vignette", 8, "post_vignette"); // postprocess
-        Uniform.samplerAndTextureFiltered("tex_scanlines", 10, "post_scanlines");
 
+        ShaderMap.use("quad_final");
+        Uniform.samplerAndTextureFiltered("tex_bloom", 4, "fbo_hdr"); // bloom scene
+        Uniform.varFloat("bloomCoef",0.5f);
+        if (lastFilterType == Vars.Filter.CRT) {
+            Uniform.samplerAndTextureFiltered("tex_vignette", 8, "post_vignette"); // postprocess
+            Uniform.samplerAndTextureFiltered("tex_scanlines", 9, "post_scanlines");
+        }
         Uniform.varFloat("texSize", width,height);
+
+        ShaderMap.use("quad_combine");
+        Uniform.samplerAndTextureUnfiltered("tex_ui", 5, "fbo_ui"); // upscaled UI
+        Uniform.samplerAndTextureUnfiltered("tex_post_values", 6, "tex_post_values"); // scene blur mix data
+        Uniform.samplerAndTextureFiltered("tex_dof", 7, "fbo_dof2"); // scene blur
+
+        // also initialize the HDR calculation shader
+        ShaderMap.use("quad_hdr");
+        Uniform.samplerAndTextureUnfiltered("tex_bloomvalue", 6, "tex_post_values"); // scene blur mix data
     }
 
     @Override
-    public void destroy() {
-    }
+    public void destroy() {}
     
     /**
      * Global weight to the depth-of-field interpolation.
@@ -354,7 +333,6 @@ public class Postprocess implements Scene {
         dofCoefTarget = val;
     }
     public static void fadeOut(Runnable function) {
-        // I really hope I know what I'm doing...
         fadeToBlack = true;
         callbackFunction = function;
     }

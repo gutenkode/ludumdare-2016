@@ -25,7 +25,7 @@ public class Ingame implements Scene {
     public static final boolean firstPerson = false;
     
     static {
-        depthTexture = new DepthCubeBuffer(1024); // shadow resolution
+        depthTexture = new DepthCubeBuffer(512); // shadow resolution
         depthTexture.addToTextureMap("fbo_depth");
         MapManager.initShaders();
     }
@@ -113,15 +113,13 @@ public class Ingame implements Scene {
         glEnable(GL_DEPTH_TEST);
         Target t = Target.getCurrent();
     
-    // create depth data from camera perspective
+        // create depth data from camera perspective
         depthTexture.makeCurrent();
-        //glClearColor(1,1,1,1); // for depth buffer values
         glClear(GL_DEPTH_BUFFER_BIT);
         MapManager.renderForShadow(shadowProj, shadowView);
         
-    // normal scene, using contents of depth texture for shadow rendering
+        // normal scene, using contents of depth texture for shadow rendering
         t.makeCurrent();
-        glClearColor(0, 0, 0, 0); // for regular rendering
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         MapManager.render(trans, flashlightDir);
     }

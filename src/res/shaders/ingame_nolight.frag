@@ -13,19 +13,23 @@ uniform sampler2D tex_shade;
 
 uniform vec4 colorMult = vec4(1.0);
 uniform vec4 colorAdd = vec4(0.0);
+uniform vec2 mapSize = vec2(3.0);
+
+void fadeEdges()
+{
+	FragColor.rgb = mix(vec3(.4,0,0), FragColor.rgb, smoothstep(0,.75, vertexPos.x));
+	FragColor.rgb = mix(vec3(.4,0,0), FragColor.rgb, smoothstep(0,.75, vertexPos.y));
+	FragColor.rgb = mix(vec3(.4,0,0), FragColor.rgb, smoothstep(0,.75, mapSize.x-vertexPos.x));
+	FragColor.rgb = mix(vec3(.4,0,0), FragColor.rgb, smoothstep(0,.75, mapSize.y-vertexPos.y));
+}
 
 void main()
 {
-	// color texture component
-	FragColor = texture(tex_diffuse, texCoord);
-	// shade texture component
-    FragColor.rgb *= texture(tex_shade, shadeCoord).rgb;
+	FragColor = texture(tex_diffuse, texCoord); // color texture component
+    FragColor.rgb *= texture(tex_shade, shadeCoord).rgb; // shade texture component
 
-	// fade edges of the map
-	//FragColor.rgb = mix(vec3(.6f,0,0),FragColor.rgb,clamp(vertexPos.x,0,1));
-	//FragColor.rgb = mix(vec3(.6f,0,0),FragColor.rgb,clamp(vertexPos.y,0,1));
+	fadeEdges();
 
 	DOFValue = vec4(0,0,0,1);
-
 	FragColor = colorMult * (colorAdd + FragColor);
 }

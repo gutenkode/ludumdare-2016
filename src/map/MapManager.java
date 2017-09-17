@@ -145,6 +145,8 @@ public class MapManager {
         runOnRoomInit();
         newMapName = null;
         Input.popLock(Input.Lock.FADE);
+
+        setRoomSizeUniforms();
     }
     /**
      * Called whenever a room is loaded, initializes entities and lights.
@@ -186,6 +188,15 @@ public class MapManager {
         ShaderMap.use("spritesheet_light");
         Uniform.arrayFloat("eLightPos",3, eLightPos);
         Uniform.arrayFloat("eLightColor",3, eLightColor);
+    }
+
+    public static void setRoomSizeUniforms() {
+        int[] m = currentMapSize();
+        float[] mapSize = new float[] {m[0],m[1]};
+        ShaderMap.use("ingame_map");
+        Uniform.varFloat("mapSize", mapSize);
+        ShaderMap.use("ingame_nolight");
+        Uniform.varFloat("mapSize", mapSize);
     }
 
     // rendering

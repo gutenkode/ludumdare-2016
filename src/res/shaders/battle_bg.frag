@@ -24,5 +24,5 @@ void main()
 	//FragColor += .5 * texture(texture1, texCoord+vec2(-cycle*2.0,cycle/2.0)); // darker "echo" texture
 
 	// prevent DOF rendering
-	DOFValue = vec4(0.0);
+	DOFValue = vec4(0,0,0,1);
 }

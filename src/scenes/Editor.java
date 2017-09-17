@@ -86,6 +86,7 @@ public class Editor implements Scene {
         zPos = me.getMapData().heightData[xPos][yPos];
         cameraPos = new float[] {me.getMapData().width/2, me.getMapData().height/2, 0};
 
+        MapManager.setRoomSizeUniforms();
         EditorUIManager.logMessage("Loaded map: "+mapName);
     }
     public static void unloadMap() { me = null; }

@@ -28,10 +28,7 @@ public class OptionsMenu implements SelectionMenuBehavior {
             options[2] = "SSAA: On";
         else
             options[2] = "SSAA: Off";
-        if (Vars.useFiltering())
-            options[3] = "Filtering: On";
-        else
-            options[3] = "Filtering: Off";
+        options[3] = "Filtering: "+Vars.currentFilter().NAME;
     }
 
     @Override
@@ -76,7 +73,7 @@ public class OptionsMenu implements SelectionMenuBehavior {
                 AudioPlayback.playSfx("sfx_menu_select");
                 break;
             case 3: // filter
-                Vars.setFiltering(!Vars.useFiltering());
+                Vars.cycleFilters();
                 refreshOptions();
                 handler.forceMenuRefocus();
                 AudioPlayback.playSfx("sfx_menu_select");

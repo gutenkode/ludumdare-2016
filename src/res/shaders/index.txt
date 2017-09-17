@@ -25,4 +25,5 @@ quad.vert		quad_horizBlur.frag	quad_horizBlur
 #quad.vert		quad_dofBlur.frag	quad_dofBlur
 quad.vert		quad_hdr.frag		quad_hdr
 quad.vert		quad_titlebg.frag	quad_titlebg
-quad.vert		quad_final.frag		quad_final
+quad.vert		quad_combine.frag	quad_combine
+#quad.vert		quad_final.frag		quad_final	# this shader is compiled in Postprocess

@@ -15,5 +15,5 @@ void main()
 {
 	FragColor = texture(texture1, texCoord*vec2(1,ratio)+vec2(offset,-offset*.25));
 	FragColor.xyz *= colorMult;
-	DOFValue = vec4(1.0);
+	DOFValue = vec4(0,.2,0,1);
 }

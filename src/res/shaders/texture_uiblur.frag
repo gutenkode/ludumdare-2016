@@ -14,6 +14,7 @@ void main()
 {
 	// colorMult takes precedence over colorAdd
 	FragColor = colorMult * (vec4(colorAdd,0) + texture(texture1, texCoord));
-	if (FragColor.a != 0)
-		DOFValue = vec4(1.0);
+	if (FragColor.a == 0)
+		discard;
+	DOFValue = vec4(1,1,0,1);
 }

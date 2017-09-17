@@ -13,6 +13,6 @@ void main()
 {
 	FragColor = colorMult * (colorAdd + vec4((depth+1.5)/2));
 	//FragColor *= depth/2.0+0.5;
-	DOFValue = vec4(1-depth-.5f);//-(depth+1)*3);
-	DOFValue.a = 1.0;
+	//DOFValue = vec4(vec3(1-depth-.5f,.2,0),1);//-(depth+1)*3);
+	DOFValue = vec4(0,.2,0,1);
 }

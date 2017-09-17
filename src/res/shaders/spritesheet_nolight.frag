@@ -3,7 +3,8 @@
 
 in vec2 texCoord, texCoordEmissive;
 
-out vec4 FragColor;
+layout(location = 0) out vec4 FragColor;
+layout(location = 1) out vec4 DOFValue;
 
 uniform sampler2D texture1;
 uniform float emissiveMult = 0.0;
@@ -19,4 +20,6 @@ void main()
 
 	if (FragColor.a == 0.0)
 		discard;
+
+	DOFValue = vec4(0,0,0,1);
 }

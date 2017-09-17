@@ -1,21 +1,32 @@
 // final mix fragment shader
 #version 330 core
 
+// these are removed by the source loader as needed
+#define CRT
+#define QUILEZ
+
+#ifdef CRT
+	#define TEX_FUNC crtTexture
+#else
+	#ifdef QUILEZ
+		#define TEX_FUNC quilezTexture
+	#else
+		#define TEX_FUNC texture
+	#endif
+#endif
+
 in vec2 texCoord;
 
 out vec4 FragColor;
 
 uniform sampler2D tex_scene;
-uniform sampler2D tex_ui;
+//uniform sampler2D tex_ui;
 uniform sampler2D tex_bloom;
-uniform sampler2D tex_dof;
-uniform sampler2D tex_dofvalue;
-//uniform sampler2D tex_noise;
+//uniform sampler2D tex_dof;
+uniform sampler2D tex_post_values;
 uniform sampler2D tex_vignette;
 uniform sampler2D tex_scanlines;
-uniform float //aspectRatio = 16.0/9.0,
-			  dofCoef = 0.0,
-			  bloomCoef = 0.5;
+uniform float bloomCoef = 1.0;
 uniform vec2 texSize = vec2(256.0);
 uniform vec3 colorMult = vec3(1.0);
 
@@ -52,30 +63,27 @@ vec4 crtTexture(sampler2D tex, vec2 p)
 
 void main()
 {
-	// the UI texture
-	vec4 ui_pixel = crtTexture(tex_ui, texCoord);
-
 	// blend 3D scene with blurred DOF scene
-	vec4 scene_pixel = crtTexture(tex_scene, texCoord);
-
+	FragColor = TEX_FUNC(tex_scene, texCoord);
+	/*
 	vec4 dof_pixel = texture(tex_dof, texCoord);
-
-	float dof_value = texture(tex_dofvalue, texCoord).r + dofCoef;
-	dof_value = clamp(dof_value, 0.0,1.0); // 0 = full blur, 1 = no blur
+	float dof_value = texture(tex_dofvalue, texCoord).r + dofCoef; // r component
 	// mix the scene with dof, based on the blur value
 	FragColor = mix(scene_pixel, dof_pixel, smoothstep(0,1,dof_value));
-
+	*/
+	//FragColor.a = 1;
 	// put the non-blurred UI over the scene, mix based on alpha of the UI texture
-	FragColor = mix(FragColor, ui_pixel, smoothstep(0,1,ui_pixel.a));
+	//vec4 ui_pixel = TEX_FUNC(tex_ui, texCoord); // the UI texture
+	//FragColor.rgb = mix(scene_pixel.rgb, ui_pixel.rgb, smoothstep(0,1,ui_pixel.a));
 
-	// vignette, noise, scanlines, etc.
-	vec2 scanlineCoord = texCoord * vec2(1,texSize.y);
-	FragColor *= texture(tex_scanlines, scanlineCoord);
-	FragColor *= texture(tex_vignette, texCoord);
-	//FragColor.xyz *= mod(texCoord.y*texSize.y, 1.0); // mathematical scanlines
+	#ifdef CRT
+		FragColor *= texture(tex_vignette, texCoord); // vignette
+		vec2 scanlineCoord = texCoord * vec2(1,texSize.y); // scanlines
+		FragColor *= texture(tex_scanlines, scanlineCoord);
+		//FragColor.xyz *= mod(texCoord.y*texSize.y, 1.0); // mathematical scanlines
+	#endif
 
-	// bloom
-	FragColor += texture(tex_bloom, texCoord) * bloomCoef;
+	FragColor += texture(tex_bloom, texCoord) * bloomCoef; // bloom
 
 	FragColor.rgb *= colorMult; // final global multiply, used for fading in/out
 

@@ -37,6 +37,18 @@ float shadowCalculation(vec3 Vec)
     return (NormZComp + 1.0) * 0.5;
 }
 
+void writeDOF(float bloom)
+{
+	// depth of field interpolation value
+	float dofLength = 0;//length(lightPos.y-vertexPos.y);
+	//dofLength = 1.0-1.0/pow(dofLength,3.0);
+	DOFValue = vec4(dofLength,bloom,0,1);
+}
+
+float sum(vec3 vec) {
+	return vec.r + vec.g + vec.b;
+}
+
 void main()
 {
 	// color texture component
@@ -50,17 +62,13 @@ void main()
     float diffuseCoef = dot(normal,L) +0.25;
 
     // flashlight cone
-    float coneDiffuseCoef = diffuseCoef * pow(clamp(dot(L,flashlightAngle), 0,1),2)*2;
+    float coneDiffuseCoef = diffuseCoef * pow(clamp(dot(L,flashlightAngle), 0,1),2) * 2;
 
     // distance from this fragment to the light source
     float lengthVal = length(lightPos-vertexPos);
 
     // light attenuation, farther away = less light
     float lightDistCoef = 2.0/lengthVal;
-
-	// depth of field interpolation value
-	float dofLength = length(lightPos.y-vertexPos.y);
-	DOFValue = vec4(0,0,0,1);//vec4(1.0-1.0/pow(dofLength,3.0),0,0,1);
 
 	// shadow rendering!
     // bias is used to reduce weird artifacts in shadow, "shadow acne"
@@ -91,7 +99,9 @@ void main()
 	FragColor.rgb *= light;
 
 	// emissive texture ignores lighting, does not affect alpha
-    FragColor.rgb += texture(texture1, texCoordEmissive).rgb * emissiveMult;
-    // final global color adjustement, colorMult takes precedence over colorAdd
+    vec3 emissive = texture(texture1, texCoordEmissive).rgb * emissiveMult;
+	FragColor.rgb += emissive;
+	writeDOF(sum(emissive) > 0 ? 1 : 0); // if there is emissive color, enable bloom here
+	// final global color adjustement, colorMult takes precedence over colorAdd
 	FragColor = colorMult * (colorAdd + FragColor);
 }

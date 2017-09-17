@@ -165,7 +165,6 @@ public class SingleSelectionMenu implements SelectionMenu {
         TextureMap.bindUnfiltered("font_1");
         for (Mesh m : textList)
             m.render();
-        //text.render3d();
 
         model.translate(-Vars.UI_SCALE/3, Vars.UI_SCALE/3.5f);
         model.translate(cursorAnimation* Vars.UI_SCALE*.2f, (1+cursorPos)* Vars.UI_SCALE);
@@ -180,6 +179,5 @@ public class SingleSelectionMenu implements SelectionMenu {
         border.destroy();
         for (ScrollingText s : textList)
             s.destroy();
-        //text.destroy();
     }
 }

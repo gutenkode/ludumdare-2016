@@ -23,12 +23,26 @@ public class Vars {
     }
     public static boolean useSSAA() { return ssaa; }
 
-    private static boolean filterScreen = true;
-    public static void setFiltering(boolean enable) {
-        filterScreen = enable;
+    public enum Filter {
+        NEAREST("None"),LINEAR("Linear"),QUILEZ("Smooth"),CRT("CRT");
+        public final String NAME;
+        Filter(String n) {NAME = n;}
+    }
+    private static Filter currentFilter = Filter.QUILEZ;
+    public static void setFilter(Filter filter) {
+        currentFilter = filter;
         Postprocess.initFinalPassShader();
     }
-    public static boolean useFiltering() { return filterScreen; }
+    public static void cycleFilters() {
+        switch (currentFilter) {
+            case NEAREST: setFilter(Filter.LINEAR); break;
+            case LINEAR: setFilter(Filter.QUILEZ); break;
+            case QUILEZ: setFilter(Filter.CRT); break;
+            case CRT: setFilter(Filter.NEAREST); break;
+            default: throw new IllegalStateException();
+        }
+    }
+    public static Filter currentFilter() { return currentFilter; }
 
     /**
      * Linearly interpolate between two values.

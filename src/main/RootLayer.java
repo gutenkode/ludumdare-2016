@@ -104,14 +104,13 @@ public class RootLayer extends Layer {
             sceneFbo.destroy();
         sceneFbo = new MultiColorFBO(renderWidth*renderScale,renderHeight*renderScale,true,false,2);
         TextureMap.delete("fbo_scene");
-        TextureMap.delete("fbo_dofvalue");
+        TextureMap.delete("fbo_post_values");
         sceneFbo.addToTextureMap("fbo_scene",0);
-        sceneFbo.addToTextureMap("fbo_dofvalue",1);
+        sceneFbo.addToTextureMap("tex_post_values",1);
         if (uiFbo != null)
             uiFbo.destroy();
         int[] buffers = new int[] {-1, sceneFbo.getColorBufferID(1)};
         uiFbo = new MultiColorFBO(renderWidth,renderHeight,false,false,buffers);
-        //uiFbo = new FBO(renderWidth,renderHeight,false,false,null);
         TextureMap.delete("fbo_ui");
         uiFbo.addToTextureMap("fbo_ui",0);
 

@@ -99,7 +99,7 @@ public class EditorUIManager implements MenuHandler {
     public static void logMessage(String message) {
         if (logMessage != null)
             logMessage.destroy();
-        logMessage = new ScrollingText(message, "font_1", 0, 0, Vars.UI_SCALE, Vars.UI_SCALE, 1);
+        logMessage = new ScrollingText(message, "font_1", 0, 0, Vars.UI_SCALE, Vars.UI_SCALE, 60f);
         logMessageTimeout = 100;
     }
 
