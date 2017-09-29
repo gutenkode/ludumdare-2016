@@ -112,7 +112,7 @@ public class TerminalScene implements Scene {
         {
             ShaderMap.use("texture");
             trans.model.setIdentity();
-            trans.makeCurrent();
+            trans.bind();
             session.render(trans.model);
         }
     }

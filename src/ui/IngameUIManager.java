@@ -110,7 +110,7 @@ public class IngameUIManager implements MenuHandler {
     }
     public static void render(Transform trans) {
         //trans.model.setIdentity();
-        //trans.makeCurrent();
+        //trans.bind();
         ModelMatrix model = trans.model;
 
         // PlayerStatBar, sets own shaders
@@ -121,13 +121,13 @@ public class IngameUIManager implements MenuHandler {
         ShaderMap.use("texture_uiblur");
         trans.view.setIdentity();
         trans.model.setIdentity();
-        trans.makeCurrent();
+        trans.bind();
 
         // render log message
         if (logMessageTimeout > 0) {
             // does not set model to identity as this is the first potentially rendered item
             model.translate(80, RootLayer.height()-80);
-            model.makeCurrent();
+            model.bind();
             TextureMap.bindUnfiltered("font_1");
             logMessage.render();
         }
@@ -139,7 +139,7 @@ public class IngameUIManager implements MenuHandler {
             // and center in the X direction
             model.translate(RootLayer.width()/2-DialogueMenu.BORDER_W/2- Vars.UI_SCALE,
                     RootLayer.height()-40-3* Vars.UI_SCALE);
-            model.makeCurrent();
+            model.bind();
             DialogueMenu.render();
         }
         if (scriptPlaying)
@@ -149,7 +149,7 @@ public class IngameUIManager implements MenuHandler {
             model.setIdentity();
             model.translate(RootLayer.width()/2+DialogueMenu.BORDER_W/2+ Vars.UI_SCALE,
                     RootLayer.height()-40-3* Vars.UI_SCALE);
-            model.makeCurrent();
+            model.bind();
             SpriteMenu.render(model);
 
             // script choice dialogue
@@ -159,7 +159,7 @@ public class IngameUIManager implements MenuHandler {
                 model.setIdentity();
                 model.translate(10+RootLayer.width()/2-DialogueMenu.BORDER_W/2- Vars.UI_SCALE,
                         RootLayer.height()-32-5* Vars.UI_SCALE-ScriptChoiceMenu.height());
-                model.makeCurrent();
+                model.bind();
                 ScriptChoiceMenu.render(model);
             }
         }
@@ -170,7 +170,7 @@ public class IngameUIManager implements MenuHandler {
             model.setIdentity();
             for (SelectionMenu sm : selectionMenus) {
                 model.translate(Vars.UI_SCALE/2, Vars.UI_SCALE/2);
-                model.makeCurrent();
+                model.bind();
                 model.push();
                 sm.render(model);
                 model.pop();
@@ -179,14 +179,14 @@ public class IngameUIManager implements MenuHandler {
             if (showFlavorText)
             {
                 model.translate(selectionMenus.peek().width()+ Vars.UI_SCALE*2,flavorTextRenderYOffset);
-                model.makeCurrent();
+                model.bind();
                 FlavorTextMenu.render();
 
                 // the sprite's position is relative to the flavor text box, so model is not reset
                 if (showSprite)
                 {
                     model.translate(0, Vars.UI_SCALE*2+FlavorTextMenu.height());
-                    model.makeCurrent();
+                    model.bind();
                     SpriteMenu.render(model);
                 }
             }
@@ -196,14 +196,14 @@ public class IngameUIManager implements MenuHandler {
                 float x = RootLayer.width()-SkillCostMenu.width()-Vars.UI_SCALE*3;
                 float y = Vars.UI_SCALE;
                 model.translate(x,y);
-                model.makeCurrent();
+                model.bind();
                 SkillCostMenu.render();
                 ShaderMap.use("vertexcolor");
                 model.translate(2,2);
-                trans.makeCurrent();
+                trans.bind();
                 SkillCostMenu.renderBars();
                 ShaderMap.use("texture");
-                trans.makeCurrent();
+                trans.bind();
                 SkillCostMenu.renderBarText();
             }
         }
@@ -219,7 +219,7 @@ public class IngameUIManager implements MenuHandler {
                 model.translate(Vars.UI_SCALE / 2 * (selectionMenus.size() + 1),
                         Vars.UI_SCALE / 2 * (selectionMenus.size() + 1));
                 model.translate(0, -menuCloseTransition);
-                model.makeCurrent();
+                model.bind();
                 closingMenu.render(model);
             }
         }

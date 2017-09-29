@@ -152,54 +152,54 @@ public class StaticObject extends Entity {
         
         switch (TYPE) {
             case BARREL:
-                Uniform.varFloat("spriteInfo", 1,1,0);
+                Uniform.vec("spriteInfo", 1,1,0);
                 model.translate(posX, posY, floatHeight);
                 model.rotate((float)Math.PI/2, 1, 0, 0);
                 model.scale(.65f, .7f, .65f);
                 model.rotate(val1, 0, 1, 0);
-                model.makeCurrent();
+                model.bind();
                 TextureMap.bindUnfiltered("obj_barrel");
                 MeshMap.render("barrel");
                 break;
             case CRATE:
-                Uniform.varFloat("spriteInfo", 1,1,0);
+                Uniform.vec("spriteInfo", 1,1,0);
                 model.translate(posX, posY, floatHeight);
                 model.scale(.4f,.4f,.4f);
                 model.rotate(val1, 0, 0, 1);
-                model.makeCurrent();
+                model.bind();
                 TextureMap.bindUnfiltered("obj_crate");
                 MeshMap.render("cube");
                 break;
             case FLUORESCENT:
-                Uniform.varFloat("spriteInfo", 2,1,0);
+                Uniform.vec("spriteInfo", 2,1,0);
                 if (b1) {
-                    Uniform.varFloat("spriteInfoEmissive", 2, 1, 1);
-                    Uniform.varFloat("emissiveMult", 3);
+                    Uniform.vec("spriteInfoEmissive", 2, 1, 1);
+                    Uniform.vec("emissiveMult", 3);
                 }
                 model.translate(posX, posY, floatHeight);
                 model.scale(.25f,.75f,1);
                 model.rotate((float)Math.PI, 1, 0, 0);
-                model.makeCurrent();
+                model.bind();
                 TextureMap.bindUnfiltered("obj_fluorescent");
                 MeshMap.render("quad");
-                Uniform.varFloat("emissiveMult", 0);
+                Uniform.vec("emissiveMult", 0);
                 break;
             case CEILING:
                 //model.scale(1,1,1);
                 model.translate(posX, posY, floatHeight);
                 //model.rotate((float)Math.PI, 1, 0, 0);
-                //model.makeCurrent();
+                //model.bind();
                 TextureMap.bindUnfiltered("obj_ceiling");
                 for (int i = 0; i < 4; i++) {
                     for (int j = 0; j < 4; j++) {
-                        Uniform.varFloat("spriteInfo", 1,2,0);
-                        model.makeCurrent();
+                        Uniform.vec("spriteInfo", 1,2,0);
+                        model.bind();
                         MeshMap.render("quad");
                         
-                        Uniform.varFloat("spriteInfo", 1,2,1);
+                        Uniform.vec("spriteInfo", 1,2,1);
                         model.translate(0, -2, 0);
                         model.rotate(-(float)Math.PI/2, 1, 0, 0);
-                        model.makeCurrent();
+                        model.bind();
                         MeshMap.render("quad");
                         
                         model.rotate((float)Math.PI/2, 1, 0, 0);
@@ -209,30 +209,30 @@ public class StaticObject extends Entity {
                 }
                 break;
             case CHAIN:
-                Uniform.varFloat("spriteInfo", 1/(val1*2),.5f,0);
+                Uniform.vec("spriteInfo", 1/(val1*2),.5f,0);
                 model.translate(posX, posY, floatHeight+1);
                 model.rotate((float)Math.PI/2, 1, 0, 0);
                 model.rotate(((float)Math.PI/2)*val0, 0, 1, 0);
                 model.scale(val1, -1,1);
-                model.makeCurrent();
+                model.bind();
                 TextureMap.bindUnfiltered("obj_chain");
                 glEnable(GL_CULL_FACE);
                 {
                     glCullFace(GL_BACK);
                     MeshMap.render("quad");
                     model.rotate((float) Math.PI, 0, 1, 0);
-                    model.makeCurrent();
+                    model.bind();
                     MeshMap.render("quad");
                 }
                 glDisable(GL_CULL_FACE);
                 break;
             case PIPE:
-                Uniform.varFloat("spriteInfo", 1,1,0);
+                Uniform.vec("spriteInfo", 1,1,0);
                 model.translate(posX, posY, floatHeight+1.3f);
                 //model.rotate((float)Math.PI/2, 1, 0, 0);
                 model.scale(.32f, .32f, .32f);
                 model.rotate((float)Math.PI+val0, 0, 0, 1);
-                model.makeCurrent();
+                model.bind();
                 TextureMap.bindUnfiltered("obj_pipe");
                 MeshMap.render("pipe");
                 break;

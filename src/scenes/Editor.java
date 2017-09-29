@@ -234,28 +234,27 @@ public class Editor implements Scene {
             // render3d static map mesh
             ShaderMap.use("ingame_nolight");
             TextureMap.bindUnfiltered("tileset_1");
-            Uniform.samplerAndTextureUnfiltered("tex_shade", 2, "tileset_shade");
-            //Uniform.samplerAndTextureUnfiltered("tex_bump", 3, "tileset_1_NRM");
+            Uniform.sampler("tex_shade", 2, "tileset_shade", false);
             trans.model.setIdentity();
-            trans.makeCurrent();
+            trans.bind();
             me.getMapData().render();
 
             // render3d cursor, BEFORE entities
             ShaderMap.use("color");
             float cval = ((float)Math.cos(cursorRot)+1)/4+.25f;
-            Uniform.varFloat("colorMult", cval, 0, 0, cval);
+            Uniform.vec("colorMult", cval, 0, 0, cval);
             trans.model.setIdentity();
             trans.model.translate(xPos+.5f,yPos+.5f,zPos+.05f);
             //trans.model.rotate(cursorRot,0,0,1);
             trans.model.scale(.5f,.5f,1);
-            trans.makeCurrent();
+            trans.bind();
             MeshMap.render("quad");
 
             if (me.getEntities() != null && !me.getEntities().isEmpty())
             {
                 // render3d entity tilesheets
                 ShaderMap.use("spritesheet_nolight");
-                trans.makeCurrent();
+                trans.bind();
                 for (Entity e : me.getEntities()) {
                     trans.model.setIdentity();
                     e.render(trans.model);
@@ -263,18 +262,18 @@ public class Editor implements Scene {
 
                 // render3d hitboxes
                 ShaderMap.use("color");
-                Uniform.varFloat("colorMult", 1, 1, 1, 1);
+                Uniform.vec("colorMult", 1, 1, 1, 1);
                 glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
                 glEnable(GL_CULL_FACE);
-                trans.makeCurrent();
+                trans.bind();
                 trans.model.setIdentity();
                 for (Entity e : me.getEntities()) {
                     trans.model.setIdentity();
-                    trans.model.makeCurrent();
+                    trans.model.bind();
                     if (e == lookAtEntity) {
-                        Uniform.varFloat("colorMult", 1, (float) Math.sin(lookAtGlow), (float) Math.sin(lookAtGlow), 1);
+                        Uniform.vec("colorMult", 1, (float) Math.sin(lookAtGlow), (float) Math.sin(lookAtGlow), 1);
                         e.renderHitbox(trans.model);
-                        Uniform.varFloat("colorMult", 1, 1, 1, 1);
+                        Uniform.vec("colorMult", 1, 1, 1, 1);
                     } else
                         e.renderHitbox(trans.model);
                 }

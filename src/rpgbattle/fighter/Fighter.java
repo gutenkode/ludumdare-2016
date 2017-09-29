@@ -279,7 +279,7 @@ public abstract class Fighter {
                 i--;
             }
         }
-        Uniform.varFloat("colorMult", 1,1,1,1);
+        Uniform.vec("colorMult", 1,1,1,1);
     }
     public boolean hasToastsLeft() { return !toast.isEmpty(); }
     public static class Toast {
@@ -313,12 +313,12 @@ public abstract class Fighter {
             }
             double val = 1.0-1.0/(timeout/20.0+1.0);
             m.translate(randX-centerOffset, randY-(float)val*40);
-            m.makeCurrent();
-            Uniform.varFloat("colorMult", 0,0,0,1);
+            m.bind();
+            Uniform.vec("colorMult", 0,0,0,1);
             mesh.render();
             m.translate(-1, -1);
-            m.makeCurrent();
-            Uniform.varFloat("colorMult", 1,1,1,1);
+            m.bind();
+            Uniform.vec("colorMult", 1,1,1,1);
             mesh.render();
             m.translate(1-randX+centerOffset, 1-randY+(float)val*40);
             timeout += Window.delta()*60;

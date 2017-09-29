@@ -31,7 +31,7 @@ public class BattleUI implements Scene {
         glDisable(GL_DEPTH_TEST);
 
         trans.model.setIdentity();
-        trans.makeCurrent();
+        trans.bind();
         BattleUIManager.render(trans);
     }
     

@@ -15,8 +15,11 @@ import main.RootLayer;
 import scenes.Editor;
 import scenes.Postprocess;
 
+import static org.lwjgl.opengl.GL11.*;
+
 /**
  * Manages rendering and updating maps and entities.
+ * TODO this is currently very monolithic.
  * @author Peter
  */
 public class MapManager {
@@ -67,15 +70,15 @@ public class MapManager {
     }
     public static void initShaders() {
         // initialize uniform values once
-        ShaderMap.use("ingame_map");
-        Uniform.varFloat("ambient", 0,0,0);
-        Uniform.samplerAndTextureFiltered("shadowCubeMap", 1, "fbo_depth");
-        Uniform.samplerAndTextureUnfiltered("tex_shade", 2, "tileset_shade");
-        Uniform.samplerAndTextureUnfiltered("tex_bump", 3, "tileset_1_NRM");
+        ShaderMap.use("ingame_light");
+        Uniform.vec("ambient", 0,0,0);
+        Uniform.sampler("shadowCubeMap", 1, "fbo_depth", true);
+        Uniform.sampler("tex_shade", 2, "tileset_shade", false);
+        Uniform.sampler("tex_bump", 3, "tileset_1_NRM", false);
 
         ShaderMap.use("spritesheet_light");
-        Uniform.varFloat("ambient", 0,0,0);
-        Uniform.samplerAndTextureFiltered("shadowCubeMap", 1, "fbo_depth");
+        Uniform.vec("ambient", 0,0,0);
+        Uniform.sampler("shadowCubeMap", 1, "fbo_depth", true);
     }
 
     // update and room load process methods
@@ -146,7 +149,6 @@ public class MapManager {
         newMapName = null;
         Input.popLock(Input.Lock.FADE);
 
-        setRoomSizeUniforms();
     }
     /**
      * Called whenever a room is loaded, initializes entities and lights.
@@ -156,6 +158,7 @@ public class MapManager {
             e.onRoomInit();
         player.onRoomInit();
         refreshLighting();
+        setRoomSizeUniforms();
     }
 
     /**
@@ -182,28 +185,27 @@ public class MapManager {
             }
         }
         // send the data to shaders
-        ShaderMap.use("ingame_map");
-        Uniform.arrayFloat("eLightPos",3, eLightPos);
-        Uniform.arrayFloat("eLightColor",3, eLightColor);
+        ShaderMap.use("ingame_light");
+        Uniform.array("eLightPos",3, eLightPos);
+        Uniform.array("eLightColor",3, eLightColor);
         ShaderMap.use("spritesheet_light");
-        Uniform.arrayFloat("eLightPos",3, eLightPos);
-        Uniform.arrayFloat("eLightColor",3, eLightColor);
+        Uniform.array("eLightPos",3, eLightPos);
+        Uniform.array("eLightColor",3, eLightColor);
     }
 
     public static void setRoomSizeUniforms() {
         int[] m = currentMapSize();
         float[] mapSize = new float[] {m[0],m[1]};
-        ShaderMap.use("ingame_map");
-        Uniform.varFloat("mapSize", mapSize);
+        ShaderMap.use("ingame_light");
+        Uniform.vec("mapSize", mapSize);
         ShaderMap.use("ingame_nolight");
-        Uniform.varFloat("mapSize", mapSize);
+        Uniform.vec("mapSize", mapSize);
     }
 
     // rendering
 
     /**
-     * Renders static map mesh, entity sprites, and static object meshes using
-     * lighting shaders and textures.
+     * Renders the static map mesh and entity sprites.
      * @param trans Transform for the scene, includes camera information.
      *              It is passed in since it must be bound to multiple shaders.
      * @param flashlightDir Flashlight angle, in spherical coordinates.
@@ -214,72 +216,60 @@ public class MapManager {
         lightVector[1] = -(float)Math.cos(flashlightDir[0]);
         lightVector[2] = 0;
         
-    // render3d static map mesh
-        ShaderMap.use("ingame_map");
+        // render static map mesh
+        ShaderMap.use("ingame_light");
         TextureMap.bindUnfiltered("tileset_1");
-        Uniform.varFloat("flashlightAngle", lightVector);
-        Uniform.varFloat("lightPos", player.posX(),
-                                                    player.posY()+player.hitboxH(),
-                                                    player.elevatorHeight()+1f);
+        Uniform.vec("flashlightAngle", lightVector);
+        Uniform.vec("lightPos", player.posX(), player.posY() +player.hitboxH(), player.elevatorHeight() +1f);
         trans.model.setIdentity();
-        trans.makeCurrent();
+        trans.bind();
         currentTimeline.getMapData().render();
         
-    // render3d entity tilesheets
+        // render entity tilesheets
         ShaderMap.use("spritesheet_light");
-        Uniform.varFloat("flashlightAngle", lightVector);
-        Uniform.varFloat("lightPos", player.posX(),
-                                                    player.posY()+player.hitboxH(),
-                                                    player.elevatorHeight()+1f);
-        trans.makeCurrent();
+        Uniform.vec("flashlightAngle", lightVector);
+        Uniform.vec("lightPos", player.posX(), player.posY() +player.hitboxH(), player.elevatorHeight() +1f);
+        trans.bind();
         player.render(trans.model);
         for (Entity e : currentTimeline.getEntities()) {
             trans.model.setIdentity();
             e.render(trans.model);
         }
 
-    // render3d hitboxes
-        /*
-        ShaderMap.use("color");
-        //Uniform.varFloat("colorMult", 1,0,0,1);
+        // render hitboxes
+        /*ShaderMap.use("color");
+        //Uniform.vec("colorMult", 1,0,0,1);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        trans.makeCurrent();
+        trans.bind();
         trans.model.setIdentity();
         player.renderHitbox(trans.model);
         for (Entity e : currentTimeline.getEntities()) {
             trans.model.setIdentity();
-            trans.model.makeCurrent();
+            trans.model.bind();
             e.renderHitbox(trans.model);
         }
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        */
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);*/
     }
+
     /**
      * Renders meshes with only elements needed for constructing
      * the depth texture for shadow mapping.
      * @param shadowProj Projection for the shadow camera.
      */
     public static void renderForShadow(CubeMapMatrix shadowProj, ViewMatrix shadowView) {
-        ShaderMap.use("shadowCubeMap"); // we don't care about textures when rendering the static mesh shadows
-        shadowProj.makeCurrent();
-        shadowView.makeCurrent();
-        Uniform.varFloat("lightPos", player.posX(),
-                                                    player.posY()+player.hitboxH(),
-                                                    player.elevatorHeight()+1f);
-        // render3d static map mesh
-        shadowModel.setIdentity();
-        shadowModel.makeCurrent();
-        currentTimeline.getMapData().render();
-        
-        //ShaderMap.use("shadowMap_tex"); // entity textures may have transparent parts, so texture data must be checked
-        //shadowProj.makeCurrent();
+        ShaderMap.use("shadowCubeMap");
+        shadowProj.bind();
+        shadowView.bind();
 
-        // render3d entity tilesheets, the player is not rendered
+        // render static map mesh
+        shadowModel.setIdentity();
+        shadowModel.bind();
+        currentTimeline.getMapData().render();
+
+        // render entity tilesheets, the player is not rendered
         for (Entity e : currentTimeline.getEntities()) {
-            // add a check for whether this entity should render3d shadows
-            shadowModel.setIdentity(); // entities don't reset the model matrix
-            //shadowModel.makeCurrent();
-            e.render(shadowModel);
+            shadowModel.setIdentity();
+            e.renderShadow(shadowModel);
         }
     }
 

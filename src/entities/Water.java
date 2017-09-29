@@ -52,21 +52,23 @@ public class Water extends Entity {
         float addHeight = (float)Math.sin(offset*Math.PI)*.1f;
 
         model.translate(posX+offset, posY+offset/2, tileHeight+addHeight);
-        model.makeCurrent();
+        model.bind();
         
-        Uniform.varFloat("spriteInfo", 1,1,1);
+        Uniform.vec("spriteInfo", 1,1,1);
         TextureMap.bindUnfiltered("entity_water");
         //for (int i = 0; i < 6; i++)
         //{
-            Uniform.varFloat("colorMult", 1,1,1,.5f);
-            //Uniform.varFloat("colorMult", 1,1,1,.65f-.1f*i);
+            Uniform.vec("colorMult", 1,1,1,.5f);
+            //Uniform.vec("colorMult", 1,1,1,.65f-.1f*i);
             //model.translate((float)Math.sin(offset*Math.PI), (float)Math.sin(offset*Math.PI)/2, .1f);
             model.translate(0,0, .1f);
-            model.makeCurrent();
+            model.bind();
             mesh.render();
         //}
-        Uniform.varFloat("colorMult", 1,1,1,1);
+        Uniform.vec("colorMult", 1,1,1,1);
     }
+    @Override
+    public void renderShadow(TransformationMatrix model) {}
 
     @Override
     public String getName() { return "Water"; }

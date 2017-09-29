@@ -87,8 +87,8 @@ public class ItemPickup extends Entity {
         model.translate(posX, posY, floatHeight+tileHeight);
         model.scale(1-addSpeed,1,1);
         model.rotate(cycle, 0, 0, 1);
-        model.makeCurrent();
-        Uniform.varFloat("spriteInfo", 1,1,0);
+        model.bind();
+        Uniform.vec("spriteInfo", 1,1,0);
         TextureMap.bindUnfiltered(item.overworldSprite());
         glEnable(GL_CULL_FACE);
         mesh.render();

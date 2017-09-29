@@ -1,4 +1,4 @@
-ingame_map.vert			ingame_map.frag			ingame_map
+ingame_light.vert		ingame_light.frag		ingame_light
 ingame_nolight.vert		ingame_nolight.frag		ingame_nolight
 spritesheet_nolight.vert	spritesheet_nolight.frag	spritesheet_nolight
 spritesheet_light.vert		spritesheet_light.frag		spritesheet_light

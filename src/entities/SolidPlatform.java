@@ -51,9 +51,9 @@ public class SolidPlatform extends Entity {
     public void render(TransformationMatrix model) {
         model.setIdentity();
         model.translate((float)posX-.5f, (float)posY-.5f, tileHeight);
-        model.makeCurrent();
+        model.bind();
         
-        Uniform.varFloat("spriteInfo", 1,1,0);
+        Uniform.vec("spriteInfo", 1,1,0);
         TextureMap.bindUnfiltered("entity_solidPlatform");
         mesh.render();
     }

@@ -44,21 +44,21 @@ public class EditorUIManager implements MenuHandler {
         ModelMatrix model = trans.model;
 
         ShaderMap.use("texture_uiblur");
-        trans.makeCurrent();
+        trans.bind();
         TextureMap.bindUnfiltered("font_1");
 
         if (logMessageTimeout > 0) {
             logMessageTimeout--;
             model.setIdentity();
             model.translate(80, RootLayer.height()-80);
-            model.makeCurrent();
+            model.bind();
             TextureMap.bindUnfiltered("font_1");
-            Uniform.varFloat("colorMult",0,0,0,1);
+            Uniform.vec("colorMult",0,0,0,1);
             logMessage.render();
 
             model.translate(-1, -1);
-            model.makeCurrent();
-            Uniform.varFloat("colorMult",1,1,1,1);
+            model.bind();
+            Uniform.vec("colorMult",1,1,1,1);
             logMessage.render();
         }
 
@@ -66,7 +66,7 @@ public class EditorUIManager implements MenuHandler {
         model.translate(Vars.UI_SCALE/2, Vars.UI_SCALE/2,0);
         for (SelectionMenu sm : selectionMenus) {
             model.translate(Vars.UI_SCALE/2, Vars.UI_SCALE/2);
-            model.makeCurrent();
+            model.bind();
             model.push();
             sm.render(model);
             model.pop();
@@ -81,7 +81,7 @@ public class EditorUIManager implements MenuHandler {
             yOffset *= Vars.UI_SCALE;
 
             model.translate(selectionMenus.peek().width()+ Vars.UI_SCALE*2,yOffset);
-            model.makeCurrent();
+            model.bind();
             FlavorTextMenu.render();
         }
     }

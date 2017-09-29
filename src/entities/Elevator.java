@@ -105,15 +105,15 @@ public class Elevator extends Entity {
     @Override
     public void render(TransformationMatrix model) {
         model.translate(posX-.5f, posY-.5f, floatTileHeight);
-        model.makeCurrent();
+        model.bind();
         
-        Uniform.varFloat("spriteInfo", 3,1,0);
-        Uniform.varFloat("emissiveMult", (float)(Math.sin(Window.time() * 2.5)+2)/2);
-        Uniform.varFloat("spriteInfoEmissive", 3,1, 2);
+        Uniform.vec("spriteInfo", 3,1,0);
+        Uniform.vec("emissiveMult", (float)(Math.sin(Window.time() * 2.5)+2)/2);
+        Uniform.vec("spriteInfoEmissive", 3,1, 2);
         TextureMap.bindUnfiltered("entity_elevator");
         mesh.render();
         
-        Uniform.varFloat("emissiveMult", 0);
+        Uniform.vec("emissiveMult", 0);
     }
 
     @Override

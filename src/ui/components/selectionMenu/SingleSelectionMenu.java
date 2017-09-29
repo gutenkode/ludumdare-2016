@@ -159,7 +159,7 @@ public class SingleSelectionMenu implements SelectionMenu {
         // update the box expand animation
         redrawBorder();
 
-        model.makeCurrent();
+        model.bind();
         TextureMap.bindUnfiltered("ui_scalablemenu");
         border.render();
         TextureMap.bindUnfiltered("font_1");
@@ -168,7 +168,7 @@ public class SingleSelectionMenu implements SelectionMenu {
 
         model.translate(-Vars.UI_SCALE/3, Vars.UI_SCALE/3.5f);
         model.translate(cursorAnimation* Vars.UI_SCALE*.2f, (1+cursorPos)* Vars.UI_SCALE);
-        model.makeCurrent();
+        model.bind();
         TextureMap.bindUnfiltered("ui_cursor");
         cursor.render();
     }

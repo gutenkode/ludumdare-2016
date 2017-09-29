@@ -174,7 +174,7 @@ public class TerminalSession {
             } else
                 t.render();
             model.translate(0, Vars.UI_SCALE);
-            model.makeCurrent();
+            model.bind();
         }
         //FontUtils.setCharPixelWidth(16);
         if (bufferedLines.isEmpty())

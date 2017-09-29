@@ -66,17 +66,17 @@ public class ToggleButton extends Entity {
     public void render(TransformationMatrix model) {
         model.setIdentity();
         model.translate((float)posX-.5f, (float)posY-.5f, tileHeight+.075f);
-        model.makeCurrent();
+        model.bind();
         
-        Uniform.varFloat("spriteInfo", 2,4,2*index);
+        Uniform.vec("spriteInfo", 2,4,2*index);
         if (brightness > 0) {
-            Uniform.varFloat("emissiveMult", brightness);
-            Uniform.varFloat("spriteInfoEmissive", 2,4,1+2*index);
+            Uniform.vec("emissiveMult", brightness);
+            Uniform.vec("spriteInfoEmissive", 2,4,1+2*index);
         }
         TextureMap.bindUnfiltered("entity_toggleButton");
         mesh.render();
         
-        Uniform.varFloat("emissiveMult", 0);
+        Uniform.vec("emissiveMult", 0);
     }
 
     @Override

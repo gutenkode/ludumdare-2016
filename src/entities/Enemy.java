@@ -116,8 +116,8 @@ public class Enemy extends Entity {
     @Override
     public void render(TransformationMatrix model) {
         model.translate(posX-.5f, posY, tileHeight);
-        model.makeCurrent();
-        Uniform.varFloat("spriteInfo", 1,1,0);
+        model.bind();
+        Uniform.vec("spriteInfo", 1,1,0);
         TextureMap.bindUnfiltered(spriteName);
         mesh.render();
     }

@@ -67,10 +67,10 @@ public abstract class Entity {
     public final void renderHitbox(TransformationMatrix model) {
         model.translate(posX, posY, tileHeight()+.5f);
         model.scale(hitboxW, hitboxH, -.5f);
-        model.makeCurrent();
+        model.bind();
         MeshMap.render("cube");
     }
-    public void editorRender(TransformationMatrix model) {}
+    public void renderShadow(TransformationMatrix model) { render(model); }
     
     /**
     * Whether this entity collides with another entity.

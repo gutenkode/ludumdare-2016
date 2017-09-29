@@ -71,10 +71,10 @@ public class Postprocess implements Scene {
         // render transition effect, if active
         if (RootLayer.getState() == RootLayer.State.BATTLE_INTRO) {
             ShaderMap.use("quad");
-            Uniform.varFloat("colorMult", colorMult,colorMult,colorMult);
+            Uniform.vec("colorMult", colorMult,colorMult,colorMult);
             TextureMap.bindFiltered("fbo_transition1");
             MeshMap.render("quad");
-            Uniform.varFloat("colorMult", 1,1,1);
+            Uniform.vec("colorMult", 1,1,1);
             return;
         }
 
@@ -86,7 +86,7 @@ public class Postprocess implements Scene {
         glClear(GL_COLOR_BUFFER_BIT);
         
         ShaderMap.use("quad_dither");
-        Uniform.varFloat("screenSize", width, height);
+        Uniform.vec("screenSize", width, height);
         TextureMap.bindFiltered("fbo_scene");
         MeshMap.render("quad");
         
@@ -99,7 +99,7 @@ public class Postprocess implements Scene {
         glClear(GL_COLOR_BUFFER_BIT);
         
         ShaderMap.use("quad_combine");
-        Uniform.varFloat("dofCoef", dofCoef);
+        Uniform.vec("dofCoef", dofCoef);
         TextureMap.bindUnfiltered("fbo_dither");
         MeshMap.render("quad");
         
@@ -110,9 +110,9 @@ public class Postprocess implements Scene {
         framebuffer.makeCurrent();
         ShaderMap.use("quad_final");
 
-        //Uniform.varFloat("bloomCoef", .5f);
-        Uniform.varFloat("colorMult", colorMult,colorMult,colorMult); // for fading in/out
-        //Uniform.varFloat("rand", random.nextFloat(), random.nextFloat()); // random position for static
+        //Uniform.vec("bloomCoef", .5f);
+        Uniform.vec("colorMult", colorMult,colorMult,colorMult); // for fading in/out
+        //Uniform.vec("rand", random.nextFloat(), random.nextFloat()); // random position for static
 
         if (Vars.currentFilter() != Vars.Filter.NEAREST) {
             TextureMap.bindFiltered("fbo_combine");
@@ -147,7 +147,7 @@ public class Postprocess implements Scene {
         for (int i = 0; i < bloomScene.length; i++) {
             bloomScene[i][0].makeCurrent();
             ShaderMap.use("quad_horizBlur");
-            Uniform.varFloat("blurSize", 1f/(width/(i+1)));
+            Uniform.vec("blurSize", 1f/(width/(i+1)));
             //if (i == 0)
                 TextureMap.bindFiltered("fbo_hdr");
             //else
@@ -157,7 +157,7 @@ public class Postprocess implements Scene {
 
             bloomScene[i][1].makeCurrent();
             ShaderMap.use("quad_vertBlur");
-            Uniform.varFloat("blurSize", 1f/(width/(i+1)));
+            Uniform.vec("blurSize", 1f/(width/(i+1)));
             TextureMap.bindFiltered("fbo_bloom"+(i+1)+"_0");
             glClear(GL_COLOR_BUFFER_BIT);
             MeshMap.render("quad");
@@ -183,9 +183,9 @@ public class Postprocess implements Scene {
         dofScene2.makeCurrent();
         ShaderMap.use("quad_dofBlur");
         Uniform.samplerAndTextureFiltered("bgl_DepthTexture", 1, "fbo_dofvalue");
-        Uniform.varFloat("bgl_RenderedTextureWidth", width);
-        Uniform.varFloat("bgl_RenderedTextureHeight", height);
-        Uniform.varFloat("focalDepth", 0);
+        Uniform.vec("bgl_RenderedTextureWidth", width);
+        Uniform.vec("bgl_RenderedTextureHeight", height);
+        Uniform.vec("focalDepth", 0);
         TextureMap.bindFiltered(texName);
         glClear(GL_COLOR_BUFFER_BIT);
         MeshMap.render3d("quad");
@@ -195,14 +195,14 @@ public class Postprocess implements Scene {
 
         dofScene1.makeCurrent();
         ShaderMap.use("quad_horizBlur");
-        Uniform.varFloat("blurSize", 1f/width);
+        Uniform.vec("blurSize", 1f/width);
         TextureMap.bindFiltered(texName);
         glClear(GL_COLOR_BUFFER_BIT);
         MeshMap.render("quad");
         
         dofScene2.makeCurrent();
         ShaderMap.use("quad_vertBlur");
-        Uniform.varFloat("blurSize", 1f/height);
+        Uniform.vec("blurSize", 1f/height);
         TextureMap.bindFiltered("fbo_dof1");
         glClear(GL_COLOR_BUFFER_BIT);
         MeshMap.render("quad");
@@ -211,14 +211,14 @@ public class Postprocess implements Scene {
 
         dofScene1.makeCurrent();
         ShaderMap.use("quad_horizBlur");
-        Uniform.varFloat("blurSize", 1f/width*2);
+        Uniform.vec("blurSize", 1f/width*2);
         TextureMap.bindFiltered("fbo_dof2");
         glClear(GL_COLOR_BUFFER_BIT);
         MeshMap.render("quad");
         
         dofScene2.makeCurrent();
         ShaderMap.use("quad_vertBlur");
-        Uniform.varFloat("blurSize", 1f/height*2);
+        Uniform.vec("blurSize", 1f/height*2);
         TextureMap.bindFiltered("fbo_dof1");
         glClear(GL_COLOR_BUFFER_BIT);
         MeshMap.render("quad");
@@ -304,22 +304,22 @@ public class Postprocess implements Scene {
         }
 
         ShaderMap.use("quad_final");
-        Uniform.samplerAndTextureFiltered("tex_bloom", 4, "fbo_hdr"); // bloom scene
-        Uniform.varFloat("bloomCoef",0.5f);
+        Uniform.sampler("tex_bloom", 4, "fbo_hdr", true); // bloom scene
+        Uniform.vec("bloomCoef",0.5f);
         if (lastFilterType == Vars.Filter.CRT) {
-            Uniform.samplerAndTextureFiltered("tex_vignette", 8, "post_vignette"); // postprocess
-            Uniform.samplerAndTextureFiltered("tex_scanlines", 9, "post_scanlines");
+            Uniform.sampler("tex_vignette", 8, "post_vignette", true); // postprocess
+            Uniform.sampler("tex_scanlines", 9, "post_scanlines", true);
         }
-        Uniform.varFloat("texSize", width,height);
+        Uniform.vec("texSize", width,height);
 
         ShaderMap.use("quad_combine");
-        Uniform.samplerAndTextureUnfiltered("tex_ui", 5, "fbo_ui"); // upscaled UI
-        Uniform.samplerAndTextureUnfiltered("tex_post_values", 6, "tex_post_values"); // scene blur mix data
-        Uniform.samplerAndTextureFiltered("tex_dof", 7, "fbo_dof2"); // scene blur
+        Uniform.sampler("tex_ui", 5, "fbo_ui", false); // upscaled UI
+        Uniform.sampler("tex_post_values", 6, "tex_post_values", false); // scene blur mix data
+        Uniform.sampler("tex_dof", 7, "fbo_dof2", true); // scene blur
 
         // also initialize the HDR calculation shader
         ShaderMap.use("quad_hdr");
-        Uniform.samplerAndTextureUnfiltered("tex_bloomvalue", 6, "tex_post_values"); // scene blur mix data
+        Uniform.sampler("tex_bloomvalue", 6, "tex_post_values", false); // scene blur mix data
     }
 
     @Override

@@ -82,14 +82,14 @@ public class TogglePlatform extends Entity {
         // flip down if deactivated
         model.rotate(-(float)Math.PI/2*position, 1, 0, 0);
         
-        model.makeCurrent();
+        model.bind();
         
-        Uniform.varFloat("emissiveMult", 1);
-        Uniform.varFloat("spriteInfo", 3,2,0);
-        Uniform.varFloat("spriteInfoEmissive", 3,2,index+1);
+        Uniform.vec("emissiveMult", 1);
+        Uniform.vec("spriteInfo", 3,2,0);
+        Uniform.vec("spriteInfoEmissive", 3,2,index+1);
         TextureMap.bindUnfiltered("entity_togglePlatform");
         mesh.render();
-        Uniform.varFloat("emissiveMult", 0);
+        Uniform.vec("emissiveMult", 0);
     }
 
     @Override

@@ -34,15 +34,15 @@ public class Title implements Scene {
 
         glDisable(GL_DEPTH_TEST);
         ShaderMap.use("quad_titlebg");
-        Uniform.varFloat("offset",(float)(time*.00175));
+        Uniform.vec("offset",(float)(time*.00175));
         TextureMap.bindFiltered("ui_titlebg");
         MeshMap.render("quad");
 
         glEnable(GL_DEPTH_TEST);
         ShaderMap.use("titlebg");
-        Uniform.varFloat("colorAdd", .2f,.3f,.5f,1);
-        Uniform.varFloat("colorMult", .5f,.5f,.6f,1);
-        trans.makeCurrent();
+        Uniform.vec("colorAdd", .1f,.2f,.5f,1);
+        Uniform.vec("colorMult", .5f,.5f,.7f,1);
+        trans.bind();
         MeshMap.render("hexahedron");
     }
 
@@ -57,7 +57,7 @@ public class Title implements Scene {
         trans.view.translate(ratio-1f,-.5f,0); // off center
 
         ShaderMap.use("quad_titlebg");
-        Uniform.varFloat("ratio",height/(float)width);
+        Uniform.vec("ratio",height/(float)width);
     }
 
     @Override

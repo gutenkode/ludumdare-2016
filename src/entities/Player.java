@@ -345,14 +345,14 @@ public class Player extends Entity {
         
         if (flipSprite)
             model.scale(-1, 1, 1);
-        model.makeCurrent();
+        model.bind();
         TextureMap.bindUnfiltered("entity_player");
         
         int spriteInd = 12*spriteMapInd[0][(int)direction];
         if (spriteFrameCycle > 0)
             spriteInd += (int)spriteFrameCycle+1;
         //int spriteInd = 4*direction+(int)spriteFrameCycle;
-        Uniform.varFloat("spriteInfo", 12,5,spriteInd);
+        Uniform.vec("spriteInfo", 12,5,spriteInd);
         
         mesh.render();
     }

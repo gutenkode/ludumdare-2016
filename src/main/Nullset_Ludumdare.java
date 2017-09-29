@@ -2,6 +2,7 @@ package main;
 
 import map.MapLevelManager;
 import mote4.scenegraph.Window;
+import mote4.util.ErrorUtils;
 import mote4.util.audio.ALContext;
 import mote4.util.audio.AudioLoader;
 import mote4.util.audio.AudioPlayback;
@@ -68,7 +69,7 @@ public class Nullset_Ludumdare {
         ShaderUtils.loadIndex("index.txt");
         AudioLoader.loadIndex("index.txt");
 
-        CubeMapTexture.load("object/chain", "cubemap");
+        CubeMapTexture.loadCubemap("object/chain", "cubemap");
 
         FontUtils.loadMetric("font/misterpixel/misterpixel_metric","font_1");
         FontUtils.loadMetric("font/6px/6px_metric","6px");
@@ -80,6 +81,8 @@ public class Nullset_Ludumdare {
         MeshMap.add(StaticMeshBuilder.constructVAOFromOBJ("barrel", false), "barrel");
         MeshMap.add(StaticMeshBuilder.constructVAOFromOBJ("pipe", false), "pipe");
         MeshMap.add(StaticMeshBuilder.constructVAOFromOBJ("hexahedron", false), "hexahedron");
+
+        ErrorUtils.checkGLError();
     }
 
     public static RootLayer rootLayer() { return rootLayer; }

@@ -32,7 +32,7 @@ public class TitleUI implements Scene {
         //glClear(GL_COLOR_BUFFER_BIT);
 
         ShaderMap.use("texture");
-        quadTrans.makeCurrent();
+        quadTrans.bind();
         TextureMap.bindUnfiltered("ui_title");
         MeshMap.render("quad");
 

@@ -101,7 +101,7 @@ public class ScriptChoiceMenu {
         
         model.translate(-Vars.UI_SCALE/3, Vars.UI_SCALE/3.5f);
         model.translate(cursorAnimation* Vars.UI_SCALE*.2f, cursorPos* Vars.UI_SCALE);
-        model.makeCurrent();
+        model.bind();
         TextureMap.bindUnfiltered("ui_cursor");
         cursor.render();
     }

@@ -102,18 +102,18 @@ public class EnemySprite {
         model.translate(fighter.shakeValue()*.01f+posX, 0, posY);
         if (fighter.isDead())
             fighter.runDeathAnimation(model);
-        model.makeCurrent();
+        model.bind();
 
         // the sprite
         if (glow) {
             float c = .75f-(float)((Math.sin(glowCycle)+1)/4.0);
-            Uniform.varFloat("colorAdd", c*.9f,c*.8f,c*.2f);
+            Uniform.vec("colorAdd", c*.9f,c*.8f,c*.2f);
         } else
-            Uniform.varFloat("colorAdd", fighter.updateFlash(Window.delta()));
+            Uniform.vec("colorAdd", fighter.updateFlash(Window.delta()));
         updateSpriteInfo();
-        Uniform.varFloat("spriteInfo", spriteInfo);
+        Uniform.vec("spriteInfo", spriteInfo);
         sprite.render(); // currently locked to 96*2 by 96*2
-        Uniform.varFloat("colorAdd", 0,0,0);
+        Uniform.vec("colorAdd", 0,0,0);
 
         renderAnimations(model);
     }
@@ -124,7 +124,7 @@ public class EnemySprite {
     private void renderAnimations(ModelMatrix model) {
         model.setIdentity();
         model.translate(posX, 0, posY+.1f); // z offset to prevent z-fighting
-        model.makeCurrent();
+        model.bind();
 
         fighter.renderAnim();
     }
@@ -144,7 +144,7 @@ public class EnemySprite {
             // health bar
             model.setIdentity();
             model.translate(posX2d - barLength / 2, posY2d);
-            model.makeCurrent();
+            model.bind();
             TextureMap.bindUnfiltered("ui_statbars");
             renderBar(3, 0, 1, model);
             renderHealth -= (renderHealth - healthPercent) / 10 * (Window.delta()*60);
@@ -153,14 +153,14 @@ public class EnemySprite {
 
             // status icons
             model.translate(6, 4);
-            model.makeCurrent();
-            Uniform.varFloat("spriteInfo", 1,1,0);
+            model.bind();
+            Uniform.vec("spriteInfo", 1,1,0);
             for (StatusEffect s : fighter.statusEffects) {
                 TextureMap.bindUnfiltered(s.spriteName);
                 statusIconMesh.render();
 
                 model.translate(10, 0);
-                model.makeCurrent();
+                model.bind();
             }
         }
     }
@@ -171,7 +171,7 @@ public class EnemySprite {
      */
     public void renderToast(ModelMatrix model) {
         model.translate(posX2d, posY2d);
-        model.makeCurrent();
+        model.bind();
         fighter.renderToast(model);
     }
     /**
@@ -207,7 +207,7 @@ public class EnemySprite {
         mag = mBuff;
 
         model.translate(posX2d+barLength/2+1, posY2d);
-        model.makeCurrent();
+        model.bind();
         statText.render();
     }
 
@@ -222,11 +222,11 @@ public class EnemySprite {
         model.push();
         model.translate(0, yOffset);
         model.scale(percent, 1, 1);
-        model.makeCurrent();
-        Uniform.varFloat("spriteInfo", 8,1,index);
+        model.bind();
+        Uniform.vec("spriteInfo", 8,1,index);
         barMesh.render();
         model.pop();
-        model.makeCurrent();
+        model.bind();
     }
     /**
      * Updates animation data for this enemy and returns the array needed

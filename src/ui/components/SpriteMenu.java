@@ -36,7 +36,7 @@ public class SpriteMenu {
         border.render();
         TextureMap.bindUnfiltered(spriteName);
         model.translate(Vars.UI_SCALE/2, Vars.UI_SCALE/2);
-        model.makeCurrent();
+        model.bind();
         sprite.render();
     }
 }

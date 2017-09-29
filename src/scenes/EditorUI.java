@@ -68,20 +68,20 @@ public class EditorUI implements Scene {
     private void renderMapPreview() {
         if (mapPreview != null) {
             ShaderMap.use("color");
-            trans.makeCurrent();
+            trans.bind();
             trans.model.setIdentity();
             trans.model.translate(160,60);
             trans.model.scale(3,3,1);
             for (int[] arr : mapPreview.heightData) {
                 trans.model.push();
                 for (int i : arr) {
-                    trans.model.makeCurrent();
+                    trans.model.bind();
                     if (i == 0)
-                        Uniform.varFloat("colorMult",1,1,1,1);
+                        Uniform.vec("colorMult",1,1,1,1);
                     else if (i > 0)
-                        Uniform.varFloat("colorMult",1-i/4f,0,0,1);
+                        Uniform.vec("colorMult",1-i/4f,0,0,1);
                     else
-                        Uniform.varFloat("colorMult",0,0,1+i/4f,1);
+                        Uniform.vec("colorMult",0,0,1+i/4f,1);
                     MeshMap.render("quad");
                     trans.model.translate(0,2);
                 }
@@ -96,7 +96,7 @@ public class EditorUI implements Scene {
         trans.model.setIdentity();
         trans.model.translate(RootLayer.width()-128,128);
         trans.model.scale(128,128,1);
-        trans.makeCurrent();
+        trans.bind();
         TextureMap.bindUnfiltered("tileset_1");
         MeshMap.render("quad");
 
@@ -109,7 +109,7 @@ public class EditorUI implements Scene {
         trans.model.setIdentity();
         trans.model.translate(RootLayer.width()-256+16+32*x,16+32*y);
         trans.model.scale(128/8,128/8,1);
-        trans.makeCurrent();
+        trans.bind();
         MeshMap.render("quad");
 
         x = (int)(pos[1] % Vars.TILESHEET_X);
@@ -117,10 +117,10 @@ public class EditorUI implements Scene {
         trans.model.setIdentity();
         trans.model.translate(RootLayer.width()-256+16+32*x,16+32*y);
         trans.model.scale(128/8,128/8,1);
-        trans.makeCurrent();
-        Uniform.varFloat("colorMult",1,1,0,1);
+        trans.bind();
+        Uniform.vec("colorMult",1,1,0,1);
         MeshMap.render("quad");
-        Uniform.varFloat("colorMult",1,1,1,1);
+        Uniform.vec("colorMult",1,1,1,1);
     }
 
     @Override

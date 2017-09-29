@@ -175,8 +175,8 @@ public class Battle implements Scene {
         trans.view.setIdentity();
         trans.view.translate(cameraPan[4]*.1f, cameraPan[5]*.1f, -4+cameraPan[6]); // pull camera back
         trans.view.rotate(cycle, 0, 0, 1);
-        trans.makeCurrent();
-        Uniform.varFloat("cycle", cycle);
+        trans.bind();
+        Uniform.vec("cycle", cycle);
         TextureMap.bindUnfiltered("ui_bg_"+ bgName);
         background.render();
 
@@ -188,7 +188,7 @@ public class Battle implements Scene {
         //trans.view.translate(0,-.5f,0); // slide down
         trans.view.rotate(-1.25f, 1, 0, 0); // rotate down
         trans.view.scale(2, 2, 2);
-        trans.makeCurrent();
+        trans.bind();
         TextureMap.bindUnfiltered("ui_floor_tile1");
         MeshMap.render("quad");
 
@@ -201,7 +201,7 @@ public class Battle implements Scene {
         trans.view.translate(0,1,0); // slide up
         trans.view.rotate(0.25f, 1, 0, 0); // rotate up
         trans.view.scale(.95f,-.95f,.95f);
-        trans.makeCurrent();
+        trans.bind();
 
         for (EnemyFighter f : enemies) {
             f.getSprite().render3d(trans.model);

@@ -88,7 +88,7 @@ public class BattleUIManager implements MenuHandler {
         ModelMatrix model = trans.model;
         
     ShaderMap.use("spritesheet_nolight"); // shader bindings are unindented for readability
-    trans.makeCurrent();
+    trans.bind();
         // EnemySprite
         for (EnemyFighter f : enemies) {
             f.getSprite().render2d(model);
@@ -99,7 +99,7 @@ public class BattleUIManager implements MenuHandler {
         PlayerStatBar.renderAnimations(RootLayer.width()/2, RootLayer.height()-10- Vars.UI_SCALE/2, model);
 
     ShaderMap.use("texture_color"); // uses the color attribute, for colored text
-    trans.makeCurrent();
+    trans.bind();
         // enemy toasts
         TextureMap.bindUnfiltered("font_1");
         for (EnemyFighter f : enemies) {
@@ -118,22 +118,22 @@ public class BattleUIManager implements MenuHandler {
         }
 
     ShaderMap.use("texture"); // log menu is not blurred
-    trans.makeCurrent();
+    trans.bind();
         // LogMenu
         model.setIdentity();
         model.translate(RootLayer.width()/2-DialogueMenu.BORDER_W/2- Vars.UI_SCALE,
                         .5f* Vars.UI_SCALE);
-        model.makeCurrent();
+        model.bind();
         LogMenu.render(model);
 
     ShaderMap.use("texture_uiblur"); // all remaining UI elements use the texture shader with blurring
-    trans.makeCurrent();
+    trans.bind();
         
         if (showDialogue) {
             model.setIdentity();
             model.translate(RootLayer.width()/2-DialogueMenu.BORDER_W/2- Vars.UI_SCALE,
                             .5f* Vars.UI_SCALE);
-            model.makeCurrent();
+            model.bind();
             DialogueMenu.render();
         }
 
@@ -141,7 +141,7 @@ public class BattleUIManager implements MenuHandler {
             model.setIdentity();
             model.translate(RootLayer.width()/2-DialogueMenu.BORDER_W/2,
                             80);
-            model.makeCurrent();
+            model.bind();
             ScriptChoiceMenu.render(model);
         }
 
@@ -151,7 +151,7 @@ public class BattleUIManager implements MenuHandler {
             model.translate(0, Vars.UI_SCALE*2+DialogueMenu.BORDER_H);
             for (SelectionMenu sm : selectionMenus) {
                 model.translate(Vars.UI_SCALE/2, Vars.UI_SCALE/2);
-                model.makeCurrent();
+                model.bind();
                 model.push();
                 sm.render(model);
                 model.pop();
@@ -160,13 +160,13 @@ public class BattleUIManager implements MenuHandler {
             if (showFlavorText) 
             {
                 model.translate(selectionMenus.peek().width()+ Vars.UI_SCALE*2,flavorTextRenderYOffset);
-                model.makeCurrent();
+                model.bind();
                 FlavorTextMenu.render();
                 
                 if (showSprite) 
                 {
                     model.translate(0, Vars.UI_SCALE*2+FlavorTextMenu.height());
-                    model.makeCurrent();
+                    model.bind();
                     SpriteMenu.render(model);
                 }
             }

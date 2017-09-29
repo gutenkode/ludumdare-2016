@@ -109,7 +109,7 @@ public class PlayerStatBar {
         statPreviewCycle = Window.time()*9;
         model.setIdentity();
         model.translate(x-80+(int)playerShake, y+ Vars.UI_SCALE);
-        model.makeCurrent();
+        model.bind();
         
         // smooth sliding of stat bars
         double d = Window.delta()*60;
@@ -131,21 +131,21 @@ public class PlayerStatBar {
     // RENDER BORDER BOX
         
         ShaderMap.use("texture_uiblur");
-        trans.makeCurrent();
+        trans.bind();
         
-        Uniform.varFloat("colorAdd", BattleManager.getPlayer().updateFlash(Window.delta()));
+        Uniform.vec("colorAdd", BattleManager.getPlayer().updateFlash(Window.delta()));
         TextureMap.bindUnfiltered("ui_scalablemenu");
         borderMesh.render();
-        Uniform.varFloat("colorAdd", 0,0,0);
+        Uniform.vec("colorAdd", 0,0,0);
         
     // RENDER STAT BARS
         
         ShaderMap.use("spritesheet_nolight");
-        trans.makeCurrent();
+        trans.bind();
         
         // translate to stat bar location
         model.translate(40, 0);
-        model.makeCurrent();
+        model.bind();
         
         // stat bar background
         TextureMap.bindUnfiltered("ui_statbars");
@@ -168,13 +168,13 @@ public class PlayerStatBar {
         if (manaPreview) {
             // glowing bar portion
             float c = (float)(Math.sin(statPreviewCycle)+1)*.5f*.75f+.25f;
-            Uniform.varFloat("colorMult", c,c,c,1);
+            Uniform.vec("colorMult", c,c,c,1);
             if (statPreviewTooHigh)
                 renderBar(0, 14, manaRender/st.maxMana, model);
             else {
                 renderBar(5, 14, manaRender / st.maxMana, model);
                 // remaining bar
-                Uniform.varFloat("colorMult", 1, 1, 1, 1);
+                Uniform.vec("colorMult", 1, 1, 1, 1);
                 float percent = (manaRender - statCostPreview) / st.maxMana;
                 percent = Math.max(0, percent);
                 renderBar(2, 14, percent, model);
@@ -183,13 +183,13 @@ public class PlayerStatBar {
         if (staminaPreview) {
             // glowing bar portion
             float c = (float)(Math.sin(statPreviewCycle)+1)*.5f*.75f+.25f;
-            Uniform.varFloat("colorMult", c,c,c,1);
+            Uniform.vec("colorMult", c,c,c,1);
             if (statPreviewTooHigh)
                 renderBar(0, 7, staminaRender/st.maxStamina, model);
             else {
                 renderBar(5, 7, staminaRender / st.maxStamina, model);
                 // remaining bar
-                Uniform.varFloat("colorMult", 1, 1, 1, 1);
+                Uniform.vec("colorMult", 1, 1, 1, 1);
                 float percent = (staminaRender - statCostPreview) / st.maxStamina;
                 percent = Math.max(0, percent);
                 renderBar(1, 7, percent, model);
@@ -199,7 +199,7 @@ public class PlayerStatBar {
     // RENDER STAT BAR TEXT
         
         ShaderMap.use("texture");
-        trans.makeCurrent();
+        trans.bind();
         
         // 6px font for stat numbers
         FontUtils.useMetric("6px");
@@ -229,30 +229,30 @@ public class PlayerStatBar {
     // RENDER STATUS EFFECT ICONS
         
         model.translate(79, -13);
-        model.makeCurrent();
+        model.bind();
         for (StatusEffect s : BattleManager.getPlayer().statusEffects) {
             TextureMap.bindUnfiltered(s.spriteName);
             statusIconMesh.render();
             
             model.translate(0, 10); // TODO after four stat boxes this will overlap the outer box, shift to the left
-            model.makeCurrent();
+            model.bind();
         }
     }
     private static void renderBar(int index, int yOffset, float percent, ModelMatrix model) {
         model.push();
         model.translate(0, yOffset);
         model.scale(percent, 1, 1);
-        model.makeCurrent();
-        Uniform.varFloat("spriteInfo", 8,1,index);
+        model.bind();
+        Uniform.vec("spriteInfo", 8,1,index);
         barMesh.render();
         model.pop();
-        model.makeCurrent();
+        model.bind();
     }
 
     public static void renderAnimations(float posX, float posY, ModelMatrix model) {
         model.setIdentity();
         model.translate(posX, posY);
-        model.makeCurrent();
+        model.bind();
 
         BattleManager.getPlayer().renderAnim();
     }

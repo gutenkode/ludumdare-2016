@@ -54,13 +54,13 @@ public class Terminal extends Entity {
         
         model.translate((float)posX-.5f, (float)posY-.05f, tileHeight);
         //model.rotate(.78f, 1, 0, 0);
-        model.makeCurrent();
-        Uniform.varFloat("spriteInfo", 2,2,index);
-        Uniform.varFloat("spriteInfoEmissive", 2,2,index+2);
-        Uniform.varFloat("emissiveMult", 1);
+        model.bind();
+        Uniform.vec("spriteInfo", 2,2,index);
+        Uniform.vec("spriteInfoEmissive", 2,2,index+2);
+        Uniform.vec("emissiveMult", 1);
         TextureMap.bindUnfiltered("entity_terminal");
         mesh.render();
-        Uniform.varFloat("emissiveMult", 0);
+        Uniform.vec("emissiveMult", 0);
     }
     
     @Override

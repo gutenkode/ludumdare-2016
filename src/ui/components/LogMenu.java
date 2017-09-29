@@ -58,7 +58,7 @@ public class LogMenu {
         for (int i = 0; i < NUM_LINES-1; i++)
             if (text[i] != null) {
                 TextureMap.bindUnfiltered("font_1");
-                model.makeCurrent();
+                model.bind();
                 text[i].render();
                 model.translate(0, Vars.UI_SCALE);
             }
@@ -67,7 +67,7 @@ public class LogMenu {
             if (offset < 0)
                 offset = 0;
         } else {
-            model.makeCurrent();
+            model.bind();
             text[NUM_LINES-1].render();
         }
     }

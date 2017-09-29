@@ -41,12 +41,12 @@ public class Ingame implements Scene {
         float shadowFarPlane = 10;
         shadowProj = new CubeMapMatrix("depthProj",shadowNearPlane,shadowFarPlane);
         shadowView = new ViewMatrix();
-        ShaderMap.use("ingame_map");
-        Uniform.varFloat("shadowNearPlane",shadowNearPlane);
-        Uniform.varFloat("shadowFarPlane",shadowFarPlane);
+        ShaderMap.use("ingame_light");
+        Uniform.vec("shadowNearPlane",shadowNearPlane);
+        Uniform.vec("shadowFarPlane",shadowFarPlane);
         ShaderMap.use("spritesheet_light");
-        Uniform.varFloat("shadowNearPlane",shadowNearPlane);
-        Uniform.varFloat("shadowFarPlane",shadowFarPlane);
+        Uniform.vec("shadowNearPlane",shadowNearPlane);
+        Uniform.vec("shadowFarPlane",shadowFarPlane);
     }
 
     @Override
@@ -103,9 +103,11 @@ public class Ingame implements Scene {
         */
         // cubemap
         shadowView.setIdentity();
-        shadowView.translate(-MapManager.getPlayer().posX(),
-                -MapManager.getPlayer().posY()-MapManager.getPlayer().hitboxH(),
-                -MapManager.getPlayer().elevatorHeight()-1f);
+        // move to player position
+        shadowView.translate(
+                -MapManager.getPlayer().posX(),
+                -MapManager.getPlayer().posY() -MapManager.getPlayer().hitboxH(),
+                -MapManager.getPlayer().elevatorHeight() -1f);
     }
 
     @Override

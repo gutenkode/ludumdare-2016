@@ -44,7 +44,7 @@ public class BattleAnimation {
         }
 
         TextureMap.bindUnfiltered(TYPE.SPRITE_NAME);
-        Uniform.varFloat("spriteInfo", TYPE.WIDTH,TYPE.HEIGHT, (int)index);
+        Uniform.vec("spriteInfo", TYPE.WIDTH,TYPE.HEIGHT, (int)index);
         EnemySprite.sprite.render();
 
         index += TYPE.FPS * Window.delta();

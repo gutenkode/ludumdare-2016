@@ -75,7 +75,7 @@ public class BattleTransition implements Scene {
             ShaderMap.use("quad");
         }
         //glClear(GL_COLOR_BUFFER_BIT);
-        model.makeCurrent();
+        model.bind();
         MeshMap.render("quad");
         
         bufferSwitch = !bufferSwitch;

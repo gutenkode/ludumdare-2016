@@ -39,14 +39,14 @@ public class TitleUIManager implements MenuHandler {
         ModelMatrix model = trans.model;
 
         ShaderMap.use("texture_uiblur");
-        trans.makeCurrent();
+        trans.bind();
         TextureMap.bindUnfiltered("font_1");
 
         model.setIdentity();
         model.translate(RootLayer.width()/2-50, RootLayer.height()/2,0);
         for (SelectionMenu sm : selectionMenus) {
             model.translate(Vars.UI_SCALE/2, Vars.UI_SCALE/2);
-            model.makeCurrent();
+            model.bind();
             model.push();
             sm.render(model);
             model.pop();

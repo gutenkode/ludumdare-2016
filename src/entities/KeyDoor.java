@@ -164,20 +164,20 @@ public class KeyDoor extends Entity {
         model.rotate(rot, 0, 0, 1);
         model.translate(-.5f, 0);
         model.scale(1,1,2);
-        model.makeCurrent();
+        model.bind();
 
         TextureMap.bindUnfiltered("entity_keyDoor");
-        Uniform.varFloat("spriteInfo", 3,5,0);
+        Uniform.vec("spriteInfo", 3,5,0);
         mesh.render();
 
         model.push();
         model.translate(-.5f*openVal, -.05f, 0);
-        model.makeCurrent();
-        Uniform.varFloat("spriteInfo", 3,5,1);
+        model.bind();
+        Uniform.vec("spriteInfo", 3,5,1);
         mesh.render();
         model.translate(2*.5f*openVal, 0, 0);
-        model.makeCurrent();
-        Uniform.varFloat("spriteInfo", 3,5,2);
+        model.bind();
+        Uniform.vec("spriteInfo", 3,5,2);
         mesh.render();
         model.pop();
 
@@ -189,14 +189,14 @@ public class KeyDoor extends Entity {
                 offset += 6;
                 slide *= -1;
             }
-            Uniform.varFloat("emissiveMult", 1);
-            Uniform.varFloat("spriteInfo", 3,10,keycardLevel+offset);
-            Uniform.varFloat("spriteInfoEmissive", 3,10,keycardLevel+offset);
+            Uniform.vec("emissiveMult", 1);
+            Uniform.vec("spriteInfo", 3,10,keycardLevel+offset);
+            Uniform.vec("spriteInfoEmissive", 3,10,keycardLevel+offset);
             model.translate(slide, .1f, .25f);
             model.scale(1,1,.5f);
-            model.makeCurrent();
+            model.bind();
             mesh.render();
-            Uniform.varFloat("emissiveMult", 0);
+            Uniform.vec("emissiveMult", 0);
         }
         model.pop();
 
@@ -209,24 +209,24 @@ public class KeyDoor extends Entity {
             int offset = 10;
             if (flicker)
                 offset += 6;
-            Uniform.varFloat("emissiveMult", 1);
+            Uniform.vec("emissiveMult", 1);
 
             // moving red lines
-            Uniform.varFloat("spriteInfo", 3,10,alertCycle+offset+8);
-            Uniform.varFloat("spriteInfoEmissive", 3,10,alertCycle+offset+8);
+            Uniform.vec("spriteInfo", 3,10,alertCycle+offset+8);
+            Uniform.vec("spriteInfoEmissive", 3,10,alertCycle+offset+8);
             model.scale(1,1,.5f);
             model.translate(0, .15f, .5f);
-            model.makeCurrent();
+            model.bind();
             mesh.render();
 
             // flashing yellow warning sign
-            Uniform.varFloat("spriteInfo", 3,10,alertCycle/2+offset);
-            Uniform.varFloat("spriteInfoEmissive", 3,10,alertCycle/2+offset);
+            Uniform.vec("spriteInfo", 3,10,alertCycle/2+offset);
+            Uniform.vec("spriteInfoEmissive", 3,10,alertCycle/2+offset);
             model.translate(0, .05f, 0);
-            model.makeCurrent();
+            model.bind();
             mesh.render();
 
-            Uniform.varFloat("emissiveMult", 0);
+            Uniform.vec("emissiveMult", 0);
         } else {
             if (alertActive) {
                 alertActive = false;
@@ -235,23 +235,23 @@ public class KeyDoor extends Entity {
         }
 
         /*
-        Uniform.varFloat("spriteInfo", 3,7,keycardLevel+3*openVal);
+        Uniform.vec("spriteInfo", 3,7,keycardLevel+3*openVal);
         TextureMap.bindUnfiltered("entity_keyDoor");
         mesh.render3d();
         
         if (MapManager.getTimelineState().isAlertTriggered()) {
-            Uniform.varFloat("emissiveMult", 1);
-            Uniform.varFloat("spriteInfo", 3,7,12+alertCycle);
-            Uniform.varFloat("spriteInfoEmissive", 3,7,12+alertCycle);
+            Uniform.vec("emissiveMult", 1);
+            Uniform.vec("spriteInfo", 3,7,12+alertCycle);
+            Uniform.vec("spriteInfoEmissive", 3,7,12+alertCycle);
             model.translate(0,.35f,0);
-            model.makeCurrent();
+            model.bind();
             mesh.render3d();
-            Uniform.varFloat("spriteInfo", 3,7,16+alertCycle/2);
-            Uniform.varFloat("spriteInfoEmissive", 3,7,16+alertCycle/2);
+            Uniform.vec("spriteInfo", 3,7,16+alertCycle/2);
+            Uniform.vec("spriteInfoEmissive", 3,7,16+alertCycle/2);
             model.translate(0,.15f,0);
-            model.makeCurrent();
+            model.bind();
             mesh.render3d();
-            Uniform.varFloat("emissiveMult", 0);
+            Uniform.vec("emissiveMult", 0);
         }
         */
     }
