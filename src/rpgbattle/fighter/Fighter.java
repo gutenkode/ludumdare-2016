@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import mote4.scenegraph.Window;
 import mote4.util.audio.AudioPlayback;
-import mote4.util.matrix.ModelMatrix;
+import mote4.util.matrix.TransformationMatrix;
 import mote4.util.shader.Uniform;
 import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.mesh.Mesh;
@@ -272,7 +272,7 @@ public abstract class Fighter {
             // new toasts are delayed by the number of toasts in the queue ahead of them
             toast.add(new Toast(type.color+text, TOAST_DELAY*toast.size()));
     }
-    public void renderToast(ModelMatrix m) {
+    public void renderToast(TransformationMatrix m) {
         for (int i = 0; i < toast.size(); i++) {
             if (toast.get(i).render(m)) {
                 toast.remove(i);
@@ -306,7 +306,7 @@ public abstract class Fighter {
             
             centerOffset = FontUtils.getStringWidth(text)/2* Vars.UI_SCALE;
         }
-        public boolean render(ModelMatrix m) {
+        public boolean render(TransformationMatrix m) {
             if (delay > 0) {
                 delay -= Window.delta()*60;
                 return false;

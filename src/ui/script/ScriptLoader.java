@@ -1,9 +1,11 @@
 package ui.script;
 
+import mote4.scenegraph.Window;
 import mote4.util.FileIO;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 /**
@@ -36,13 +38,18 @@ public class ScriptLoader {
             scripts.clear();
         else
             scripts = new HashMap<>();
-        JSONObject json = new JSONObject(FileIO.getString("/res/maps/"+path+"/scripts.json"));
-        for (String key : json.keySet()) {
-            JSONArray arr = json.getJSONArray(key);
-            String[] dialogue = new String[arr.length()];
-            for (int i = 0; i < dialogue.length; i++)
-                dialogue[i] = arr.getString(i);
-            scripts.put(key, dialogue);
+        try {
+            JSONObject json = new JSONObject(FileIO.getString("/res/maps/" + path + "/scripts.json"));
+            for (String key : json.keySet()) {
+                JSONArray arr = json.getJSONArray(key);
+                String[] dialogue = new String[arr.length()];
+                for (int i = 0; i < dialogue.length; i++)
+                    dialogue[i] = arr.getString(i);
+                scripts.put(key, dialogue);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            Window.destroy();
         }
     }
 

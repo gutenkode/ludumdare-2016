@@ -2,14 +2,11 @@ package scenes;
 
 import map.MapManager;
 import mote4.scenegraph.Scene;
-import mote4.scenegraph.target.DepthBuffer;
 import mote4.scenegraph.target.DepthCubeBuffer;
 import mote4.scenegraph.target.Target;
-import mote4.util.audio.AudioPlayback;
 import mote4.util.matrix.CubeMapMatrix;
-import mote4.util.matrix.GenericMatrix;
 import mote4.util.matrix.Transform;
-import mote4.util.matrix.ViewMatrix;
+import mote4.util.matrix.TransformationMatrix;
 import mote4.util.shader.ShaderMap;
 import mote4.util.shader.Uniform;
 
@@ -31,7 +28,7 @@ public class Ingame implements Scene {
     }
     
     private Transform trans;
-    private final ViewMatrix shadowView;
+    private final TransformationMatrix shadowView;
     private final CubeMapMatrix shadowProj; // defines the shadow camera, combines projection with view and model transforms
     private float[] flashlightDir = new float[2];
 
@@ -40,7 +37,7 @@ public class Ingame implements Scene {
         float shadowNearPlane = .1f;
         float shadowFarPlane = 10;
         shadowProj = new CubeMapMatrix("depthProj",shadowNearPlane,shadowFarPlane);
-        shadowView = new ViewMatrix();
+        shadowView = new TransformationMatrix("viewMatrix");
         ShaderMap.use("ingame_light");
         Uniform.vec("shadowNearPlane",shadowNearPlane);
         Uniform.vec("shadowFarPlane",shadowFarPlane);

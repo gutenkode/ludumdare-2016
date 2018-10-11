@@ -1,6 +1,6 @@
 package ui.components.selectionMenu;
 
-import mote4.util.matrix.ModelMatrix;
+import mote4.util.matrix.TransformationMatrix;
 
 /**
  * A SelectionMenu is the core component of the player's UI; it displays a list
@@ -19,7 +19,7 @@ public interface SelectionMenu {
     void onFocus();
 
     void update();
-    void render(ModelMatrix model);
+    void render(TransformationMatrix model);
 
     void destroy();
 }

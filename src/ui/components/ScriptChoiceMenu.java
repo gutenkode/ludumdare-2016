@@ -2,7 +2,7 @@ package ui.components;
 
 import mote4.scenegraph.Window;
 import mote4.util.audio.AudioPlayback;
-import mote4.util.matrix.ModelMatrix;
+import mote4.util.matrix.TransformationMatrix;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.builder.StaticMeshBuilder;
@@ -93,7 +93,7 @@ public class ScriptChoiceMenu {
         return -1;
     }
     
-    public static void render(ModelMatrix model) {
+    public static void render(TransformationMatrix model) {
         TextureMap.bindUnfiltered("ui_scalablemenu");
         border.render();
         TextureMap.bindUnfiltered("font_1");

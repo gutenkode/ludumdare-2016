@@ -2,7 +2,7 @@ package ui.components.selectionMenu;
 
 import mote4.scenegraph.Window;
 import mote4.util.audio.AudioPlayback;
-import mote4.util.matrix.ModelMatrix;
+import mote4.util.matrix.TransformationMatrix;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.builder.StaticMeshBuilder;
@@ -155,7 +155,7 @@ public class SingleSelectionMenu implements SelectionMenu {
     }
 
     @Override
-    public void render(ModelMatrix model) {
+    public void render(TransformationMatrix model) {
         // update the box expand animation
         redrawBorder();
 

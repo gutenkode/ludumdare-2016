@@ -32,7 +32,7 @@ public class MapManager {
     private static String newMapName; // stored while a fadeout is performed
     // data for entity lights in shaders
     private static float[] eLightPos, eLightColor;
-    private static ModelMatrix shadowModel = new ModelMatrix(); // used when rendering shadows
+    private static TransformationMatrix shadowModel = new TransformationMatrix("modelMatrix"); // used when rendering shadows
 
     // initialization and timelines
 
@@ -256,7 +256,7 @@ public class MapManager {
      * the depth texture for shadow mapping.
      * @param shadowProj Projection for the shadow camera.
      */
-    public static void renderForShadow(CubeMapMatrix shadowProj, ViewMatrix shadowView) {
+    public static void renderForShadow(CubeMapMatrix shadowProj, TransformationMatrix shadowView) {
         ShaderMap.use("shadowCubeMap");
         shadowProj.bind();
         shadowView.bind();

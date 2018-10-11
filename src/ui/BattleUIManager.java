@@ -5,7 +5,7 @@ import java.util.Stack;
 
 import mote4.scenegraph.Window;
 import mote4.util.audio.AudioPlayback;
-import mote4.util.matrix.ModelMatrix;
+import mote4.util.matrix.TransformationMatrix;
 import mote4.util.matrix.Transform;
 import mote4.util.shader.ShaderMap;
 import mote4.util.texture.TextureMap;
@@ -85,7 +85,7 @@ public class BattleUIManager implements MenuHandler {
         }
     }
     public static void render(Transform trans) {
-        ModelMatrix model = trans.model;
+        TransformationMatrix model = trans.model;
         
     ShaderMap.use("spritesheet_nolight"); // shader bindings are unindented for readability
     trans.bind();

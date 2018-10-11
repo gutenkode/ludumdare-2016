@@ -32,9 +32,9 @@ public class MapLevelManager {
      * @param fileName
      */
     public static void loadIndexFile(String fileName) {
-        BufferedReader bf = FileIO.getBufferedReader("/res/maps/"+fileName);
         ArrayList<String> file = new ArrayList<>();
         try {
+            BufferedReader bf = FileIO.getBufferedReader("/res/maps/"+fileName);
             String inString;
             while ((inString = bf.readLine()) != null)
                 file.add(inString);

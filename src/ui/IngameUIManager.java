@@ -1,26 +1,26 @@
 package ui;
 
 import entities.ScriptTrigger;
+import main.Input;
+import main.RootLayer;
+import main.Vars;
 import mote4.scenegraph.Window;
 import mote4.util.audio.AudioPlayback;
-import main.RootLayer;
-import ui.components.*;
-
-import java.util.Stack;
-import mote4.util.matrix.ModelMatrix;
+import mote4.util.matrix.TransformationMatrix;
 import mote4.util.matrix.Transform;
 import mote4.util.shader.ShaderMap;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.mesh.ScrollingText;
-import main.Vars;
-import main.Input;
 import rpgbattle.BattleManager;
+import ui.components.*;
 import ui.components.selectionMenu.SelectionMenu;
 import ui.components.selectionMenu.SingleSelectionMenu;
 import ui.components.selectionMenu.TabbedSelectionMenu;
 import ui.script.ScriptReader;
-import ui.selectionmenubehavior.ingame.RootIngameMenu;
 import ui.selectionmenubehavior.SelectionMenuBehavior;
+import ui.selectionmenubehavior.ingame.RootIngameMenu;
+
+import java.util.Stack;
 
 /**
  * Static class for managing the UI elements in the overworld.
@@ -111,7 +111,7 @@ public class IngameUIManager implements MenuHandler {
     public static void render(Transform trans) {
         //trans.model.setIdentity();
         //trans.bind();
-        ModelMatrix model = trans.model;
+        TransformationMatrix model = trans.model;
 
         // PlayerStatBar, sets own shaders
         if (statBarSlide < .95)

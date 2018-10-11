@@ -1,6 +1,6 @@
 package ui.components;
 
-import mote4.util.matrix.ModelMatrix;
+import mote4.util.matrix.TransformationMatrix;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.mesh.Mesh;
 import mote4.util.vertex.mesh.ScrollingText;
@@ -50,7 +50,7 @@ public class LogMenu {
         text[NUM_LINES-1] = new ScrollingText(s, "font_1", Vars.UI_SCALE/2, Vars.UI_SCALE/2, Vars.UI_SCALE, Vars.UI_SCALE, CHARS_PER_SECOND);
     }
     
-    public static void render(ModelMatrix model) {
+    public static void render(TransformationMatrix model) {
         TextureMap.bindUnfiltered("ui_scalablemenu_blur");
         border.render();
         

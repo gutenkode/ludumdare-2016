@@ -1,6 +1,6 @@
 package ui.components;
 
-import mote4.util.matrix.ModelMatrix;
+import mote4.util.matrix.TransformationMatrix;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.builder.StaticMeshBuilder;
 import mote4.util.vertex.mesh.Mesh;
@@ -31,7 +31,7 @@ public class SpriteMenu {
         spriteName = s;
     }
     
-    public static void render(ModelMatrix model) {
+    public static void render(TransformationMatrix model) {
         TextureMap.bindUnfiltered("ui_scalablemenu");
         border.render();
         TextureMap.bindUnfiltered(spriteName);

@@ -1,7 +1,7 @@
 package ui.components;
 
 import mote4.scenegraph.Window;
-import mote4.util.matrix.ModelMatrix;
+import mote4.util.matrix.TransformationMatrix;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.FontUtils;
@@ -94,7 +94,7 @@ public class EnemySprite {
     }
     public void showStats(boolean e) { showStats = e; }
 
-    public void render3d(ModelMatrix model) {
+    public void render3d(TransformationMatrix model) {
         TextureMap.bindUnfiltered(fighter.spriteName);
 
         model.setIdentity();
@@ -121,7 +121,7 @@ public class EnemySprite {
      * Updates the battle animations for this fighter.
      * @param model
      */
-    private void renderAnimations(ModelMatrix model) {
+    private void renderAnimations(TransformationMatrix model) {
         model.setIdentity();
         model.translate(posX, 0, posY+.1f); // z offset to prevent z-fighting
         model.bind();
@@ -129,7 +129,7 @@ public class EnemySprite {
         fighter.renderAnim();
     }
 
-    public void render2d(ModelMatrix model) {
+    public void render2d(TransformationMatrix model) {
         float healthPercent = (float)fighter.stats.health/fighter.stats.maxHealth;
         boolean healthIsCurrent = Math.abs(renderHealth-healthPercent) < .01;
         if (healthIsCurrent)
@@ -169,7 +169,7 @@ public class EnemySprite {
      * Used for rendering toasts.
      * @param model
      */
-    public void renderToast(ModelMatrix model) {
+    public void renderToast(TransformationMatrix model) {
         model.translate(posX2d, posY2d);
         model.bind();
         fighter.renderToast(model);
@@ -178,7 +178,7 @@ public class EnemySprite {
      * Render the text showing stat buffs/debuffs.
      * @param model
      */
-    public void renderStatText(ModelMatrix model) {
+    public void renderStatText(TransformationMatrix model) {
         if (!showStats)
             return;
         int aBuff = fighter.stats.getAtkBuff();
@@ -218,7 +218,7 @@ public class EnemySprite {
      * @param percent
      * @param model
      */
-    private void renderBar(int index, int yOffset, float percent, ModelMatrix model) {
+    private void renderBar(int index, int yOffset, float percent, TransformationMatrix model) {
         model.push();
         model.translate(0, yOffset);
         model.scale(percent, 1, 1);

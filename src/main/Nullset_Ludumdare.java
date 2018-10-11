@@ -7,7 +7,6 @@ import mote4.util.audio.ALContext;
 import mote4.util.audio.AudioLoader;
 import mote4.util.audio.AudioPlayback;
 import mote4.util.shader.ShaderUtils;
-import mote4.util.texture.CubeMapTexture;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.builder.StaticMeshBuilder;
@@ -69,11 +68,12 @@ public class Nullset_Ludumdare {
         ShaderUtils.loadIndex("index.txt");
         AudioLoader.loadIndex("index.txt");
 
-        CubeMapTexture.loadCubemap("object/chain", "cubemap");
+        TextureMap.loadCubemap("object/chain", "cubemap");
 
-        FontUtils.loadMetric("font/misterpixel/misterpixel_metric","font_1");
-        FontUtils.loadMetric("font/6px/6px_metric","6px");
-        FontUtils.loadMetric("font/terminal/terminal_metric","terminal");
+        FontUtils.loadMetric("font/misterpixel/misterpixel","font_1");
+        FontUtils.loadMetric("font/misterpixel/misterpixel","6px");
+        //FontUtils.loadMetric("font/6px/6px","6px");
+        FontUtils.loadMetric("font/terminal/terminal","terminal");
         FontUtils.useMetric("font_1");
                 
         MeshMap.add(StaticMeshBuilder.loadQuadMesh(), "quad");

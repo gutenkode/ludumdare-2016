@@ -2,14 +2,13 @@ package rpgbattle.fighter;
 
 import mote4.scenegraph.Window;
 import mote4.util.audio.AudioPlayback;
-import mote4.util.matrix.ModelMatrix;
+import mote4.util.matrix.TransformationMatrix;
 import rpgbattle.BattleManager;
 import rpgbattle.EnemyData;
 import rpgbattle.enemyBehavior.EnemyBehavior;
 import rpgbattle.fighter.Fighter.Toast.ToastType;
 import rpgsystem.Element;
 import rpgsystem.StatusEffect;
-import ui.BattleUIManager;
 import ui.components.EnemySprite;
 
 /**
@@ -153,7 +152,7 @@ public class EnemyFighter extends Fighter {
     @Override
     public boolean restoreMana(int amount) { return false; }
 
-    public void runDeathAnimation(ModelMatrix model) {
+    public void runDeathAnimation(TransformationMatrix model) {
         model.scale(deathScale,1,1);
         if (deathScale > 0) {
             deathScale -= .035 * (Window.delta()*60);
@@ -164,7 +163,7 @@ public class EnemyFighter extends Fighter {
     public boolean isDeathAnimationFinished() { return deathScale <= 0; }
     public EnemySprite getSprite() { return sprite; }
     
-    //public void runDeathAnimation(ModelMatrix model) {
+    //public void runDeathAnimation(TransformationMatrix model) {
     //    behavior.runDeathAnimation(model);
     //}
 

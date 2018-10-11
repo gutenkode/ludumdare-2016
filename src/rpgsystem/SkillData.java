@@ -1,9 +1,12 @@
 package rpgsystem;
 
+import mote4.scenegraph.Window;
 import mote4.util.FileIO;
 import org.json.JSONObject;
 import rpgbattle.PlayerSkills;
 import ui.components.BattleAnimation;
+
+import java.io.IOException;
 
 /**
  * Manages loading data for skills from a json file.
@@ -12,7 +15,14 @@ import ui.components.BattleAnimation;
 public class SkillData {
     private static final JSONObject json;
     static {
-        json = new JSONObject(FileIO.getString("/res/files/skills.json"));
+        JSONObject temp = null;
+        try {
+            temp = new JSONObject(FileIO.getString("/res/files/skills.json"));
+        } catch (IOException e) {
+            e.printStackTrace();
+            Window.destroy();
+        }
+        json = temp;
     }
 
     public final String name, desc, spriteName, sfxName;
