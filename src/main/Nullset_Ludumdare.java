@@ -71,7 +71,7 @@ public class Nullset_Ludumdare {
         TextureMap.loadCubemap("object/chain", "cubemap");
 
         FontUtils.loadMetric("font/misterpixel/misterpixel","font_1");
-        FontUtils.loadMetric("font/misterpixel/misterpixel","6px");
+        FontUtils.loadMetric("font/misterpixel/misterpixel","6px"); // TODO generate the font metric
         //FontUtils.loadMetric("font/6px/6px","6px");
         FontUtils.loadMetric("font/terminal/terminal","terminal");
         FontUtils.useMetric("font_1");

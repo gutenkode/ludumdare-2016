@@ -102,17 +102,19 @@ public class RootLayer extends Layer {
 
         if (sceneFbo != null)
             sceneFbo.destroy();
-        sceneFbo = new MultiColorFBO(renderWidth*renderScale,renderHeight*renderScale,true,false,2);
-        TextureMap.delete("fbo_scene");
-        TextureMap.delete("fbo_post_values");
-        sceneFbo.addToTextureMap("fbo_scene",0);
-        sceneFbo.addToTextureMap("tex_post_values",1);
+        sceneFbo = new MultiColorFBO(renderWidth*renderScale,renderHeight*renderScale,2,true,false, GL_RGBA8,GL_RGBA8);
+        //sceneFbo = new MultiColorFBO(renderWidth*renderScale,renderHeight*renderScale,true,false,2);
+        //TextureMap.delete("fbo_scene");
+        //TextureMap.delete("fbo_post_values");
+        sceneFbo.addToTextureMap("fbo_scene",0,true);
+        sceneFbo.addToTextureMap("tex_post_values",1,true);
         if (uiFbo != null)
             uiFbo.destroy();
         int[] buffers = new int[] {-1, sceneFbo.getColorBufferID(1)};
-        uiFbo = new MultiColorFBO(renderWidth,renderHeight,false,false,buffers);
-        TextureMap.delete("fbo_ui");
-        uiFbo.addToTextureMap("fbo_ui",0);
+        uiFbo = new MultiColorFBO(renderWidth,renderHeight,2,false,false, buffers, GL_RGBA8,GL_RGBA8);
+        //uiFbo = new MultiColorFBO(renderWidth,renderHeight,false,false,buffers);
+        //TextureMap.delete("fbo_ui");
+        uiFbo.addToTextureMap("fbo_ui",0,true);
 
         Postprocess.resizeBuffers(renderWidth, renderHeight);
 
