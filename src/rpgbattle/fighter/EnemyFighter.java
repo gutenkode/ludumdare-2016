@@ -163,7 +163,7 @@ public class EnemyFighter extends Fighter {
     public boolean isDeathAnimationFinished() { return deathScale <= 0; }
     public EnemySprite getSprite() { return sprite; }
     
-    //public void runDeathAnimation(ModelMatrix model) {
+    //public void runDeathAnimation(TransformationMatrix model) {
     //    behavior.runDeathAnimation(model);
     //}
 

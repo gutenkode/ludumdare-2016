@@ -62,6 +62,8 @@ public class Nullset_Ludumdare {
         ShaderUtils.loadIndex("index.txt");
         AudioLoader.loadIndex("index.txt");
 
+        TextureMap.loadCubemap("object/chain", "cubemap");
+
         FontUtils.loadMetric("font/misterpixel/misterpixel","font_1");
         FontUtils.loadMetric("font/6px/6px","6px");
         FontUtils.loadMetric("font/terminal/terminal","terminal");
