@@ -230,6 +230,7 @@ public class Postprocess implements Scene {
     
     /**
      * This method is called with the width/height of the internal resolution.
+     * framebufferResized is called with the width/height of the window.
      * @param width
      * @param height 
      */

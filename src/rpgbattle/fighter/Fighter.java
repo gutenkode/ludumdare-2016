@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import mote4.scenegraph.Window;
 import mote4.util.audio.AudioPlayback;
-import mote4.util.matrix.ModelMatrix;
+import mote4.util.matrix.TransformationMatrix;
 import mote4.util.shader.Uniform;
 import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.mesh.Mesh;
@@ -146,22 +146,35 @@ public abstract class Fighter {
     
     public void inflictStatus(StatusEffect e, int accuracy) {
         if (calculateHit(accuracy)) {
-            AudioPlayback.playSfx("sfx_skill_status");
             BattleUIManager.logMessage(getStatusEffectString(e));
+            boolean success = false;
             switch (e) {
                 case POISON:
-                    addToast(ToastType.POISON, e.name.toUpperCase());
+                    // enemies null to acid are immune to poison
+                    if (stats.elementResistance(Element.ACID) == Element.Resistance.NULL)
+                        addToast("NULL");
+                    else {
+                        addToast(ToastType.POISON, e.name.toUpperCase());
+                        success = true;
+                    }
                     break;
                 case FATIGUE:
                     addToast(ToastType.STAMINA, e.name.toUpperCase());
+                    success = true;
                     break;
                 default:
                     addToast(e.name.toUpperCase());
+                    success = true;
                     break;
             }
-            this.addAnim(new BattleAnimation(BattleAnimation.Type.STATUS));
-            if (!statusEffects.contains(e)) {
-                statusEffects.add(e);
+            if (success) {
+                AudioPlayback.playSfx("sfx_skill_status");
+                this.addAnim(new BattleAnimation(BattleAnimation.Type.STATUS));
+                if (!statusEffects.contains(e)) {
+                    statusEffects.add(e);
+                }
+            } else {
+                AudioPlayback.playSfx("sfx_skill_miss");
             }
         } else {
             addToast("MISS");
@@ -268,11 +281,11 @@ public abstract class Fighter {
         addToast(type, String.valueOf(val));
     }
     void addToast(ToastType type, String text) {
-        if (RootLayer.getState() == RootLayer.State.BATTLE)
+        if (RootLayer.getInstance().getState() == RootLayer.State.BATTLE)
             // new toasts are delayed by the number of toasts in the queue ahead of them
             toast.add(new Toast(type.color+text, TOAST_DELAY*toast.size()));
     }
-    public void renderToast(ModelMatrix m) {
+    public void renderToast(TransformationMatrix m) {
         for (int i = 0; i < toast.size(); i++) {
             if (toast.get(i).render(m)) {
                 toast.remove(i);
@@ -306,7 +319,7 @@ public abstract class Fighter {
             
             centerOffset = FontUtils.getStringWidth(text)/2* Vars.UI_SCALE;
         }
-        public boolean render(ModelMatrix m) {
+        public boolean render(TransformationMatrix m) {
             if (delay > 0) {
                 delay -= Window.delta()*60;
                 return false;

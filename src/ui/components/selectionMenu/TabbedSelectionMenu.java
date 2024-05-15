@@ -1,13 +1,9 @@
 package ui.components.selectionMenu;
 
 import main.Input;
-import mote4.util.audio.AudioPlayback;
-import mote4.util.matrix.ModelMatrix;
-import mote4.util.vertex.FontUtils;
-import mote4.util.vertex.mesh.Mesh;
-import mote4.util.vertex.mesh.ScrollingText;
 import main.Vars;
-import ui.MenuMeshCreator;
+import mote4.util.audio.AudioPlayback;
+import mote4.util.matrix.TransformationMatrix;
 import ui.selectionmenubehavior.SelectionMenuBehavior;
 
 import java.util.ArrayList;
@@ -63,13 +59,13 @@ public class TabbedSelectionMenu implements SelectionMenu {
         }
         menus.get(currentMenu).update();
     }
-    public void render(ModelMatrix model) {
+    public void render(TransformationMatrix model) {
         model.push();
         int i = 0;
         for (SingleSelectionMenu m : menus) {
             if (currentMenu != i) {
                 model.push();
-                model.translate(0, heights[i]);
+                model.translate(0, (int)heights[i]);
                 m.render(model);
                 model.pop();
             }

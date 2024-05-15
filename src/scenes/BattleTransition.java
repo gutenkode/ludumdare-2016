@@ -2,7 +2,7 @@ package scenes;
 
 import mote4.scenegraph.Scene;
 import mote4.scenegraph.target.FBO;
-import mote4.util.matrix.ModelMatrix;
+import mote4.util.matrix.TransformationMatrix;
 import mote4.util.shader.ShaderMap;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.mesh.MeshMap;
@@ -18,7 +18,7 @@ public class BattleTransition implements Scene {
     
     private FBO fbo1, fbo2;
     private double delay;
-    private ModelMatrix model;
+    private TransformationMatrix model;
     private static boolean bufferSwitch;
     
     public BattleTransition() {
@@ -32,7 +32,7 @@ public class BattleTransition implements Scene {
         TextureMap.delete("fbo_transition2");
         fbo2.addToTextureMap("fbo_transition2");
         
-        model = new ModelMatrix();
+        model = new TransformationMatrix("modelMatrix");
         
         bufferSwitch = true;
         

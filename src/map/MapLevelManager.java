@@ -2,7 +2,6 @@ package map;
 
 import mote4.scenegraph.Window;
 import mote4.util.FileIO;
-import scenes.Editor;
 import ui.script.ScriptLoader;
 
 import java.io.BufferedReader;
@@ -32,15 +31,15 @@ public class MapLevelManager {
      * @param fileName
      */
     public static void loadIndexFile(String fileName) {
-        BufferedReader bf = FileIO.getBufferedReader("/res/maps/"+fileName);
         ArrayList<String> file = new ArrayList<>();
         try {
+            BufferedReader bf = FileIO.getBufferedReader("/res/maps/"+fileName);
             String inString;
             while ((inString = bf.readLine()) != null)
                 file.add(inString);
             bf.close();
         } catch (IOException e) {
-            System.err.println("Error loading index file '"+fileName+"':");
+            System.err.println("Error loading index file '/res/maps/"+fileName+"':");
             e.printStackTrace();
             Window.destroy();
         }

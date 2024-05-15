@@ -97,7 +97,7 @@ public class OptionsMenu implements SelectionMenuBehavior {
                 handler.showFlavorText(false, "Supersample Antialiasing\nHigh-quality antialiasing, smooths\nedges and increases detail.");
                 break;
             case 3: // filter
-                handler.showFlavorText(false, "Toggle between linear and nearest\nneighbor filtering on the screen.");
+                handler.showFlavorText(false, "Change filtering modes.");
                 break;
             default:
                 handler.closeFlavorText();

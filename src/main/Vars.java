@@ -24,7 +24,7 @@ public class Vars {
     public static boolean useSSAA() { return ssaa; }
 
     public enum Filter {
-        NEAREST("None"),LINEAR("Linear"),QUILEZ("Smooth"),CRT("CRT");
+        NEAREST("Sharp"), LINEAR("Soft"), QUILEZ("Smooth"), CRT("CRT");
         public final String NAME;
         Filter(String n) {NAME = n;}
     }
@@ -35,7 +35,7 @@ public class Vars {
     }
     public static void cycleFilters() {
         switch (currentFilter) {
-            case NEAREST: setFilter(Filter.LINEAR); break;
+            case NEAREST: setFilter(Filter.QUILEZ); break; // skip linear
             case LINEAR: setFilter(Filter.QUILEZ); break;
             case QUILEZ: setFilter(Filter.CRT); break;
             case CRT: setFilter(Filter.NEAREST); break;

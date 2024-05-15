@@ -4,10 +4,10 @@ import entities.ScriptTrigger;
 import mote4.scenegraph.Window;
 import mote4.util.audio.AudioPlayback;
 import main.RootLayer;
+import mote4.util.matrix.TransformationMatrix;
 import ui.components.*;
 
 import java.util.Stack;
-import mote4.util.matrix.ModelMatrix;
 import mote4.util.matrix.Transform;
 import mote4.util.shader.ShaderMap;
 import mote4.util.texture.TextureMap;
@@ -111,7 +111,7 @@ public class IngameUIManager implements MenuHandler {
     public static void render(Transform trans) {
         //trans.model.setIdentity();
         //trans.bind();
-        ModelMatrix model = trans.model;
+        TransformationMatrix model = trans.model;
 
         // PlayerStatBar, sets own shaders
         if (statBarSlide < .95)

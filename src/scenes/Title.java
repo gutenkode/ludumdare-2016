@@ -34,7 +34,7 @@ public class Title implements Scene {
 
         glDisable(GL_DEPTH_TEST);
         ShaderMap.use("quad_titlebg");
-        Uniform.vec("offset",(float)(time*.00175));
+        Uniform.vec("offset",(float)(time*.0125));
         TextureMap.bindFiltered("ui_titlebg");
         MeshMap.render("quad");
 

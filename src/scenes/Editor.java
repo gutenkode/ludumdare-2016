@@ -86,7 +86,12 @@ public class Editor implements Scene {
         zPos = me.getMapData().heightData[xPos][yPos];
         cameraPos = new float[] {me.getMapData().width/2, me.getMapData().height/2, 0};
 
-        MapManager.setRoomSizeUniforms();
+        // set room size uniforms
+        ShaderMap.use("ingame_light");
+        Uniform.vec("mapSize", me.getMapData().width, me.getMapData().height);
+        ShaderMap.use("ingame_nolight");
+        Uniform.vec("mapSize", me.getMapData().width, me.getMapData().height);
+
         EditorUIManager.logMessage("Loaded map: "+mapName);
     }
     public static void unloadMap() { me = null; }
@@ -231,7 +236,7 @@ public class Editor implements Scene {
 
         if (me != null)
         {
-            // render3d static map mesh
+            // render static map mesh
             ShaderMap.use("ingame_nolight");
             TextureMap.bindUnfiltered("tileset_1");
             Uniform.sampler("tex_shade", 2, "tileset_shade", false);
@@ -239,7 +244,7 @@ public class Editor implements Scene {
             trans.bind();
             me.getMapData().render();
 
-            // render3d cursor, BEFORE entities
+            // render cursor, BEFORE entities
             ShaderMap.use("color");
             float cval = ((float)Math.cos(cursorRot)+1)/4+.25f;
             Uniform.vec("colorMult", cval, 0, 0, cval);
@@ -252,7 +257,7 @@ public class Editor implements Scene {
 
             if (me.getEntities() != null && !me.getEntities().isEmpty())
             {
-                // render3d entity tilesheets
+                // render entity tilesheets
                 ShaderMap.use("spritesheet_nolight");
                 trans.bind();
                 for (Entity e : me.getEntities()) {
@@ -260,7 +265,7 @@ public class Editor implements Scene {
                     e.render(trans.model);
                 }
 
-                // render3d hitboxes
+                // render hitboxes
                 ShaderMap.use("color");
                 Uniform.vec("colorMult", 1, 1, 1, 1);
                 glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

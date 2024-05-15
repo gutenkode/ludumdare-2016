@@ -1,5 +1,6 @@
 package rpgbattle;
 
+import mote4.scenegraph.Window;
 import mote4.util.FileIO;
 import org.json.*;
 import rpgbattle.enemyBehavior.*;
@@ -8,6 +9,7 @@ import rpgbattle.fighter.Fighter;
 import rpgbattle.fighter.FighterStats;
 import rpgsystem.Element;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.IllegalFormatException;
 
@@ -19,7 +21,14 @@ import java.util.IllegalFormatException;
 public class EnemyData {
     private static final JSONObject json;
     static {
-        json = new JSONObject(FileIO.getString("/res/files/enemies.json"));
+        JSONObject o = null;
+        try {
+            o = new JSONObject(FileIO.getString("/res/files/enemies.json"));
+        } catch (IOException e) {
+            e.printStackTrace();
+            Window.destroy();
+        }
+        json = o;
     }
     
     public static String getIngameSprite(String enemyName) {

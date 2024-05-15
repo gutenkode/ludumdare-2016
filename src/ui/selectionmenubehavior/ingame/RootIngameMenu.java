@@ -42,10 +42,11 @@ public class RootIngameMenu implements SelectionMenuBehavior {
     public void onAction(int index) {
         switch (getElementName(index)) {
             case "Items":
-                handler.openTabbedMenu(
+                handler.openMenu(new IngameItemMenu(handler,null));
+                /*handler.openTabbedMenu(
                         new IngameItemMenu(handler,"CONSUMABLE", Item.ItemType.CONSUMABLE),
                         new IngameItemMenu(handler,"KEY", Item.ItemType.KEY)
-                );
+                );*/
                 break;
             case "Skills":
                 handler.openMenu(new RootSkillMenu(handler));

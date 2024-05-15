@@ -14,6 +14,9 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class RootLayer extends Layer {
 
+    private static RootLayer rootLayer;
+    static { rootLayer = new RootLayer(); }
+
     public enum State {
         TITLE,
         INGAME,
@@ -21,22 +24,22 @@ public class RootLayer extends Layer {
         BATTLE,
         EDITOR;
     }
-    private static int renderWidth, renderHeight;
-    private static State state;
-    private static Scene[] current, title, ingame, battle, editor;
-    private static Scene transition;
-
+    private int renderWidth, renderHeight;
+    private State state;
+    private Scene[] current, title, ingame, battle, editor;
+    private Scene transition;
     private MultiColorFBO sceneFbo, uiFbo;
 
-    static { // TODO remove all static code
-        title = new Scene[] {new Title(), new TitleUI()};
+
+    public static RootLayer getInstance() { return rootLayer; }
+    private RootLayer() {
+        super(null);
+
+        title  = new Scene[] {new Title(),  new TitleUI()};
         ingame = new Scene[] {new Ingame(), new IngameUI(), new TerminalScene()};
         battle = new Scene[] {new Battle(), new BattleUI()};
         editor = new Scene[] {new Editor(), new EditorUI(), new TerminalScene()};
-    }
 
-    public RootLayer() {
-        super(null);
         setState(State.TITLE);
     }
 
@@ -102,17 +105,17 @@ public class RootLayer extends Layer {
 
         if (sceneFbo != null)
             sceneFbo.destroy();
-        sceneFbo = new MultiColorFBO(renderWidth*renderScale,renderHeight*renderScale,true,false,2);
+        sceneFbo = new MultiColorFBO(renderWidth*renderScale,renderHeight*renderScale,2,true,false,GL_RGBA16,GL_RGBA16);
         TextureMap.delete("fbo_scene");
         TextureMap.delete("fbo_post_values");
-        sceneFbo.addToTextureMap("fbo_scene",0);
-        sceneFbo.addToTextureMap("tex_post_values",1);
+        sceneFbo.addToTextureMap("fbo_scene",0,true);
+        sceneFbo.addToTextureMap("tex_post_values",1,true);
         if (uiFbo != null)
             uiFbo.destroy();
         int[] buffers = new int[] {-1, sceneFbo.getColorBufferID(1)};
-        uiFbo = new MultiColorFBO(renderWidth,renderHeight,false,false,buffers);
+        uiFbo = new MultiColorFBO(renderWidth*renderScale,renderHeight*renderScale,2,false,false,buffers,GL_RGBA16,GL_RGBA16);
         TextureMap.delete("fbo_ui");
-        uiFbo.addToTextureMap("fbo_ui",0);
+        uiFbo.addToTextureMap("fbo_ui",0,true);
 
         Postprocess.resizeBuffers(renderWidth, renderHeight);
 
@@ -126,9 +129,18 @@ public class RootLayer extends Layer {
             s.framebufferResized(renderWidth,renderHeight);
     }
     @Override
-    public void destroy() {}
+    public void destroy() {
+        for (Scene s : title)
+            s.destroy();
+        for (Scene s : ingame)
+            s.destroy();
+        for (Scene s : battle)
+            s.destroy();
+        for (Scene s : editor)
+            s.destroy();
+    }
 
-    private static void setState(State s) {
+    private void setState(State s) {
         state = s;
         switch (state) {
             case TITLE:
@@ -150,43 +162,42 @@ public class RootLayer extends Layer {
         }
     }
     public static State getState() {
-        return state;
+        return getInstance().state;
     }
 
-    public static int width() { return renderWidth; }
-    public static int height() { return renderHeight; }
+    public static int width() { return getInstance().renderWidth; }
+    public static int height() { return getInstance().renderHeight; }
 
     /**
      * Starts a transition to battle.
      * Called by BattleManager.
      */
-    public static void transitionToBattle() {
+    public void transitionToBattle() {
         setState(State.BATTLE_INTRO);
         if (transition != null)
             transition.destroy();
         transition = new BattleTransition();
     }
-
     /**
      * Begins a battle after a transition.
      * Called by BattleTransition, should not be called otherwise.
      */
     public static void startBattle() {
-        setState(State.BATTLE);
+        getInstance().setState(State.BATTLE);
     }
     public static void exitBattle() {
         loadIngame();
     }
     public static void loadIngame() {
-        setState(State.INGAME);
+        getInstance().setState(State.INGAME);
         AudioPlayback.playMusic("mus_field",true);
     }
     public static void loadEditor() {
-        setState(State.EDITOR);
+        getInstance().setState(State.EDITOR);
         AudioPlayback.stopMusic();
     }
     public static void loadTitle() {
-        setState(State.TITLE);
+        getInstance().setState(State.TITLE);
         AudioPlayback.stopMusic();
     }
 }

@@ -7,7 +7,6 @@ import mote4.util.audio.ALContext;
 import mote4.util.audio.AudioLoader;
 import mote4.util.audio.AudioPlayback;
 import mote4.util.shader.ShaderUtils;
-import mote4.util.texture.CubeMapTexture;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.builder.StaticMeshBuilder;
@@ -27,8 +26,7 @@ public class Nullset_Ludumdare {
     private static RootLayer rootLayer;
     
     public static void main(String[] args) {
-        if (System.getProperty("os.name").toLowerCase().contains("mac"))
-            System.setProperty("java.awt.headless", "true"); // prevents ImageIO from hanging on OS X
+        //ErrorUtils.debug(true);
         //Window.initFullscreen();
         //Window.initWindowed(1920/2, 1080/2);
         Window.setVsync(false);
@@ -44,7 +42,6 @@ public class Nullset_Ludumdare {
         
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        //glEnable(GL_CULL_FACE);
 
         //glfwSetInputMode(Window.getWindowID(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         glfwSetWindowSizeLimits(Window.getWindowID(), 640, 360, GLFW_DONT_CARE, GLFW_DONT_CARE);
@@ -53,12 +50,8 @@ public class Nullset_Ludumdare {
         // important line, this sets up the level loading process
         MapLevelManager.loadIndexFile("index.txt");
         MapLevelManager.setCurrentLevel(1);
-        
-        //FBO ingame = new FBO(853,480,true,false,null); // 640x480, PS1 resolution
-        //FBO ingame = new FBO(1280/2,720/2,true,false,null);
-        //FBO ingame = new FBO(1920/3,1080/3,true,false,null);
-        //ingame.addToTextureMap("fbo_scene");
-        rootLayer = new RootLayer();
+
+        rootLayer = RootLayer.getInstance();
         Window.addLayer(rootLayer);
         Window.addScene(new Postprocess()); // Postprocess is on the default layer and renders to the screen
         Window.loop(60);
@@ -69,11 +62,9 @@ public class Nullset_Ludumdare {
         ShaderUtils.loadIndex("index.txt");
         AudioLoader.loadIndex("index.txt");
 
-        CubeMapTexture.loadCubemap("object/chain", "cubemap");
-
-        FontUtils.loadMetric("font/misterpixel/misterpixel_metric","font_1");
-        FontUtils.loadMetric("font/6px/6px_metric","6px");
-        FontUtils.loadMetric("font/terminal/terminal_metric","terminal");
+        FontUtils.loadMetric("font/misterpixel/misterpixel","font_1");
+        FontUtils.loadMetric("font/6px/6px","6px");
+        FontUtils.loadMetric("font/terminal/terminal","terminal");
         FontUtils.useMetric("font_1");
                 
         MeshMap.add(StaticMeshBuilder.loadQuadMesh(), "quad");

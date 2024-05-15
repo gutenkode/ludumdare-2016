@@ -1,8 +1,8 @@
 package ui;
 
 import mote4.util.audio.AudioPlayback;
-import mote4.util.matrix.ModelMatrix;
 import mote4.util.matrix.Transform;
+import mote4.util.matrix.TransformationMatrix;
 import mote4.util.shader.ShaderMap;
 import mote4.util.texture.TextureMap;
 import main.Vars;
@@ -36,14 +36,14 @@ public class TitleUIManager implements MenuHandler {
             selectionMenus.peek().update();
     }
     public static void render(Transform trans) {
-        ModelMatrix model = trans.model;
+        TransformationMatrix model = trans.model;
 
         ShaderMap.use("texture_uiblur");
         trans.bind();
         TextureMap.bindUnfiltered("font_1");
 
         model.setIdentity();
-        model.translate(RootLayer.width()/2-50, RootLayer.height()/2,0);
+        model.translate(RootLayer.getInstance().width()/2-50, RootLayer.getInstance().height()/2,0);
         for (SelectionMenu sm : selectionMenus) {
             model.translate(Vars.UI_SCALE/2, Vars.UI_SCALE/2);
             model.bind();

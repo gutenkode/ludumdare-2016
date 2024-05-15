@@ -2,20 +2,19 @@ package map;
 
 import entities.Entity;
 import entities.Player;
-import java.util.ArrayList;
-
 import entities.RoomLink;
-import mote4.util.matrix.*;
+import main.Input;
+import main.RootLayer;
+import mote4.util.matrix.CubeMapMatrix;
+import mote4.util.matrix.Transform;
+import mote4.util.matrix.TransformationMatrix;
 import mote4.util.shader.ShaderMap;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
-import main.Input;
-
-import main.RootLayer;
 import scenes.Editor;
 import scenes.Postprocess;
 
-import static org.lwjgl.opengl.GL11.*;
+import java.util.ArrayList;
 
 /**
  * Manages rendering and updating maps and entities.
@@ -32,7 +31,7 @@ public class MapManager {
     private static String newMapName; // stored while a fadeout is performed
     // data for entity lights in shaders
     private static float[] eLightPos, eLightColor;
-    private static ModelMatrix shadowModel = new ModelMatrix(); // used when rendering shadows
+    private static TransformationMatrix shadowModel = new TransformationMatrix("modelMatrix"); // used when rendering shadows
 
     // initialization and timelines
 
@@ -158,7 +157,6 @@ public class MapManager {
             e.onRoomInit();
         player.onRoomInit();
         refreshLighting();
-        setRoomSizeUniforms();
     }
 
     /**
@@ -191,9 +189,8 @@ public class MapManager {
         ShaderMap.use("spritesheet_light");
         Uniform.array("eLightPos",3, eLightPos);
         Uniform.array("eLightColor",3, eLightColor);
-    }
 
-    public static void setRoomSizeUniforms() {
+        // set room size uniforms
         int[] m = currentMapSize();
         float[] mapSize = new float[] {m[0],m[1]};
         ShaderMap.use("ingame_light");
@@ -256,7 +253,7 @@ public class MapManager {
      * the depth texture for shadow mapping.
      * @param shadowProj Projection for the shadow camera.
      */
-    public static void renderForShadow(CubeMapMatrix shadowProj, ViewMatrix shadowView) {
+    public static void renderForShadow(CubeMapMatrix shadowProj, TransformationMatrix shadowView) {
         ShaderMap.use("shadowCubeMap");
         shadowProj.bind();
         shadowView.bind();
@@ -320,15 +317,14 @@ public class MapManager {
      * @return 
      */
     public static boolean entityCollidesWithMap(Entity e, float chgX, float chgY) {
-        // out of bounds check
-        /*
-        if ((e.posX()-e.hitboxW()+chgX) < 0 ||
-            (e.posX()+e.hitboxW()+chgX) >= md.width ||
-            (e.posY()-e.hitboxH()+chgY) < 0 ||
-            (e.posX()+e.hitboxH()+chgY) >= md.height)
-            return true;
-        */
         MapData md = currentTimeline.getMapData();
+        // out of bounds check
+        if ((int)(e.posX()-e.hitboxW()+chgX) < 0 ||
+            (int)(e.posX()+e.hitboxW()+chgX) >= md.width ||
+            (int)(e.posY()-e.hitboxH()+chgY) < 0 ||
+            (int)(e.posY()+e.hitboxH()+chgY) >= md.height)
+            return true;
+        // check if any of the corners of the entity are in a map square with a different height
         if (md.heightData[(int)(e.posX()+e.hitboxW()+chgX)][(int)(e.posY()+e.hitboxH()+chgY)] != e.tileHeight() ||
             md.heightData[(int)(e.posX()-e.hitboxW()+chgX)][(int)(e.posY()+e.hitboxH()+chgY)] != e.tileHeight() ||
             md.heightData[(int)(e.posX()-e.hitboxW()+chgX)][(int)(e.posY()-e.hitboxH()+chgY)] != e.tileHeight() ||

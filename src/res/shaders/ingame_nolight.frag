@@ -17,10 +17,11 @@ uniform vec2 mapSize = vec2(3.0);
 
 void fadeEdges()
 {
-	FragColor.rgb = mix(vec3(.4,0,0), FragColor.rgb, smoothstep(0,.75, vertexPos.x));
-	FragColor.rgb = mix(vec3(.4,0,0), FragColor.rgb, smoothstep(0,.75, vertexPos.y));
-	FragColor.rgb = mix(vec3(.4,0,0), FragColor.rgb, smoothstep(0,.75, mapSize.x-vertexPos.x));
-	FragColor.rgb = mix(vec3(.4,0,0), FragColor.rgb, smoothstep(0,.75, mapSize.y-vertexPos.y));
+	const vec3 fade = vec3(0.4, 0.0, 0.0);
+	FragColor.rgb = mix(fade, FragColor.rgb, smoothstep(0,.8, vertexPos.x));
+	FragColor.rgb = mix(fade, FragColor.rgb, smoothstep(0,.8, vertexPos.y));
+	FragColor.rgb = mix(fade, FragColor.rgb, smoothstep(0,.8, mapSize.x-vertexPos.x));
+	FragColor.rgb = mix(fade, FragColor.rgb, smoothstep(0,.25, mapSize.y-vertexPos.y));
 }
 
 void main()

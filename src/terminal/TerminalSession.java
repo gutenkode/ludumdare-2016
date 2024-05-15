@@ -3,7 +3,7 @@ package terminal;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
-import mote4.util.matrix.ModelMatrix;
+import mote4.util.matrix.TransformationMatrix;
 import mote4.util.texture.TextureMap;
 import mote4.util.vertex.FontUtils;
 import mote4.util.vertex.mesh.Mesh;
@@ -150,7 +150,7 @@ public class TerminalSession {
         return false;
     }
     
-    public void render(ModelMatrix model) {
+    public void render(TransformationMatrix model) {
         if ((writtenLines.isEmpty() || writtenLines.get(writtenLines.size()-1).isDone()) && !bufferedLines.isEmpty()) {
             String s = bufferedLines.remove();
             writtenLines.add(new ScrollingText(s,METRIC, 0,0, WIDTH,HEIGHT, WRITE_SPEED));

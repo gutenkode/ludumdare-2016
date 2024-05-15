@@ -1,6 +1,5 @@
 package rpgbattle.enemyBehavior;
 
-import mote4.util.matrix.ModelMatrix;
 import rpgbattle.BattleManager;
 import rpgbattle.battleAction.AttackAction;
 import rpgbattle.battleAction.BattleAction;

@@ -1,8 +1,8 @@
 package ui.components;
 
 import mote4.scenegraph.Window;
-import mote4.util.matrix.ModelMatrix;
 import mote4.util.matrix.Transform;
+import mote4.util.matrix.TransformationMatrix;
 import mote4.util.shader.ShaderMap;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
@@ -95,7 +95,7 @@ public class PlayerStatBar {
      * @param trans
      */
     public static void render(int x, int y, Transform trans) {
-        ModelMatrix model = trans.model;
+        TransformationMatrix model = trans.model;
         
         // ew...
         BattleManager.getPlayer().updateShake(Window.delta());
@@ -238,7 +238,7 @@ public class PlayerStatBar {
             model.bind();
         }
     }
-    private static void renderBar(int index, int yOffset, float percent, ModelMatrix model) {
+    private static void renderBar(int index, int yOffset, float percent, TransformationMatrix model) {
         model.push();
         model.translate(0, yOffset);
         model.scale(percent, 1, 1);
@@ -249,7 +249,7 @@ public class PlayerStatBar {
         model.bind();
     }
 
-    public static void renderAnimations(float posX, float posY, ModelMatrix model) {
+    public static void renderAnimations(float posX, float posY, TransformationMatrix model) {
         model.setIdentity();
         model.translate(posX, posY);
         model.bind();

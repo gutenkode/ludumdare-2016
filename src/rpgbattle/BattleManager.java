@@ -54,7 +54,7 @@ public class BattleManager {
     public static void startBattle(String... enemyNames) {
         AudioPlayback.playSfx("sfx_battle_start");
         // RootScene -> go to battle
-        RootLayer.transitionToBattle();
+        RootLayer.getInstance().transitionToBattle();
 
         fighters = new ArrayList<>();
         enemies = new ArrayList<>();

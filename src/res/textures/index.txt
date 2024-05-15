@@ -1,5 +1,5 @@
-tileset/foundation3		tileset_1
-tileset/foundation3_NRM 	tileset_1_NRM
+tileset/foundation		tileset_1
+tileset/foundation_NRM 		tileset_1_NRM
 tileset/shade			tileset_shade
 
 ui/title			ui_title

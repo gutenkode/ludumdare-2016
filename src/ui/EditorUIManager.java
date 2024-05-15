@@ -1,7 +1,7 @@
 package ui;
 
-import mote4.util.matrix.ModelMatrix;
 import mote4.util.matrix.Transform;
+import mote4.util.matrix.TransformationMatrix;
 import mote4.util.shader.ShaderMap;
 import mote4.util.shader.Uniform;
 import mote4.util.texture.TextureMap;
@@ -41,7 +41,7 @@ public class EditorUIManager implements MenuHandler {
             selectionMenus.peek().update();
     }
     public static void render(Transform trans) {
-        ModelMatrix model = trans.model;
+        TransformationMatrix model = trans.model;
 
         ShaderMap.use("texture_uiblur");
         trans.bind();
@@ -50,7 +50,7 @@ public class EditorUIManager implements MenuHandler {
         if (logMessageTimeout > 0) {
             logMessageTimeout--;
             model.setIdentity();
-            model.translate(80, RootLayer.height()-80);
+            model.translate(80, RootLayer.getInstance().height()-80);
             model.bind();
             TextureMap.bindUnfiltered("font_1");
             Uniform.vec("colorMult",0,0,0,1);
